@@ -2,7 +2,7 @@
 resource "aws_instance" "nat" {
   ami                         = var.amis["nat"]
   instance_type               = "m3.medium"
-  key_name                    = aws_key_pair.ops.key_name
+  key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.nat.id]
   subnet_id                   = aws_subnet.b_public.id
   associate_public_ip_address = true

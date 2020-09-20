@@ -11,7 +11,7 @@ resource "aws_emr_cluster" "emr" {
   autoscaling_role                  = aws_iam_role.emr_autoscaling_default_role.name
 
   ec2_attributes {
-    key_name                          = aws_key_pair.ops.key_name
+    key_name                          = var.key_name
     subnet_id                         = aws_subnet.b_private.id
     emr_managed_master_security_group = aws_security_group.emr-master-managed.id
     emr_managed_slave_security_group  = aws_security_group.emr-slave-managed.id

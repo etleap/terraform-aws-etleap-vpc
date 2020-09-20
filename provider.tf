@@ -38,10 +38,7 @@ variable "vpc_cidr_block_3" {
   default     = "0"
 }
 
-variable "route53_zone_id" {
-}
-
-variable "public_key" {
+variable "key_name" {
 }
 
 variable "first_name" {

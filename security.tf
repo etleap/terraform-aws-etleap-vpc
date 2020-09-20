@@ -1,8 +1,3 @@
-resource "aws_key_pair" "ops" {
-  key_name   = "Etleap-${var.deployment_id}"
-  public_key = var.public_key
-}
-
 resource "aws_security_group" "app" {
   name        = "Etleap App"
   description = "Etleap App"
