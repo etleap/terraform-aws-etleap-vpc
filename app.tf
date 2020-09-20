@@ -8,6 +8,7 @@ resource "aws_instance" "app" {
   ami                         = var.amis["app"]
   key_name                    = var.key_name
   iam_instance_profile        = aws_iam_instance_profile.app.name
+  subnet_id                   = aws_subnet.b_public.id
   user_data                   = <<EOF
 #cloud-config
 # -*- YAML -*-
@@ -121,7 +122,7 @@ resource "aws_network_interface" "app" {
 resource "aws_network_interface_attachment" "app" {
   instance_id          = aws_instance.app.id
   network_interface_id = aws_network_interface.app.id
-  device_index         = 0
+  device_index         = 1
 }
 
 resource "aws_eip" "app" {
