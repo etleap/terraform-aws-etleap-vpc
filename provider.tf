@@ -90,5 +90,6 @@ variable "amis" {
 }
 
 provider "aws" {
-   version = ">= 2.37.0"
+  version = ">= 2.37.0"
+  region  = var.region
 }
