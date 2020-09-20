@@ -10,13 +10,32 @@ variable "deployment_id" {
 variable "deployment_secret_arn" {
 }
 
+variable "db_root_password_arn" {
+}
+
+variable "admin_password_arn" {
+}
+
+variable "db_password_arn" {
+}
+
+variable "db_salesforce_password_arn" {
+}
+
+variable "setup_password" {
+}
+
 variable "vpc_cidr_block_1" {
+  description = "The first octet of the CIDR block of the desired VPC's address space."
 }
 
 variable "vpc_cidr_block_2" {
+  description = "The second octet of the CIDR block of the desired VPC's address space."
 }
 
-variable "subdomain" {
+variable "vpc_cidr_block_3" {
+  description = "The third octet of the CIDR block of the desired VPC's address space. Must be divisible by 4 because Etleap creates 4 /24 blocks."
+  default     = "0"
 }
 
 variable "route53_zone_id" {
@@ -38,26 +57,32 @@ variable "vpn_cidr_block" {
   default = "0.0.0.0/32"
 }
 
-variable "root_db_password" {
+variable "ssl_key" {
 }
 
-variable "etleap_admin_password" {
-}
-
-variable "self_signed_cert_key" {
-}
-
-variable "self_signed_cert_pem" {
+variable "ssl_pem" {
 }
 
 variable "github_access_token" {
   default = ""
 }
 
+variable "app_hostname" {
+  default = "$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)"
+}
+
 // -----------------------------
 // End of configurable variables
 
 data "aws_caller_identity" "current" {}
+
+data "aws_secretsmanager_secret" "db_root_password" {
+  arn = var.db_root_password_arn
+}
+
+data "aws_secretsmanager_secret_version" "db_root_password" {
+  secret_id = data.aws_secretsmanager_secret.db_root_password.id
+}
 
 variable "amis" {
   default = {

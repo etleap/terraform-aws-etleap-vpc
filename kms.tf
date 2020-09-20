@@ -12,7 +12,7 @@ resource "aws_kms_key" "etleap_encryption_key_virginia" {
   provider                = aws.virginia
   description             = "Etleap secrets encryption key virginia region"
   deletion_window_in_days = 30
-  policy                  = templatefile("${path.module}/kms-policy.json", {account_id = var.account_id})
+  policy                  = templatefile("${path.module}/kms-policy.json", {account_id = data.aws_caller_identity.current.account_id})
 
   tags = {
     Name = "Etleap KMS"
@@ -23,7 +23,7 @@ resource "aws_kms_key" "etleap_encryption_key_oregon" {
   provider                = aws.oregon
   description             = "Etleap secrets encryption key oregon"
   deletion_window_in_days = 30
-  policy                  = templatefile("${path.module}/kms-policy.json", {account_id = var.account_id})
+  policy                  = templatefile("${path.module}/kms-policy.json", {account_id = data.aws_caller_identity.current.account_id})
 
   tags = {
     Name = "Etleap KMS Oregon"

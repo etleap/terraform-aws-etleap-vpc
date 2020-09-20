@@ -1,5 +1,5 @@
 resource "aws_vpc" "etleap" {
-  cidr_block           = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.0.0/22"
+  cidr_block           = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.0/22"
   enable_dns_hostnames = true
 
   tags = {
@@ -45,7 +45,7 @@ resource "aws_route" "prod_public" {
 
 resource "aws_subnet" "a_private" {
   vpc_id            = aws_vpc.etleap.id
-  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.0.0/24"
+  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 0}.0/24"
   availability_zone = "${var.region}a"
 
   tags = {
@@ -55,7 +55,7 @@ resource "aws_subnet" "a_private" {
 
 resource "aws_subnet" "b_private" {
   vpc_id            = aws_vpc.etleap.id
-  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.1.0/24"
+  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 1}.0/24"
   availability_zone = "${var.region}b"
 
   tags = {
@@ -65,7 +65,7 @@ resource "aws_subnet" "b_private" {
 
 resource "aws_subnet" "a_public" {
   vpc_id            = aws_vpc.etleap.id
-  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.2.0/24"
+  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 2}.0/24"
   availability_zone = "${var.region}a"
 
   tags = {
@@ -75,7 +75,7 @@ resource "aws_subnet" "a_public" {
 
 resource "aws_subnet" "b_public" {
   vpc_id            = aws_vpc.etleap.id
-  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.3.0/24"
+  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.0/24"
   availability_zone = "${var.region}b"
 
   tags = {

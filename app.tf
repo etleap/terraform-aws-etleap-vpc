@@ -23,11 +23,11 @@ packages:
 write_files:
 - path: /home/ubuntu/ssl_certificate/ssl.pem
   content: |
-    ${indent(4, data.aws_ssm_parameter.self_signed_cert_pem.value)}
+    ${indent(4, var.ssl_pem.value)}
   owner: ubuntu:ubuntu
 - path: /home/ubuntu/ssl_certificate/ssl.key
   content: |
-    ${indent(4, data.aws_ssm_parameter.self_signed_cert_key.value)}
+    ${indent(4, var.ssl_key.value)}
   owner: ubuntu:ubuntu
 - path: /tmp/db-init.sh
   content: |
@@ -40,36 +40,40 @@ write_files:
     export ETLEAP_DEPLOYMENT_ID=${var.deployment_id}
     export USE_PROD_SECRETS=0
     export JOB_ROLE=customer_job,monitor
-    export ETLEAP_DB_PASSWORD=${random_password.etleap-db-password.result}
-    export SALESFORCE_DB_PASSWORD=${random_password.salesforce-db-password.result}
-    export ETLEAP_HOSTS_ALLOWED=".${var.subdomain}"
-    export FRONT_END_HOSTNAME="app.${var.subdomain}"
+    export ETLEAP_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString)"
+    export SALESFORCE_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString)"
+    export FRONT_END_HOSTNAME="${var.app_hostname}"
+    export ETLEAP_HOSTS_ALLOWED="$FRONT_END_HOSTNAME"
     export ETLEAP_FRONT_END_URL="https://$FRONT_END_HOSTNAME/"
-    export ETLEAP_CORS_ALLOWED_ORIGINS="https://app.${var.subdomain}"
-    export API_HOSTNAME="app.${var.subdomain}"
-    export API_URL="https://$API_HOSTNAME/"
-    export ETLEAP_BASE_URL=$API_URL
+    export ETLEAP_CORS_ALLOWED_ORIGINS="https://$FRONT_END_HOSTNAME"
+    export API_HOSTNAME="$FRONT_END_HOSTNAME"
+    export API_URL="https://$FRONT_END_HOSTNAME/"
+    export ETLEAP_BASE_URL="$API_URL"
     export ETLEAP_CONF_FILE=/opt/etleap/prod-customervpc.conf
-    export ETLEAP_HTTP_SESSION_DOMAIN="app.${var.subdomain}"
+    export ETLEAP_HTTP_SESSION_DOMAIN="$FRONT_END_HOSTNAME"
     export ETLEAP_KMS_KEY_VIRGINIA="${aws_kms_key.etleap_encryption_key_virginia.key_id}"
     export ETLEAP_KMS_KEY_OREGON="${aws_kms_key.etleap_encryption_key_oregon.key_id}"
     export ETLEAP_SETUP_FIRST_NAME="${var.first_name}"
     export ETLEAP_SETUP_LAST_NAME="${var.last_name}"
     export ETLEAP_SETUP_EMAIL="${var.email}"
-    export ETLEAP_SETUP_PASSWORD="${random_password.temp-user-password.result}"
-    export ETLEAP_SETUP_ADMIN_PASSWORD="${data.aws_ssm_parameter.etleap_admin_password.value}"
+    export ETLEAP_SETUP_PASSWORD="${var.setup_password}"
+    export ETLEAP_SETUP_ADMIN_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.admin_password_arn} | jq -r .SecretString)"
     export ETLEAP_SETUP_INTERMEDIATE_BUCKET="${aws_s3_bucket.intermediate.id}"
     export ETLEAP_SETUP_INTERMEDIATE_ROLE_ARN="${aws_iam_role.intermediate.arn}"
     export ETLEAP_DMS_ROLE_ARN="${aws_iam_role.dms.arn}"
     export ETLEAP_DMS_INSTANCE_ARN="${aws_dms_replication_instance.dms.replication_instance_arn}"
-    export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"
+    export ETLEAP_AWS_ACCOUNT_ID="${data.aws_caller_identity.current.account_id}"
     export MARKETPLACE_DEPLOYMENT="false"
     export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${var.deployment_secret_arn} | jq -r .SecretString)"
+    export ETLEAP_RDS_HOSTNAME="${aws_db_instance.db.address}"
+    export ETLEAP_EMR_HOSTNAME="${aws_emr_cluster.emr.master_public_dns}"
+    export ETLEAP_YSJES_HOSTNAME="${aws_instance.app.private_ip}"
+    export ETLEAP_MAIN_APP_IP="${aws_instance.app.private_ip}"
 
 runcmd:
-- "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.0.2\"]/g' /etc/docker/daemon.json"
+- "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.2\"]/g' /etc/docker/daemon.json"
 - "service docker restart"
-- "/tmp/db-init.sh ${data.aws_ssm_parameter.root_db_password.value} ${random_password.etleap-db-password.result} ${random_password.salesforce-db-password.result} ${var.deployment_id}"
+- "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id}"
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
 - ". /home/ubuntu/.etleap && /home/ubuntu/cron-deploy-customervpc.sh"
@@ -111,16 +115,6 @@ resource "aws_iam_role" "app" {
 }
 EOF
 
-}
-
-resource "random_password" "temp-user-password" {
-  length  = 16
-  special = false
-}
-
-output "login-info" {
-  value       = random_password.temp-user-password.result
-  description = "Temp Password"
 }
 
 output "app-ip-address" {
