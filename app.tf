@@ -23,11 +23,11 @@ packages:
 write_files:
 - path: /home/ubuntu/ssl_certificate/ssl.pem
   content: |
-    ${indent(4, var.ssl_pem.value)}
+    ${indent(4, var.ssl_pem)}
   owner: ubuntu:ubuntu
 - path: /home/ubuntu/ssl_certificate/ssl.key
   content: |
-    ${indent(4, var.ssl_key.value)}
+    ${indent(4, var.ssl_key)}
   owner: ubuntu:ubuntu
 - path: /tmp/db-init.sh
   content: |
