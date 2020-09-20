@@ -124,7 +124,7 @@ resource "aws_network_interface" "app" {
   security_groups = [aws_security_group.app.id]
 }
 
-resource "aws_eip" "vpn" {
+resource "aws_eip" "app" {
   instance = aws_instance.app.id
   vpc      = true
 }
