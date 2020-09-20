@@ -9,7 +9,7 @@ variable "deployment_id" {
   default = "test"
 }
 
-variable account_id {
+variable "account_id" {
   default = "959096951266"
 }
 
@@ -45,19 +45,11 @@ variable "email" {
   default = "caius@etleap.com"
 }
 
-variable "sumo_access_id" {
-  default = "su4aD17jx7RbUe"
-}
-
 // -----------------------------
 // End of configurable variables
 
 variable "vpn_cidr_block" {
   default = "0.0.0.0/32"
-}
-
-data "aws_ssm_parameter" "sumo_access_key" {
-  name = "/etleap/sumo_access_key"
 }
 
 data "aws_ssm_parameter" "root_db_password" {
@@ -84,12 +76,11 @@ data "aws_caller_identity" "current" {}
 
 variable "amis" {
   default = {
-    app          = "ami-00e34d9b0383c3821"
+    app          = "ami-046ce6172c7e24849"
     nat          = "ami-00a9d4a05375b2763"
   }
 }
 
 provider "aws" {
-  version = ">= 2.37.0"
-  region  = var.region
+   version = ">= 2.37.0"
 }

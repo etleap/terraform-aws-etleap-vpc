@@ -1,7 +1,7 @@
-resource "aws_iam_policy_attachment" "cloudwatch" {
-  name       = "Etleap CloudWatch"
-  roles      = [aws_iam_role.app.name, aws_iam_role.emr.name]
-  policy_arn = aws_iam_policy.cloudwatch.arn
+resource "aws_iam_policy_attachment" "secrets" {
+  name       = "Get Deployment Secret"
+  roles      = [aws_iam_role.app.name]
+  policy_arn = aws_iam_policy.get_secrets.arn
 }
 
 resource "aws_iam_policy_attachment" "ec2_describe" {
@@ -56,8 +56,8 @@ EOF
 
 }
 
-resource "aws_iam_policy" "cloudwatch" {
-  name   = "EtleapCloudWatch"
+resource "aws_iam_policy" "get_secrets" {
+  name   = "EtleapEC2Secrets"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -65,18 +65,7 @@ resource "aws_iam_policy" "cloudwatch" {
         {
             "Effect": "Allow",
             "Action": [
-                "cloudwatch:DeleteAlarms",
-                "cloudwatch:PutMetricAlarm"
-            ],
-            "Resource": [
-                "arn:aws:cloudwatch:us-east-1:223848809711:alarm:*[${var.deployment_id}*]*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "cloudwatch:PutMetricData",
-                "cloudwatch:DescribeAlarms"
+                "secretsmanager:GetSecretValue"
             ],
             "Resource": [
                 "*"
@@ -157,12 +146,7 @@ resource "aws_iam_policy" "assume_any_role" {
         "sts:AssumeRole"
       ],
       "Resource": [
-<<<<<<< HEAD
         "*"
-=======
-        "arn:aws:iam::223848809711:role/*",
-        "arn:aws:iam::841591717599:role/*"
->>>>>>> IAM: Enable app to assume role in vpcdeployments account.
       ]
     }
   ]

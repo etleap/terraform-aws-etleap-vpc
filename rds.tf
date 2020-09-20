@@ -4,7 +4,7 @@ resource "aws_db_instance" "db" {
   storage_type                 = "gp2"
   engine                       = "mysql"
   engine_version               = "5.6.41"
-  instance_class               = "db.m4.large"
+  instance_class               = "db.m5.large"
   name                         = "EtleapDB"
   username                     = "root"
   password                     = data.aws_ssm_parameter.root_db_password.value
@@ -21,12 +21,12 @@ resource "aws_db_instance" "db" {
 }
 
 resource "aws_db_subnet_group" "db" {
-  name       = "etleap_db"
+  name       = "etleap_db_${random_id.deployment_random.hex}"
   subnet_ids = [aws_subnet.a_private.id, aws_subnet.b_private.id]
 }
 
 resource "aws_db_parameter_group" "mysql5-6-etleap" {
-  name        = "etleap-mysql5-6"
+  name        = "etleap-mysql5-6-${random_id.deployment_random.hex}"
   description = "MySQL 5.6 with Etleap modifications"
   family      = "mysql5.6"
 

@@ -26,7 +26,7 @@ resource "aws_emr_cluster" "emr" {
   }
 
   master_instance_group {
-    instance_type = "c5.xlarge"
+    instance_type = "m5.xlarge"
     ebs_config {
       size                 = "128"
       type                 = "gp2"
@@ -61,9 +61,9 @@ resource "aws_emr_cluster" "emr" {
   }
 
   bootstrap_action {
-    name = "Install Sumo agent"
-    path = "s3://datadanze-emr/conf-hadoop2/install-sumo-agent.sh"
-    args = [var.sumo_access_id, data.aws_ssm_parameter.sumo_access_key.value, var.deployment_id]
+    name = "Install Kinesis Agent"
+    path = "s3://datadanze-emr/conf-hadoop2/install-kinesis-agent.sh"
+    args = [var.deployment_id, "app.etleap.internal", "false"]
   }
 
   bootstrap_action {
@@ -136,14 +136,9 @@ resource "aws_emr_cluster" "emr" {
     {
       "Classification": "spark-defaults",
       "Properties": {
-        "spark.cleaner.periodicGC.interval": "1min",
-        "spark.driver.memory": "7g",
-        "spark.executor.cores": "1",
-        "spark.executor.extraJavaOptions": "-XX:+UseG1GC -verbose:gc -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -Djavax.net.ssl.trustStore=/etc/pki/ca-trust/extracted/java/cacerts -Djavax.net.ssl.trustStorePassword=changeit",
-        "spark.executor.memory": "1g",
-        "spark.kryoserializer.buffer.max": "128m",
-        "spark.metrics.namespace": "spark.jdbc.extractor.internal",
-        "spark.scheduler.mode": "FAIR"
+        "spark.history.fs.cleaner.enabled": "true",
+        "spark.history.fs.cleaner.interval": "1h",
+        "spark.history.fs.cleaner.maxAge": "3h"
       }
     }
   ]
