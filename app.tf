@@ -7,7 +7,6 @@ resource "aws_instance" "app" {
   instance_type               = "t3.large"
   ami                         = var.amis["app"]
   key_name                    = var.key_name
-  associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.app.name
 
   network_interface {
