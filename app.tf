@@ -124,7 +124,12 @@ resource "aws_network_interface" "app" {
   security_groups = [aws_security_group.app.id]
 }
 
-output "app-ip-address" {
-  value       = aws_instance.app.public_ip
+resource "aws_eip" "vpn" {
+  instance = aws_instance.app.id
+  vpc      = true
+}
+
+output "app_ip_address" {
+  value       = aws_eip.app.public_ip
   description = "App IP Address"
 }
