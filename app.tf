@@ -75,7 +75,7 @@ write_files:
 runcmd:
 - "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.2\"]/g' /etc/docker/daemon.json"
 - "service docker restart"
-- "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id}"
+- "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
 - ". /home/ubuntu/.etleap && /home/ubuntu/cron-deploy-customervpc.sh"
