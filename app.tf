@@ -67,8 +67,8 @@ write_files:
     export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${var.deployment_secret_arn} | jq -r .SecretString)"
     export ETLEAP_RDS_HOSTNAME="${aws_db_instance.db.address}"
     export ETLEAP_EMR_HOSTNAME="${aws_emr_cluster.emr.master_public_dns}"
-    export ETLEAP_YSJES_HOSTNAME="${aws_instance.app.private_ip}"
-    export ETLEAP_MAIN_APP_IP="${aws_instance.app.private_ip}"
+    export ETLEAP_YSJES_HOSTNAME="${self.private_ip}"
+    export ETLEAP_MAIN_APP_IP="${self.private_ip}"
 
 runcmd:
 - "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.2\"]/g' /etc/docker/daemon.json"
