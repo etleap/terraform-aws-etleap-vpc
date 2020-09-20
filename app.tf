@@ -64,7 +64,7 @@ write_files:
     export ETLEAP_DMS_INSTANCE_ARN="${aws_dms_replication_instance.dms.replication_instance_arn}"
     export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"
     export MARKETPLACE_DEPLOYMENT="false"
-    export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.deployment_secret.arn} | jq -r .SecretString)"
+    export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${var.deployment_secret_arn} | jq -r .SecretString)"
 
 runcmd:
 - "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.0.2\"]/g' /etc/docker/daemon.json"
@@ -118,30 +118,6 @@ resource "random_password" "temp-user-password" {
   special = false
 }
 
-resource "aws_secretsmanager_secret" "deployment_secret" {
-  name                    = "EtleapDeploymentSecret"
-  recovery_window_in_days = 30
-
-  lifecycle {
-    # Deletion Protection
-    prevent_destroy = true
-  }
-}
-
-resource "random_password" "deployment_secret_value" {
-  length  = 40
-  special = false
-}
-
-resource "aws_secretsmanager_secret_version" "deployment_secret" {
-  secret_id     = aws_secretsmanager_secret.deployment_secret.id
-  secret_string = random_password.deployment_secret_value.result
-
-  lifecycle {
-    ignore_changes = [ secret_string ]
-  }
-}
-
 output "login-info" {
   value       = random_password.temp-user-password.result
   description = "Temp Password"
@@ -150,14 +126,4 @@ output "login-info" {
 output "app-ip-address" {
   value       = aws_instance.app.public_ip
   description = "App IP Address"
-}
-
-output "deployment-secret-arn" {
-  value       = aws_secretsmanager_secret.deployment_secret.arn
-  description = "Deployment Secret ARN. Make sure to import this resource redeploying with a previously used deployment_id"
-}
-
-output "deployment-secret-version" {
-  value       = aws_secretsmanager_secret_version.deployment_secret.id
-  description = "Deployment Secret ARN. Make sure to import this resource when redeploying with a previously used deployment_id"
 }
