@@ -63,7 +63,7 @@ resource "aws_emr_cluster" "emr" {
   bootstrap_action {
     name = "Install Kinesis Agent"
     path = "s3://datadanze-emr/conf-hadoop2/install-kinesis-agent.sh"
-    args = [var.deployment_id, element(tolist(aws_network_interface.app.private_ips[*]), 0), "false"]
+    args = [var.deployment_id, element(tolist(aws_network_interface.main_app.private_ips[*]), 0), "false"]
   }
 
   bootstrap_action {
