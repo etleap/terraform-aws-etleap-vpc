@@ -68,6 +68,10 @@ variable "app_hostname" {
   default = "$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)"
 }
 
+variable "ha_mode" {
+  default = false
+}
+
 // -----------------------------
 // End of configurable variables
 
@@ -83,8 +87,8 @@ data "aws_secretsmanager_secret_version" "db_root_password" {
 
 variable "amis" {
   default = {
-    app          = "ami-046ce6172c7e24849"
-    nat          = "ami-00a9d4a05375b2763"
+    app = "ami-046ce6172c7e24849"
+    nat = "ami-00a9d4a05375b2763"
   }
 }
 

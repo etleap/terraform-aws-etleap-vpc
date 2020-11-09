@@ -18,6 +18,7 @@ resource "aws_db_instance" "db" {
   copy_tags_to_snapshot        = true
   deletion_protection          = true
   performance_insights_enabled = true
+  multi_az                     = var.ha_mode
 }
 
 resource "aws_db_subnet_group" "db" {
