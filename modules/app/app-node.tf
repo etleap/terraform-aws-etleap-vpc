@@ -31,15 +31,20 @@ variable "vpc_cidr_block_2" {
 variable "vpc_cidr_block_3" {
 }
 
+variable "app_private_ip" {
+  default = null
+}
+
 resource "aws_instance" "app" {
   instance_type        = "t3.large"
   ami                  = var.ami
   key_name             = var.key_name
   iam_instance_profile = var.instance_profile
+  private_ip           = var.app_private_ip
 
   network_interface {
     network_interface_id = var.network_interface
-    device_index         = 0
+    device_index         = var.network_interface == null ? null : 0
   }
 
   user_data = <<EOF

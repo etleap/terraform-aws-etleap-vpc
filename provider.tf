@@ -70,6 +70,14 @@ variable "app_hostname" {
 
 variable "ha_mode" {
   default = false
+} 
+
+variable "app_private_ip" {
+  default = null
+}
+
+variable "nat_private_ip" {
+  default = null
 }
 
 // -----------------------------
@@ -95,4 +103,8 @@ variable "amis" {
 provider "aws" {
   version = ">= 2.37.0"
   region  = var.region
+}
+
+locals {
+  use_app_static_private_ip = var.app_private_ip != null && !var.ha_mode
 }

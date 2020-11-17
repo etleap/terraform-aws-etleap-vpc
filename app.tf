@@ -29,7 +29,8 @@ module "main_app" {
 
   source            = "./modules/app/"
   instance_profile  = aws_iam_instance_profile.app.name
-  network_interface = aws_network_interface.main_app.id
+  network_interface = local.use_app_static_private_ip ? null : aws_network_interface.main_app[0].id
+  app_private_ip    = var.app_private_ip
 
   ami      = var.amis["app"]
   key_name = var.key_name
@@ -72,13 +73,14 @@ module "ha_app" {
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
     deployment_role = "customervpc_ha",
-    main_app_ip     = element(tolist(aws_network_interface.main_app.private_ips[*]), 0),
+    main_app_ip     = element(tolist(aws_network_interface.main_app[0].private_ips[*]), 0),
     app_hostname    = aws_lb.app[0].dns_name
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
 
 resource "aws_network_interface" "main_app" {
+  count           = local.use_app_static_private_ip ? 0 : 1
   subnet_id       = aws_subnet.b_public.id
   security_groups = [aws_security_group.app.id]
 }
