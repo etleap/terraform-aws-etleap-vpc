@@ -40,7 +40,6 @@ resource "aws_instance" "app" {
   ami                  = var.ami
   key_name             = var.key_name
   iam_instance_profile = var.instance_profile
-  private_ip           = var.app_private_ip
 
   network_interface {
     network_interface_id = var.network_interface
