@@ -30,7 +30,6 @@ module "main_app" {
   source            = "./modules/app/"
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.main_app.id
-  app_private_ip    = var.app_private_ip
 
   ami      = var.amis["app"]
   key_name = var.key_name
