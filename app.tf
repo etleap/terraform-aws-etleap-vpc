@@ -79,8 +79,10 @@ module "ha_app" {
 }
 
 resource "aws_network_interface" "main_app" {
-  subnet_id       = aws_subnet.b_public.id
-  security_groups = [aws_security_group.app.id]
+  private_ips       = var.app_private_ip != null ? [var.app_private_ip] : null
+  private_ips_count = 0
+  subnet_id         = aws_subnet.b_public.id
+  security_groups   = [aws_security_group.app.id]
 }
 
 resource "aws_network_interface" "ha_app" {
@@ -134,12 +136,14 @@ resource "aws_lb_listener" "app" {
 }
 
 resource "aws_lb_target_group_attachment" "main_app" {
+  count            = var.ha_mode ? 1 : 0
   target_group_arn = aws_lb_target_group.app[0].arn
   target_id        = module.main_app.instance_id
   port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "ha_app" {
+  count            = var.ha_mode ? 1 : 0
   target_group_arn = aws_lb_target_group.app[0].arn
   target_id        = module.ha_app[0].instance_id
   port             = 443

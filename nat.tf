@@ -7,6 +7,7 @@ resource "aws_instance" "nat" {
   subnet_id                   = aws_subnet.b_public.id
   associate_public_ip_address = true
   source_dest_check           = false
+  private_ip                  = var.nat_private_ip
 
   tags = {
     Name = "Etleap NAT"

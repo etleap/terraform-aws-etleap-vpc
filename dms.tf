@@ -17,7 +17,7 @@ resource "aws_dms_replication_instance" "dms" {
 
 resource "aws_dms_replication_subnet_group" "dms" {
   replication_subnet_group_description = "DMS Subnet Group"
-  replication_subnet_group_id          = "etleap-dms"
+  replication_subnet_group_id          = "etleap-dms-${var.deployment_id}-${random_id.deployment_random.hex}"
   subnet_ids                           = [aws_subnet.a_private.id, aws_subnet.b_private.id]
   tags = {
     Name = "Etleap DMS Subnet Group"

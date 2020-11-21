@@ -70,6 +70,14 @@ variable "app_hostname" {
 
 variable "ha_mode" {
   default = false
+} 
+
+variable "app_private_ip" {
+  default = null
+}
+
+variable "nat_private_ip" {
+  default = null
 }
 
 // -----------------------------
