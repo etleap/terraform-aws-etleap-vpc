@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "emr_profile_policy" {
 }
 
 resource "aws_iam_instance_profile" "emr_profile" {
-  name = "EtleapEMRProfile"
+  name = "EtleapEMRProfile-${var.deployment_id}-${random_id.deployment_random.hex}"
   role = aws_iam_role.emr.name
 }
 

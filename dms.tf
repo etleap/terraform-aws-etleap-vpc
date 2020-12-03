@@ -25,7 +25,7 @@ resource "aws_dms_replication_subnet_group" "dms" {
 }
 
 resource "aws_security_group" "dms" {
-  name        = "Etleap-DMS"
+  name        = "Etleap-DMS-${var.deployment_id}-${random_id.deployment_random.hex}"
   description = "DMS group"
   vpc_id      = aws_vpc.etleap.id
 
@@ -106,7 +106,7 @@ EOF
 }
 
 resource "aws_iam_policy" "job_manage_dms" {
-  name   = "Etleap-Manage-DMS"
+  name   = "Etleap-Manage-DMS-${var.deployment_id}-${random_id.deployment_random.hex}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
