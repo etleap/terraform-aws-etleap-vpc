@@ -80,6 +80,10 @@ variable "nat_private_ip" {
   default = null
 }
 
+variable "nat_assign_elastic_ip" {
+  default = false
+}
+
 // -----------------------------
 // End of configurable variables
 
