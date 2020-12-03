@@ -25,7 +25,7 @@ resource "aws_dms_replication_subnet_group" "dms" {
 }
 
 resource "aws_security_group" "dms" {
-  name        = "Etleap-DMS-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name        = "Etleap-DMS"
   description = "DMS group"
   vpc_id      = aws_vpc.etleap.id
 
