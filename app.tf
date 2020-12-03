@@ -150,12 +150,12 @@ resource "aws_lb_target_group_attachment" "ha_app" {
 }
 
 resource "aws_iam_instance_profile" "app" {
-  name = "EtleapApp"
+  name = "EtleapApp-${var.deployment_id}-${random_id.deployment_random.hex}"
   role = aws_iam_role.app.name
 }
 
 resource "aws_iam_role" "app" {
-  name               = "EtleapApp"
+  name               = "EtleapApp-${var.deployment_id}-${random_id.deployment_random.hex}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
