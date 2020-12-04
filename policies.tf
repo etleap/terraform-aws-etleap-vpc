@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "emr_profile_policy" {
 }
 
 resource "aws_iam_instance_profile" "emr_profile" {
-  name = "EtleapEMRProfile"
+  name = "EtleapEMRProfile-${var.deployment_id}-${random_id.deployment_random.hex}"
   role = aws_iam_role.emr.name
 }
 
@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "emr_autoscaling_default_role" {
 }
 
 resource "aws_iam_role" "emr" {
-  name               = "EtleapEMR"
+  name               = "EtleapEMR-${var.deployment_id}-${random_id.deployment_random.hex}"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
@@ -57,7 +57,7 @@ EOF
 }
 
 resource "aws_iam_policy" "get_secrets" {
-  name   = "EtleapEC2Secrets"
+  name   = "EtleapEC2Secrets-${var.deployment_id}-${random_id.deployment_random.hex}"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -78,7 +78,7 @@ EOF
 }
 
 resource "aws_iam_policy" "ec2_describe" {
-  name   = "EtleapEC2Describe"
+  name   = "EtleapEC2Describe-${var.deployment_id}-${random_id.deployment_random.hex}"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -101,7 +101,7 @@ EOF
 }
 
 resource "aws_iam_policy" "emr_profile_policy" {
-  name   = "EtleapEMRProfilePolicy"
+  name   = "EtleapEMRProfilePolicy-${var.deployment_id}-${random_id.deployment_random.hex}"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -135,7 +135,7 @@ EOF
 }
 
 resource "aws_iam_policy" "assume_any_role" {
-  name   = "Etleap_assume_any_role"
+  name   = "Etleap_assume_any_role-${var.deployment_id}-${random_id.deployment_random.hex}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -156,7 +156,7 @@ EOF
 }
 
 resource "aws_iam_role" "emr_default_role" {
-  name               = "EtleapEMR_DefaultRole"
+  name               = "EtleapEMR_DefaultRole-${var.deployment_id}-${random_id.deployment_random.hex}"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
@@ -176,7 +176,7 @@ EOF
 }
 
 resource "aws_iam_role" "emr_autoscaling_default_role" {
-  name               = "EtleapEMR_AutoScaling_DefaultRole"
+  name               = "EtleapEMR_AutoScaling_DefaultRole-${var.deployment_id}-${random_id.deployment_random.hex}"
   assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",

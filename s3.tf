@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "intermediate" {
 }
 
 resource "aws_iam_role" "intermediate" {
-  name               = "EtleapIntermediate"
+  name               = "EtleapIntermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -30,7 +30,7 @@ EOF
 }
 
 resource "aws_iam_policy" "intermediate" {
-  name = "EtleapIntermediate"
+  name = "EtleapIntermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
 
   policy = <<EOF
 {
