@@ -47,7 +47,6 @@ resource "aws_security_group_rule" "nat-ingress" {
 }
 
 resource "aws_eip" "nat" {
-  count = var.nat_assign_elastic_ip ? 1 : 0
   instance = aws_instance.nat.id
   vpc      = true
 }
