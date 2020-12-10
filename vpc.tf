@@ -94,13 +94,15 @@ resource "aws_route_table_association" "b_private" {
 }
 
 resource "aws_route_table_association" "a_public" {
-  subnet_id      = aws_subnet.a_public.id
-  route_table_id = aws_route_table.public.id
+  subnet_id        = aws_subnet.a_public.id
+  route_table_id   = aws_route_table.public.id
+  propagating_vgws = var.virtual_gateways_to_propagate
 }
 
 resource "aws_route_table_association" "b_public" {
   subnet_id      = aws_subnet.b_public.id
   route_table_id = aws_route_table.public.id
+  propagating_vgws = var.virtual_gateways_to_propagate
 }
 
 output "public_route_table_id" {
@@ -109,4 +111,8 @@ output "public_route_table_id" {
 
 output "private_route_table_id" {
   value = aws_route_table.private.id
+}
+
+output "vpc_id" {
+  value = aws_vpc.etleap.id
 }

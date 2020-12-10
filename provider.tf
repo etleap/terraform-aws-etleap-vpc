@@ -80,6 +80,10 @@ variable "nat_private_ip" {
   default = null
 }
 
+variable "virtual_gateways_to_propagate" {
+  default = null
+}
+
 // -----------------------------
 // End of configurable variables
 
