@@ -80,6 +80,11 @@ variable "nat_private_ip" {
   default = null
 }
 
+variable "virtual_gateways_to_propagate" {
+  description = "A list of virtual gateways whose routes to propagate to the VPC route tables"
+  default     = null
+}
+
 // -----------------------------
 // End of configurable variables
 
