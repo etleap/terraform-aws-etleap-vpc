@@ -100,8 +100,8 @@ resource "aws_route_table_association" "a_public" {
 }
 
 resource "aws_route_table_association" "b_public" {
-  subnet_id      = aws_subnet.b_public.id
-  route_table_id = aws_route_table.public.id
+  subnet_id        = aws_subnet.b_public.id
+  route_table_id   = aws_route_table.public.id
   propagating_vgws = var.virtual_gateways_to_propagate
 }
 
