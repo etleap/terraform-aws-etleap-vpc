@@ -10,10 +10,10 @@ resource "aws_iam_policy_attachment" "ec2_describe" {
   policy_arn = aws_iam_policy.ec2_describe.arn
 }
 
-resource "aws_iam_policy_attachment" "cw_get_metric_data" {
+resource "aws_iam_policy_attachment" "cloudwatch_get_metric_data" {
   name       = "Etleap Get Metric Data"
   roles      = [aws_iam_role.app.name]
-  policy_arn = aws_iam_policy.cw_get_metric_data.arn
+  policy_arn = aws_iam_policy.cloudwatch_get_metric_data.arn
 }
 
 resource "aws_iam_policy_attachment" "assume_any_role" {
@@ -106,7 +106,7 @@ EOF
 
 }
 
-resource "aws_iam_policy" "cw_get_metric_data" {
+resource "aws_iam_policy" "cloudwatch_get_metric_data" {
   name   = "EtleapGetMetricData-${var.deployment_id}-${random_id.deployment_random.hex}"
   policy = <<EOF
 {
