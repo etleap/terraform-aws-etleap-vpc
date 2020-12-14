@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
-  alarm_name          = "EMR Cluster Running"
+  alarm_name          = "${var.deployment_id} - EMR Cluster Running"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "CoreNodesRunning"
@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
-  alarm_name          = "60% Disk EMR HDFS"
+  alarm_name          = "${var.deployment_id} - 60% Disk EMR HDFS"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "HDFSUtilization"
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
-  alarm_name          = "EMR Unhealthy Nodes"
+  alarm_name          = "${var.deployment_id} - EMR Unhealthy Nodes"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "MRUnhealthyNodes"
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
-  alarm_name          = "EMR Missing Blocks"
+  alarm_name          = "${var.deployment_id} - EMR Missing Blocks"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "MissingBlocks"
@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
-  alarm_name          = "RDS CPU 90%"
+  alarm_name          = "${var.deployment_id} - RDS CPU 90%"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
@@ -85,7 +85,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_disk" {
-  alarm_name          = "RDS Disk Space"
+  alarm_name          = "${var.deployment_id} - RDS Disk Space"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "FreeStorageSpace"
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_disk" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
-  alarm_name          = "RDS Freeable Memory"
+  alarm_name          = "${var.deployment_id} - RDS Freeable Memory"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "FreeableMemory"
