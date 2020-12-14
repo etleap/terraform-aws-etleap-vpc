@@ -103,6 +103,22 @@ resource "aws_route_table_association" "b_public" {
   route_table_id = aws_route_table.public.id
 }
 
+output "public_subnet_a" {
+  value = aws_subnet.a_public.id
+}
+
+output "public_subnet_b" {
+  value = aws_subnet.b_public.id
+}
+
+output "private_subnet_a" {
+  value = aws_subnet.a_private.id
+}
+
+output "private_subnet_b" {
+  value = aws_subnet.b_private.id
+}
+
 output "public_route_table_id" {
   value = aws_route_table.public.id
 }
