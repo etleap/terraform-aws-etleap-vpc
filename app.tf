@@ -35,6 +35,7 @@ module "main_app" {
   key_name = var.key_name
   ssl_pem  = var.ssl_pem
   ssl_key  = var.ssl_key
+  region   = var.region
 
   vpc_cidr_block_1 = var.vpc_cidr_block_1
   vpc_cidr_block_2 = var.vpc_cidr_block_2
@@ -64,6 +65,7 @@ module "ha_app" {
   key_name = var.key_name
   ssl_pem  = var.ssl_pem
   ssl_key  = var.ssl_key
+  region   = var.region
 
   vpc_cidr_block_1 = var.vpc_cidr_block_1
   vpc_cidr_block_2 = var.vpc_cidr_block_2

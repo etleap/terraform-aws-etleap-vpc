@@ -22,6 +22,9 @@ variable "ssl_pem" {
 variable "ssl_key" {
 }
 
+variable "region" {
+}
+
 variable "vpc_cidr_block_1" {
 }
 
@@ -67,6 +70,10 @@ write_files:
 - path: /home/ubuntu/.etleap
   content: |
     ${indent(4, var.config)}
+- path: /root/.aws/config
+  content: |
+    [default]
+    region = ${var.region}
 
 runcmd:
 - "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.2\"]/g' /etc/docker/daemon.json"
