@@ -55,11 +55,9 @@ variable "vpn_cidr_block" {
 }
 
 variable "ssl_key" {
-  default = null
 }
 
 variable "ssl_pem" {
-  default = null
 }
 
 variable "github_access_token" {
