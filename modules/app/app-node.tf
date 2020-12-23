@@ -77,6 +77,10 @@ write_files:
   content: |
     [default]
     region = ${var.region}
+- path: /home/ubuntu/.aws/config
+  content: |
+    [default]
+    region = ${var.region}
 
 runcmd:
 - "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.2\"]/g' /etc/docker/daemon.json"

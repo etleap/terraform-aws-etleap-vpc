@@ -46,7 +46,7 @@ module "main_app" {
     var             = local.context,
     deployment_role = "customervpc",
     main_app_ip     = "127.0.0.1",
-    app_hostname    = var.ha_mode ? aws_lb.app[0].dns_name : var.app_hostname
+    app_hostname    = var.app_hostname == null ? (var.ha_mode ? aws_lb.app[0].dns_name : var.app_hostname) : var.app_hostname
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
@@ -77,7 +77,7 @@ module "ha_app" {
     var             = local.context,
     deployment_role = "customervpc_ha",
     main_app_ip     = element(tolist(aws_network_interface.main_app.private_ips[*]), 0),
-    app_hostname    = aws_lb.app[0].dns_name
+    app_hostname    = var.app_hostname == null ? aws_lb.app[0].dns_name : var.app_hostname
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
