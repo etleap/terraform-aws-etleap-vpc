@@ -34,8 +34,11 @@ variable "vpc_cidr_block_2" {
 variable "vpc_cidr_block_3" {
 }
 
+variable "instance_type" {
+}
+
 resource "aws_instance" "app" {
-  instance_type        = "t3.large"
+  instance_type        = var.instance_type
   ami                  = var.ami
   key_name             = var.key_name
   iam_instance_profile = var.instance_profile
@@ -71,6 +74,10 @@ write_files:
   content: |
     ${indent(4, var.config)}
 - path: /root/.aws/config
+  content: |
+    [default]
+    region = ${var.region}
+- path: /home/ubuntu/.aws/config
   content: |
     [default]
     region = ${var.region}

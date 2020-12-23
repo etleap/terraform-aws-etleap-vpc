@@ -85,6 +85,16 @@ variable "cloudwatch_alarm_sns_topics" {
   description = "A list of SNS topics to send notifications to when a Cloudwatch alarm is triggered"
 }
 
+variable app_instance_type {
+  default     = "t3.large"
+  description = "The instance type for the main app node(s)"
+}
+
+variable nat_instance_type {
+  default     = "m5n.large"
+  description = "The instance type for the NAT instance"
+}
+
 // -----------------------------
 // End of configurable variables
 

@@ -1,7 +1,7 @@
 # TODO See if it makes sense to use NAT gateway instead, avoids having to manage AMIs
 resource "aws_instance" "nat" {
   ami                         = var.amis["nat"]
-  instance_type               = "m5n.large"
+  instance_type               = var.nat_instance_type
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.nat.id]
   subnet_id                   = aws_subnet.b_public.id
