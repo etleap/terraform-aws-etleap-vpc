@@ -31,11 +31,12 @@ module "main_app" {
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.main_app.id
 
-  ami      = var.amis["app"]
-  key_name = var.key_name
-  ssl_pem  = var.ssl_pem
-  ssl_key  = var.ssl_key
-  region   = var.region
+  ami           = var.amis["app"]
+  key_name      = var.key_name
+  ssl_pem       = var.ssl_pem
+  ssl_key       = var.ssl_key
+  region        = var.region
+  instance_type = var.app_instance_type
 
   vpc_cidr_block_1 = var.vpc_cidr_block_1
   vpc_cidr_block_2 = var.vpc_cidr_block_2
@@ -61,11 +62,12 @@ module "ha_app" {
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.ha_app[0].id
 
-  ami      = var.amis["app"]
-  key_name = var.key_name
-  ssl_pem  = var.ssl_pem
-  ssl_key  = var.ssl_key
-  region   = var.region
+  ami           = var.amis["app"]
+  key_name      = var.key_name
+  ssl_pem       = var.ssl_pem
+  ssl_key       = var.ssl_key
+  region        = var.region
+  instance_type = var.app_instance_type
 
   vpc_cidr_block_1 = var.vpc_cidr_block_1
   vpc_cidr_block_2 = var.vpc_cidr_block_2

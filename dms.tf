@@ -3,7 +3,7 @@ resource "aws_dms_replication_instance" "dms" {
   engine_version               = "3.3.2"
   allocated_storage            = 50
   apply_immediately            = true
-  availability_zone            = "us-east-1b"
+  availability_zone            = "${var.region}b"
   preferred_maintenance_window = "sun:10:30-sun:14:30"
   replication_instance_id      = "etleap-dms-${var.deployment_id}-${random_id.deployment_random.hex}"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms.id

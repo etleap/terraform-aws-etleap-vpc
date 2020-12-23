@@ -47,33 +47,33 @@ resource "aws_emr_cluster" "emr" {
 
   bootstrap_action {
     name = "Configure Fair Scheduler"
-    path = "s3://datadanze-emr/conf-hadoop2/download-fair-scheduler-config.sh"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/download-fair-scheduler-config.sh"
   }
 
   bootstrap_action {
     name = "Add Etleap-provided JARs"
-    path = "s3://datadanze-emr/conf-hadoop2/add-app-provided-libs.sh"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/add-app-provided-libs.sh"
   }
 
   bootstrap_action {
     name = "Replace the Java keystore with Etleap's"
-    path = "s3://datadanze-emr/conf-hadoop2/install-etleap-keystore.sh"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-etleap-keystore.sh"
   }
 
   bootstrap_action {
     name = "Install Kinesis Agent"
-    path = "s3://datadanze-emr/conf-hadoop2/install-kinesis-agent.sh"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-kinesis-agent.sh"
     args = [var.deployment_id, element(tolist(aws_network_interface.main_app.private_ips[*]), 0), "false"]
   }
 
   bootstrap_action {
     name = "Set TCP keepalive"
-    path = "s3://datadanze-emr/conf-hadoop2/set-tcp-keepalive.sh"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/set-tcp-keepalive.sh"
   }
 
   bootstrap_action {
     name = "Copy HDFS init script"
-    path = "s3://datadanze-emr/conf-hadoop2/copy-hdfs-init.sh"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/copy-hdfs-init.sh"
   }
 
   step {
