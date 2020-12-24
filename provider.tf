@@ -97,7 +97,7 @@ variable nat_instance_type {
 
 variable create_dms_role {
   default     = true
-  description = "True if this template should create DMS default roles. Set to `false` if you already have DMS running in the account where you deploy Etleap."
+  description = "True if this template should create the roles required by DMS, “dms-vpc-role” and “dms-cloudwatch-logs-role”. Set to `false` if you have already used DMS in the account where you deploy Etleap."
 }
 
 // -----------------------------
