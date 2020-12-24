@@ -95,6 +95,11 @@ variable nat_instance_type {
   description = "The instance type for the NAT instance"
 }
 
+variable create_dms_role {
+  default     = true
+  description = "True if this template should create DMS default roles. Set to `false` if you already have DMS running in the account where you deploy Etleap."
+}
+
 // -----------------------------
 // End of configurable variables
 
