@@ -55,25 +55,25 @@ data "aws_iam_policy_document" "dms_assume_role" {
 }
 
 resource "aws_iam_role" "dms-vpc-role" {
-    count              = var.create_dms_role ? 1 : 0
+    count              = var.dms_roles_to_be_created ? 1 : 0
     name               = "dms-vpc-role"
     assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
-  count      = var.create_dms_role ? 1 : 0
+  count      = var.dms_roles_to_be_created ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
   role       = aws_iam_role.dms-vpc-role[0].name
 }
 
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {
-    count              = var.create_dms_role ? 1 : 0
+    count              = var.dms_roles_to_be_created ? 1 : 0
     name               = "dms-cloudwatch-logs-role"
     assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
-  count      = var.create_dms_role ? 1 : 0
+  count      = var.dms_roles_to_be_created ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
   role       = aws_iam_role.dms-cloudwatch-logs-role[0].name
 }

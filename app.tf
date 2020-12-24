@@ -5,7 +5,7 @@ locals {
     db_salesforce_password_arn = var.db_salesforce_password_arn
     admin_password_arn         = var.admin_password_arn
     deployment_secret_arn      = var.deployment_secret_arn
-    kms_key                    = aws_kms_key.etleap_encryption_key_virginia.key_id
+    kms_key                    = aws_kms_key.etleap_encryption_key.key_id
     first_name                 = var.first_name
     last_name                  = var.last_name
     email                      = var.email
