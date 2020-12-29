@@ -1,22 +1,23 @@
 locals {
   context = {
-    deployment_id              = var.deployment_id
-    db_password_arn            = var.db_password_arn
-    db_salesforce_password_arn = var.db_salesforce_password_arn
-    admin_password_arn         = var.admin_password_arn
-    deployment_secret_arn      = var.deployment_secret_arn
-    kms_key                    = aws_kms_key.etleap_encryption_key.key_id
-    first_name                 = var.first_name
-    last_name                  = var.last_name
-    email                      = var.email
-    setup_password             = var.setup_password
-    s3_bucket                  = aws_s3_bucket.intermediate.id
-    s3_role                    = aws_iam_role.intermediate.arn
-    dms_role                   = aws_iam_role.dms.arn
-    dms_replication_instance   = aws_dms_replication_instance.dms.replication_instance_arn
-    account_id                 = data.aws_caller_identity.current.account_id
-    db_address                 = aws_db_instance.db.address
-    emr_cluster                = aws_emr_cluster.emr.master_public_dns
+    deployment_id                 = var.deployment_id
+    db_password_arn               = var.db_password_arn
+    db_salesforce_password_arn    = var.db_salesforce_password_arn
+    admin_password_arn            = var.admin_password_arn
+    deployment_secret_arn         = var.deployment_secret_arn
+    kms_key                       = aws_kms_key.etleap_encryption_key.key_id
+    first_name                    = var.first_name
+    last_name                     = var.last_name
+    email                         = var.email
+    setup_password                = var.setup_password
+    s3_bucket                     = aws_s3_bucket.intermediate.id
+    s3_role                       = aws_iam_role.intermediate.arn
+    dms_role                      = aws_iam_role.dms.arn
+    dms_replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
+    dms_replication_instance_name = lower(aws_dms_replication_instance.dms.replication_instance_id)
+    account_id                    = data.aws_caller_identity.current.account_id
+    db_address                    = aws_db_instance.db.address
+    emr_cluster                   = aws_emr_cluster.emr.master_public_dns
   }
 }
 
