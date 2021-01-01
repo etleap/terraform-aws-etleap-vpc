@@ -6,7 +6,6 @@ resource "aws_emr_cluster" "emr" {
   release_label                     = "emr-5.20.0"
   applications                      = ["Hadoop", "Spark"]
   keep_job_flow_alive_when_no_steps = true
-  log_uri                           = "s3://${aws_s3_bucket.log.id}/logs/"
   service_role                      = aws_iam_role.emr_default_role.name
   autoscaling_role                  = aws_iam_role.emr_autoscaling_default_role.name
 

@@ -1,15 +1,10 @@
-resource "aws_s3_bucket" "log" {
-  bucket        = "etleap-logs-${var.deployment_id}-${random_id.deployment_random.hex}"
-  force_destroy = true
-}
-
 resource "aws_s3_bucket" "intermediate" {
   bucket        = "etleap-intermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
   force_destroy = true
 }
 
 resource "aws_iam_role" "intermediate" {
-  name               = "EtleapIntermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name               = "EtleapIntermediate${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -30,7 +25,7 @@ EOF
 }
 
 resource "aws_iam_policy" "intermediate" {
-  name = "EtleapIntermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name = "EtleapIntermediate${local.resource_name_suffix}"
 
   policy = <<EOF
 {

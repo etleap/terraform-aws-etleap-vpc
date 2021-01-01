@@ -5,7 +5,7 @@ resource "aws_dms_replication_instance" "dms" {
   apply_immediately            = true
   availability_zone            = "${var.region}b"
   preferred_maintenance_window = "sun:10:30-sun:14:30"
-  replication_instance_id      = "etleap-dms-${var.deployment_id}-${random_id.deployment_random.hex}"
+  replication_instance_id      = "etleap-dms${local.resource_name_suffix}"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms.id
   vpc_security_group_ids       = [aws_security_group.dms.id]
   publicly_accessible          = true
@@ -17,7 +17,7 @@ resource "aws_dms_replication_instance" "dms" {
 
 resource "aws_dms_replication_subnet_group" "dms" {
   replication_subnet_group_description = "DMS Subnet Group"
-  replication_subnet_group_id          = "etleap-dms-${var.deployment_id}-${random_id.deployment_random.hex}"
+  replication_subnet_group_id          = "etleap-dms${local.resource_name_suffix}"
   subnet_ids                           = [aws_subnet.a_private.id, aws_subnet.b_private.id]
   tags = {
     Name = "Etleap DMS Subnet Group"
@@ -79,12 +79,12 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
 }
 
 resource "aws_iam_role" "dms" {
-  name               = "Etleap-dms-role-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name               = "Etleap-dms-role${local.resource_name_suffix}"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
 resource "aws_iam_policy" "dms_s3" {
-  name   = "Etleap-DMS-S3-Access-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name   = "Etleap-DMS-S3-Access${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -110,7 +110,7 @@ EOF
 }
 
 resource "aws_iam_policy" "job_manage_dms" {
-  name   = "Etleap-Manage-DMS-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name   = "Etleap-Manage-DMS${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",

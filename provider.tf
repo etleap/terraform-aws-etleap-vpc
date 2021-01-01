@@ -100,6 +100,11 @@ variable dms_roles_to_be_created {
   description = "True if this template should create the roles required by DMS, “dms-vpc-role” and “dms-cloudwatch-logs-role”. Set to `false` if you have already used DMS in the account where you deploy Etleap."
 }
 
+variable "unique_resource_names" {
+  default     = true
+  description = "If set to 'true', a suffix is appended to resource names to make them unique per deployment. Recommend leaving this as 'true' except in the case of migrations from earlier versions."
+}
+
 // -----------------------------
 // End of configurable variables
 
@@ -123,4 +128,8 @@ variable "amis" {
 provider "aws" {
   version = ">= 2.37.0"
   region  = var.region
+}
+
+locals {
+  resource_name_suffix = var.unique_resource_names ? "-${var.deployment_id}-${random_id.deployment_random.hex}" : ""
 }

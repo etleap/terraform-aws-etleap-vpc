@@ -16,7 +16,7 @@
       "Effect": "Allow",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${account_id}:role/EtleapApp-${deployment_id}-${random_hex}"
+          "arn:aws:iam::${account_id}:role/EtleapApp${resource_name_suffix}"
         ]
       },
       "Action": [
@@ -33,7 +33,7 @@
       "Effect": "Allow",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${account_id}:role/EtleapApp-${deployment_id}-${random_hex}"
+          "arn:aws:iam::${account_id}:role/EtleapApp${resource_name_suffix}"
         ]
       },
       "Action": [

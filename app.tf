@@ -96,11 +96,11 @@ resource "aws_network_interface" "ha_app" {
 }
 
 resource "aws_iam_server_certificate" "etleap" {
+  count            = var.ha_mode ? 1 : 0
   name             = "Etleap_App_Cert"
   private_key      = var.ssl_key
   certificate_body = var.ssl_pem
 }
-
 
 resource "aws_lb" "app" {
   count              = var.ha_mode ? 1 : 0
@@ -131,7 +131,7 @@ resource "aws_lb_listener" "app" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_iam_server_certificate.etleap.arn
+  certificate_arn   = aws_iam_server_certificate.etleap[0].arn
 
   default_action {
     type             = "forward"
@@ -154,12 +154,12 @@ resource "aws_lb_target_group_attachment" "ha_app" {
 }
 
 resource "aws_iam_instance_profile" "app" {
-  name = "EtleapApp-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name = "EtleapApp${local.resource_name_suffix}"
   role = aws_iam_role.app.name
 }
 
 resource "aws_iam_role" "app" {
-  name               = "EtleapApp-${var.deployment_id}-${random_id.deployment_random.hex}"
+  name               = "EtleapApp${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
