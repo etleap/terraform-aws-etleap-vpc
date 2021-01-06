@@ -65,7 +65,7 @@ variable "github_access_token" {
 }
 
 variable "app_hostname" {
-  default = "$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)"
+  default = null
 }
 
 variable "ha_mode" {

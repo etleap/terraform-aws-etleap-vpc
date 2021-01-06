@@ -1,4 +1,5 @@
 locals {
+  default_hostname = var.ha_mode ? aws_lb.app[0].dns_name : "$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)"
   context = {
     deployment_id                 = var.deployment_id
     db_password_arn               = var.db_password_arn
@@ -18,6 +19,7 @@ locals {
     account_id                    = data.aws_caller_identity.current.account_id
     db_address                    = aws_db_instance.db.address
     emr_cluster                   = aws_emr_cluster.emr.master_public_dns
+    app_hostname                  = var.app_hostname == null ? local.default_hostname : var.app_hostname
   }
 }
 
@@ -45,8 +47,7 @@ module "main_app" {
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
     deployment_role = "customervpc",
-    main_app_ip     = "127.0.0.1",
-    app_hostname    = var.app_hostname == null ? (var.ha_mode ? aws_lb.app[0].dns_name : var.app_hostname) : var.app_hostname
+    main_app_ip     = "127.0.0.1"
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
@@ -76,8 +77,7 @@ module "ha_app" {
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
     deployment_role = "customervpc_ha",
-    main_app_ip     = element(tolist(aws_network_interface.main_app.private_ips[*]), 0),
-    app_hostname    = var.app_hostname == null ? aws_lb.app[0].dns_name : var.app_hostname
+    main_app_ip     = element(tolist(aws_network_interface.main_app.private_ips[*]), 0)
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${var.db_root_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
@@ -179,5 +179,5 @@ EOF
 }
 
 output "app_public_address" {
-  value = var.ha_mode ? aws_lb.app[0].dns_name : module.main_app.app_public_ip_address
+  value = local.context.app_hostname
 }
