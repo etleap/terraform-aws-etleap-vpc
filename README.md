@@ -14,3 +14,5 @@ The table below describe the alarms that are defined, together with the action n
 | RDS CPU 90% | RDS instance is saturating CPU | Increase the RDS instance size |
 | RDS Disk Space | RDS is running out of disk space | Increase the `allocated_storage` via Terraform, or via the console |
 | RDS Freeable Memory | RDS is running out of disk space | Increase the `allocated_storage` via Terraform, or via the console |
+| * Node 80% CPU | CPU usage is consistently high on the specified instance | Upgrade the instance type to a larger one, or one of a newer generation, if available |
+| * 90% Disk * | Disk is getting full for one of the instances | Increase the EBS size of the attached volumes; contant Etleap Support to diagnose to root cause |

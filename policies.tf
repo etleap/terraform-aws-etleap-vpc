@@ -10,10 +10,10 @@ resource "aws_iam_policy_attachment" "ec2_describe" {
   policy_arn = aws_iam_policy.ec2_describe.arn
 }
 
-resource "aws_iam_policy_attachment" "cloudwatch_get_metric_data" {
-  name       = "Etleap Get Metric Data"
+resource "aws_iam_policy_attachment" "cloudwatch_metric_data" {
+  name       = "Etleap Get and Put Metric Data"
   roles      = [aws_iam_role.app.name]
-  policy_arn = aws_iam_policy.cloudwatch_get_metric_data.arn
+  policy_arn = aws_iam_policy.cloudwatch_metric_data.arn
 }
 
 resource "aws_iam_policy_attachment" "assume_any_role" {
@@ -106,8 +106,8 @@ EOF
 
 }
 
-resource "aws_iam_policy" "cloudwatch_get_metric_data" {
-  name   = "EtleapGetMetricData${local.resource_name_suffix}"
+resource "aws_iam_policy" "cloudwatch_metric_data" {
+  name   = "EtleapMetricData${local.resource_name_suffix}"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -115,7 +115,8 @@ resource "aws_iam_policy" "cloudwatch_get_metric_data" {
         {
             "Effect": "Allow",
             "Action": [
-                "cloudwatch:GetMetricData"
+                "cloudwatch:GetMetricData",
+                "cloudwatch:PutMetricData"
             ],
             "Resource": [
                 "*"

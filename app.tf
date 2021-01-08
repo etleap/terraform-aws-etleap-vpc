@@ -179,5 +179,5 @@ EOF
 }
 
 output "app_public_address" {
-  value = local.context.app_hostname
+  value = var.app_hostname == null ? (var.ha_mode ? aws_lb.app[0].dns_name : module.main_app.app_public_ip_address ) : var.app_hostname
 }

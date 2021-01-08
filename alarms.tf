@@ -117,3 +117,112 @@ resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
   ok_actions                = var.cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.cloudwatch_alarm_sns_topics
 }
+
+resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
+  alarm_name          = "${var.deployment_id} - Main Node 80% CPU"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  dimensions = {
+    InstanceId = module.main_app.instance_id
+  }
+  period                    = "300"
+  statistic                 = "Average"
+  threshold                 = "80"
+  alarm_actions             = var.cloudwatch_alarm_sns_topics
+  ok_actions                = var.cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "ha_node_cpu" {
+  count               = var.ha_mode ? 1 : 0
+  alarm_name          = "${var.deployment_id} - HA Node 80% CPU"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  dimensions = {
+    InstanceId = module.ha_app[0].instance_id
+  }
+  period                    = "300"
+  statistic                 = "Average"
+  threshold                 = "80"
+  alarm_actions             = var.cloudwatch_alarm_sns_topics
+  ok_actions                = var.cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
+  alarm_name          = "${var.deployment_id} - Main Node 90% Disk Root"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Disk"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    InstanceId = module.main_app.instance_id
+    Device     = "Root"
+  }
+  period                    = "60"
+  statistic                 = "Maximum"
+  threshold                 = "90"
+  alarm_actions             = var.cloudwatch_alarm_sns_topics
+  ok_actions                = var.cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
+  alarm_name          = "${var.deployment_id} - Main Node 90% Disk Docker"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Disk"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    InstanceId = module.main_app.instance_id
+    Device     = "Docker"
+  }
+  period                    = "60"
+  statistic                 = "Maximum"
+  threshold                 = "90"
+  alarm_actions             = var.cloudwatch_alarm_sns_topics
+  ok_actions                = var.cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "ha_app_disk_root" {
+  count               = var.ha_mode ? 1 : 0
+  alarm_name          = "${var.deployment_id} - HA Node 90% Disk Root"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Disk"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    InstanceId = module.ha_app[0].instance_id
+    Device     = "Root"
+  }
+  period                    = "60"
+  statistic                 = "Maximum"
+  threshold                 = "90"
+  alarm_actions             = var.cloudwatch_alarm_sns_topics
+  ok_actions                = var.cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
+  count               = var.ha_mode ? 1 : 0
+  alarm_name          = "${var.deployment_id} - HA Node 90% Disk Docker"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Disk"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    InstanceId = module.ha_app[0].instance_id
+    Device     = "Docker"
+  }
+  period                    = "60"
+  statistic                 = "Maximum"
+  threshold                 = "90"
+  alarm_actions             = var.cloudwatch_alarm_sns_topics
+  ok_actions                = var.cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.cloudwatch_alarm_sns_topics
+}
