@@ -95,6 +95,11 @@ variable nat_instance_type {
   description = "The instance type for the NAT instance"
 }
 
+variable dms_instance_type {
+  default     = "dms.t2.small"
+  description = "The instance type for the DMS instance"
+}
+
 variable dms_roles_to_be_created {
   default     = true
   description = "True if this template should create the roles required by DMS, “dms-vpc-role” and “dms-cloudwatch-logs-role”. Set to `false` if you have already used DMS in the account where you deploy Etleap."
