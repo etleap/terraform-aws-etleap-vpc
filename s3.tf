@@ -56,3 +56,108 @@ resource "aws_iam_policy_attachment" "intermediate" {
 resource "random_id" "deployment_random" {
   byte_length = 3
 }
+
+resource "aws_iam_role" "s3_input_role" {
+  count              = length(var.s3_input_buckets) > 0 ? 1 : 0
+  name               = "EtleapInput${local.resource_name_suffix}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": { "sts:ExternalId": "${var.deployment_id}" }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource aws_iam_policy "s3_input_policy" {
+  count  = length(var.s3_input_buckets) > 0 ? 1 : 0
+  name   = "EtleapInput${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement":[{
+    "Effect":"Allow",
+    "Action":[
+      "s3:GetObject",
+      "s3:ListBucket"
+    ],
+    "Resource": [
+      ${join(",\n", formatlist("\"arn:aws:s3:::%s\"", var.s3_input_buckets))},
+      ${join(",\n", formatlist("\"arn:aws:s3:::%s/*\"", var.s3_input_buckets))}
+    ]
+  },
+  {
+    "Effect":"Allow",
+    "Action": [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ],
+    "Resource":[
+      "${aws_s3_bucket.intermediate.arn}",
+      "${aws_s3_bucket.intermediate.arn}/*"
+    ]
+  }]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "s3_input" {
+  count      = length(var.s3_input_buckets) > 0 ? 1 : 0
+  name       = "Input Bucket Access"
+  roles      = [aws_iam_role.s3_input_role[0].name]
+  policy_arn = aws_iam_policy.s3_input_policy[0].arn
+}
+
+resource "aws_s3_bucket_policy" "intermediate" {
+  count  = length(var.s3_data_lake_account_ids) > 0 ? 1 : 0
+  bucket = aws_s3_bucket.intermediate.id
+  policy = <<EOF
+{
+  "Id": "Intermediate",
+  "Version": "2012-10-17",
+  "Statement":[{
+    "Sid": "S3DataLakeReadAccess",
+    "Effect":"Allow",
+    "Principal": {
+      "AWS": [${join(", ", formatlist("\"arn:aws:iam::%s:root\"", var.s3_data_lake_account_ids))}]
+    },
+    "Action": [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ],
+    "Resource": [
+      "${aws_s3_bucket.intermediate.arn}",
+      "${aws_s3_bucket.intermediate.arn}/*"
+    ]
+  }]
+}
+EOF
+}
+
+output "s3_input_role_arn" {
+  value       = length(var.s3_input_buckets) > 0 ? aws_iam_role.s3_input_role[0].arn : null
+  description = "Role to use when setting up \"S3 Input\" connections with a bucket from a different AWS account."
+}
+
+output "s3_input_bucket_policy" {
+  value = {
+    for bucket in var.s3_input_buckets :
+    bucket => templatefile("${path.module}/templates/input-bucket-policy.tmpl", {
+      account = data.aws_caller_identity.current.account_id,
+      bucket  = bucket
+    })
+  }
+  description = "Policies that need to applied to the S3 buckets specified by 's3_input_buckets' so Etleap's role can read from them."
+}

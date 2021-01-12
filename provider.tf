@@ -105,6 +105,16 @@ variable "unique_resource_names" {
   description = "If set to 'true', a suffix is appended to resource names to make them unique per deployment. Recommend leaving this as 'true' except in the case of migrations from earlier versions."
 }
 
+variable "s3_input_buckets" {
+  default = []
+  description = "The names of the S3 buckets which will be used with \"S3 Input\" connections. The module will create an IAM role to be specified with the \"S3 Input\" connections."
+}
+
+variable "s3_data_lake_account_ids" {
+  default = []
+  description = "The 12-digit IDs of the AWS accounts containing the roles specified with \"S3 Data Lake\" connections. IAM roles in these accounts are given read access to the intermediate data S3 bucket."
+}
+
 // -----------------------------
 // End of configurable variables
 

@@ -156,6 +156,11 @@ resource "aws_emr_instance_group" "task_spot" {
     volumes_per_instance = 1
   }
   bid_price          = "0.21"
+  lifecycle { 
+    ignore_changes = [
+      instance_count
+    ]  
+  }
   autoscaling_policy = <<EOF
 {
   "Constraints": {
