@@ -37,6 +37,15 @@ resource "aws_emr_cluster" "emr" {
     name           = "CORE"
     instance_type  = "c5.xlarge"
     instance_count = "1"
+
+    # /mnt
+    ebs_config {
+      size                 = "64"
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+
+    # /mnt1
     ebs_config {
       size                 = "512"
       type                 = "gp2"
@@ -107,7 +116,8 @@ resource "aws_emr_cluster" "emr" {
         "yarn.nodemanager.remote-app-log-dir": "/log",
         "yarn.node-labels.am.default-node-label-expression": "CORE_OR_TASK",
         "yarn.nodemanager.node-labels.provider": "config",
-        "yarn.nodemanager.node-labels.provider.configured-node-partition": "CORE_OR_TASK"
+        "yarn.nodemanager.node-labels.provider.configured-node-partition": "CORE_OR_TASK",
+        "yarn.nodemanager.local-dirs": "/mnt/yarn"
       }
     },
     {
@@ -120,10 +130,24 @@ resource "aws_emr_cluster" "emr" {
       }
     },
     {
+      "Classification": "core-site",
+      "Properties": {
+        "fs.s3.buffer.dir": "/mnt/s3"
+      }
+    },
+    {
+      "Classification": "hdfs-site",
+      "Properties": {
+        "dfs.datanode.data.dir": "file:///mnt1/hdfs",
+        "dfs.namenode.name.dir": "file:///mnt/namenode"
+      }
+    },
+    {
       "Classification": "mapred-site",
       "Properties": {
         "mapreduce.job.counters.limit": "512",
-        "mapreduce.client.submit.file.replication": "2"
+        "mapreduce.client.submit.file.replication": "2",
+        "mapred.local.dir": "/mnt/mapred"
       }
     },
     {
