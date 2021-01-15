@@ -1,6 +1,6 @@
 resource "aws_dms_replication_instance" "dms" {
   replication_instance_class   = var.dms_instance_type
-  engine_version               = "3.3.2"
+  engine_version               = "3.4.2"
   allocated_storage            = 50
   apply_immediately            = true
   availability_zone            = "${var.region}b"
