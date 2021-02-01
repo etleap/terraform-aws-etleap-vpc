@@ -88,7 +88,13 @@ runcmd:
 - ${var.db_init}
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
-- ". /home/ubuntu/.etleap && bash -c \"$(curl -sS -L https://deployment.etleap.com/deployment/v1/install.sh)\""
+- "apt-get update && apt-get -y upgrade"
+
+power_state:
+  delay: "now"
+  mode: reboot
+  condition: True
+  timeout: 30
 EOF
 
   tags = {
