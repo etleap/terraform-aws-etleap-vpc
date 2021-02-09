@@ -3,7 +3,7 @@ resource "aws_emr_cluster" "emr" {
     aws_instance.nat
   ]
   name                              = "Etleap EMR"
-  release_label                     = "emr-5.20.0"
+  release_label                     = "emr-5.30.0"
   applications                      = ["Hadoop", "Spark"]
   keep_job_flow_alive_when_no_steps = true
   service_role                      = aws_iam_role.emr_default_role.name
@@ -117,8 +117,23 @@ resource "aws_emr_cluster" "emr" {
         "yarn.node-labels.am.default-node-label-expression": "CORE_OR_TASK",
         "yarn.nodemanager.node-labels.provider": "config",
         "yarn.nodemanager.node-labels.provider.configured-node-partition": "CORE_OR_TASK",
+        "yarn.resourcemanager.system-metrics-publisher.enabled": "false",
         "yarn.nodemanager.local-dirs": "/mnt/yarn"
       }
+    },
+    {
+      "Classification": "yarn-env",
+      "Properties": {
+      },
+      "Configurations": [
+        {
+          "Classification": "export",
+          "Properties": {
+            "YARN_RESOURCEMANAGER_OPTS": "\"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=8001 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/tmp\"",
+            "YARN_RESOURCEMANAGER_HEAPSIZE": "4832"
+          }
+        }
+      ]
     },
     {
       "Classification": "capacity-scheduler",
@@ -147,6 +162,7 @@ resource "aws_emr_cluster" "emr" {
       "Properties": {
         "mapreduce.job.counters.limit": "512",
         "mapreduce.client.submit.file.replication": "2",
+        "mapreduce.job.counters.counter.name.max": "255",
         "mapred.local.dir": "/mnt/mapred"
       }
     },
