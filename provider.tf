@@ -85,7 +85,7 @@ variable "non_critial_cloudwatch_alarm_sns_topics" {
   description = "A list of SNS topics to send notifications to when a Cloudwatch alarm is triggered"
 }
 
-variable "critial_cloudwatch_alarm_sns_topics" {
+variable "critical_cloudwatch_alarm_sns_topics" {
   default     = null
   description = "A list of SNS topics to send notifications when critical CloudWatch alarms are triggered"
 }
