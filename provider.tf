@@ -80,7 +80,7 @@ variable "nat_private_ip" {
   default = null
 }
 
-variable "non_critial_cloudwatch_alarm_sns_topics" {
+variable "non_critical_cloudwatch_alarm_sns_topics" {
   default     = null
   description = "A list of SNS topics to send notifications to when a Cloudwatch alarm is triggered"
 }

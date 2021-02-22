@@ -11,9 +11,9 @@ resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
   statistic          = "Average"
   threshold          = "1"
   treat_missing_data = "breaching"
-  alarm_actions             = var.critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
@@ -28,9 +28,9 @@ resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
   period                    = "300"
   statistic                 = "Maximum"
   threshold                 = "60"
-  alarm_actions             = var.non_critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.non_critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.non_critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
@@ -45,9 +45,9 @@ resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
   period                    = "300"
   statistic                 = "Minimum"
   threshold                 = "0"
-  alarm_actions             = var.non_critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.non_critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.non_critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
@@ -62,9 +62,9 @@ resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
   period                    = "300"
   statistic                 = "Minimum"
   threshold                 = "0"
-  alarm_actions             = var.non_critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.non_critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.non_critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
@@ -79,9 +79,9 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "100"
-  alarm_actions             = var.non_critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.non_critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.non_critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_disk" {
@@ -96,9 +96,9 @@ resource "aws_cloudwatch_metric_alarm" "rds_disk" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "15728640000"
-  alarm_actions             = var.critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
@@ -113,9 +113,9 @@ resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "524288000"
-  alarm_actions             = var.non_critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.non_critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.non_critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
@@ -130,9 +130,9 @@ resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_actions             = var.non_critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.non_critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.non_critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "ha_node_cpu" {
@@ -148,9 +148,9 @@ resource "aws_cloudwatch_metric_alarm" "ha_node_cpu" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_actions             = var.non_critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.non_critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.non_critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
@@ -166,9 +166,9 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
   period                    = "60"
   statistic                 = "Maximum"
   threshold                 = "90"
-  alarm_actions             = var.critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
@@ -184,9 +184,9 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
   period                    = "60"
   statistic                 = "Maximum"
   threshold                 = "90"
-  alarm_actions             = var.critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "ha_app_disk_root" {
@@ -203,9 +203,9 @@ resource "aws_cloudwatch_metric_alarm" "ha_app_disk_root" {
   period                    = "60"
   statistic                 = "Maximum"
   threshold                 = "90"
-  alarm_actions             = var.critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
 resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
@@ -222,7 +222,7 @@ resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
   period                    = "60"
   statistic                 = "Maximum"
   threshold                 = "90"
-  alarm_actions             = var.critial_cloudwatch_alarm_sns_topics
-  ok_actions                = var.critial_cloudwatch_alarm_sns_topics
-  insufficient_data_actions = var.critial_cloudwatch_alarm_sns_topics
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
