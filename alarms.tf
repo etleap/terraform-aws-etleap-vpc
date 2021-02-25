@@ -226,3 +226,20 @@ resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
+
+resource "aws_cloudwatch_metric_alarm" "app_running" {
+  alarm_name = "${var.deployment_id} - App is running"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "5"
+  metric_name         = "AppRunning"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    "Deployemnt" = var.deployment_id
+  }
+  period                    = "60"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}

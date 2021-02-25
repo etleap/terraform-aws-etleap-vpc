@@ -140,7 +140,7 @@ data "aws_secretsmanager_secret_version" "db_root_password" {
 
 variable "amis" {
   default = {
-    app = "ami-0c7afe61eea27e5cd"
+    app = "ami-08ce966d848a83907"
     nat = "ami-00a9d4a05375b2763"
   }
 }

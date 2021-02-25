@@ -15,3 +15,4 @@ This module defines a number of CloudWatch alarms that can be used to alert your
 | RDS Freeable Memory | No | RDS is running out of disk space | Increase the `allocated_storage` via Terraform, or via the console |
 | * Node 80% CPU | No | CPU usage is consistently high on the specified instance | Upgrade the instance type to a larger one, or one of a newer generation, if available |
 | * 90% Disk * | Yes | Disk is getting full for one of the instances | Increase the EBS size of the attached volumes; contant Etleap Support to diagnose to root cause |
+| App is running | Yes | The main web application is down and not accepting requests | If in single-availability node, reprovision the instace. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
