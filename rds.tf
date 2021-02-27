@@ -33,7 +33,7 @@ resource "aws_db_parameter_group" "mysql5-6-etleap" {
 
   parameter {
     name         = "max_allowed_packet"
-    value        = 16777216
+    value        = 546308096
     apply_method = "pending-reboot"
   }
 
