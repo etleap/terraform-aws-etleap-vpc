@@ -234,7 +234,7 @@ resource "aws_cloudwatch_metric_alarm" "app_running" {
   metric_name         = "AppRunning"
   namespace           = "Etleap/EC2"
   dimensions = {
-    "Deployemnt" = var.deployment_id
+    "Deployment" = var.deployment_id
   }
   period                    = "60"
   statistic                 = "Sum"
