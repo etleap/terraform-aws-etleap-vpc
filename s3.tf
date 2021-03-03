@@ -145,19 +145,3 @@ resource "aws_s3_bucket_policy" "intermediate" {
 }
 EOF
 }
-
-output "s3_input_role_arn" {
-  value       = length(var.s3_input_buckets) > 0 ? aws_iam_role.s3_input_role[0].arn : null
-  description = "Role to use when setting up \"S3 Input\" connections with a bucket from a different AWS account."
-}
-
-output "s3_input_bucket_policy" {
-  value = {
-    for bucket in var.s3_input_buckets :
-    bucket => templatefile("${path.module}/templates/input-bucket-policy.tmpl", {
-      account = data.aws_caller_identity.current.account_id,
-      bucket  = bucket
-    })
-  }
-  description = "Policies that need to applied to the S3 buckets specified by 's3_input_buckets' so Etleap's role can read from them."
-}

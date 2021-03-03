@@ -7,7 +7,7 @@ resource "aws_db_instance" "db" {
   instance_class               = "db.m5.large"
   name                         = "EtleapDB"
   username                     = "root"
-  password                     = data.aws_secretsmanager_secret_version.db_root_password.secret_string
+  password                     = module.db_root_password.secret_string
   db_subnet_group_name         = aws_db_subnet_group.db.name
   parameter_group_name         = aws_db_parameter_group.mysql5-6-etleap.name
   vpc_security_group_ids       = [aws_security_group.db.id]
