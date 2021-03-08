@@ -179,6 +179,12 @@ resource "aws_emr_cluster" "emr" {
         "spark.history.fs.cleaner.interval": "1h",
         "spark.history.fs.cleaner.maxAge": "3h"
       }
+    },
+    {
+      "Classification": "container-log4j",
+      "Properties": {
+        "log4j.threshold": "WARN"
+      }
     }
   ]
 EOF
