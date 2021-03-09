@@ -73,7 +73,7 @@ variable "critical_cloudwatch_alarm_sns_topics" {
 }
 
 variable app_instance_type {
-  default     = "t3.large"
+  default     = "t3.xlarge"
   description = "The instance type for the main app node(s)"
 }
 
