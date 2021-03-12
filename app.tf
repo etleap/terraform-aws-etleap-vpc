@@ -20,6 +20,8 @@ locals {
     db_address                    = aws_db_instance.db.address
     emr_cluster                   = aws_emr_cluster.emr.master_public_dns
     app_hostname                  = var.app_hostname == null ? local.default_hostname : var.app_hostname
+    github_username               = var.github_username
+    github_access_token_arn       = var.github_access_token_arn
   }
 }
 

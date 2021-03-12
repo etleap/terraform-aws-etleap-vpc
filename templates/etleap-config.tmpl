@@ -31,3 +31,7 @@ export ETLEAP_EMR_HOSTNAME="${var.emr_cluster}"
 export ETLEAP_MAIN_APP_IP="${main_app_ip}"
 export ETLEAP_YSJES_HOSTNAME=$ETLEAP_MAIN_APP_IP
 export ETLEAP_DEPLOYMENT_ROLE="${deployment_role}"
+%{ if var.github_username != null && var.github_access_token_arn != null }
+export ETLEAP_GITHUB_USERNAME="${var.github_username}"
+export ETLEAP_SECRET_GITHUB_ACCESS_TOKEN="$(aws secretsmanager get-secret-value --secret-id ${var.github_access_token_arn} | jq -r .SecretString)"
+%{ endif }

@@ -52,7 +52,7 @@ variable "app_hostname" {
 
 variable "ha_mode" {
   default = false
-} 
+}
 
 variable "app_private_ip" {
   default = null
@@ -72,22 +72,22 @@ variable "critical_cloudwatch_alarm_sns_topics" {
   description = "A list of SNS topics to send notifications when critical CloudWatch alarms are triggered"
 }
 
-variable app_instance_type {
+variable "app_instance_type" {
   default     = "t3.xlarge"
   description = "The instance type for the main app node(s)"
 }
 
-variable nat_instance_type {
+variable "nat_instance_type" {
   default     = "m5n.large"
   description = "The instance type for the NAT instance"
 }
 
-variable dms_instance_type {
+variable "dms_instance_type" {
   default     = "dms.t2.small"
   description = "The instance type for the DMS instance"
 }
 
-variable dms_roles_to_be_created {
+variable "dms_roles_to_be_created" {
   default     = true
   description = "True if this template should create the roles required by DMS, “dms-vpc-role” and “dms-cloudwatch-logs-role”. Set to `false` if you have already used DMS in the account where you deploy Etleap."
 }
@@ -98,13 +98,23 @@ variable "unique_resource_names" {
 }
 
 variable "s3_input_buckets" {
-  default = []
+  default     = []
   description = "The names of the S3 buckets which will be used with \"S3 Input\" connections. The module will create an IAM role to be specified with the \"S3 Input\" connections."
 }
 
 variable "s3_data_lake_account_ids" {
-  default = []
+  default     = []
   description = "The 12-digit IDs of the AWS accounts containing the roles specified with \"S3 Data Lake\" connections. IAM roles in these accounts are given read access to the intermediate data S3 bucket."
+}
+
+variable "github_username" {
+  default     = null
+  description = "Github username to use when accessing custom transforms"
+}
+
+variable "github_access_token_arn" {
+  default     = null
+  description = "ARN of the secret containing the GitHub access token"
 }
 
 // -----------------------------
