@@ -99,9 +99,13 @@ resource "aws_network_interface" "ha_app" {
 
 resource "aws_iam_server_certificate" "etleap" {
   count            = var.ha_mode ? 1 : 0
-  name             = "Etleap_App_Cert"
+  name_prefix      = "Etleap_App_Cert_"
   private_key      = var.ssl_key
   certificate_body = var.ssl_pem
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_lb" "app" {
