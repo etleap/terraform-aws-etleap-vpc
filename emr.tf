@@ -40,7 +40,7 @@ resource "aws_emr_cluster" "emr" {
 
     # /mnt
     ebs_config {
-      size                 = "64"
+      size                 = "128"
       type                 = "gp2"
       volumes_per_instance = 1
     }
@@ -197,7 +197,7 @@ resource "aws_emr_instance_group" "task_spot" {
   instance_type  = "c5.xlarge"
   instance_count = "1"
   ebs_config {
-    size                 = "64"
+    size                 = "128"
     type                 = "gp2"
     volumes_per_instance = 1
   }
