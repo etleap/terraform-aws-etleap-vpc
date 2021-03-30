@@ -118,6 +118,6 @@ resource "aws_db_parameter_group" "mysql5-6-etleap" {
   parameter {
     name         = "innodb_log_file_size"
     value        = 5463080960 # 10x max_allowed_packet
-    apply_method = "immediate"
+    apply_method = "pending-reboot"
   }
 }
