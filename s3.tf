@@ -1,6 +1,16 @@
 resource "aws_s3_bucket" "intermediate" {
   bucket        = "etleap-intermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
   force_destroy = true
+
+  lifecycle_rule {
+    id      = "emr-logs"
+    enabled = true
+    prefix  = "emr-logs/"
+
+    expiration {
+      days = 90
+    }
+  }
 }
 
 resource "aws_iam_role" "intermediate" {

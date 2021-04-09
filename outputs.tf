@@ -50,3 +50,15 @@ output "private_route_table_id" {
 output "vpc_id" {
   value = aws_vpc.etleap.id
 }
+
+output "emr_cluster_id" {
+  value = aws_emr_cluster.emr.id
+}
+
+output "intermediate_bucket_id" {
+  value = aws_s3_bucket.intermediate.id
+}
+
+output "deployment_id" {
+  value = var.deployment_id
+}
