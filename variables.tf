@@ -117,6 +117,10 @@ variable "github_access_token_arn" {
   description = "ARN of the secret containing the GitHub access token"
 }
 
+variable "connection_secrets" {
+  default     = {}
+  description = "A map between environment variables and Secrets Manager Secret ARN for secrets to be injected into the application."
+}
 // -----------------------------
 // End of configurable variables
 
