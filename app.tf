@@ -23,6 +23,8 @@ locals {
     github_username               = var.github_username
     github_access_token_arn       = var.github_access_token_arn
     connection_secrets            = var.connection_secrets
+    inbound_sns_arn               = module.inbound_queue.sns_topic_arn
+    inbound_sqs_arn               = module.inbound_queue.sqs_queue_arn
   }
 }
 

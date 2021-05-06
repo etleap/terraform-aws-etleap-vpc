@@ -19,8 +19,9 @@ output "s3_input_bucket_policy" {
 }
 
 output "setup_password" {
-    value       = module.setup_password.secret_string
-    description = "The password to log into Etleap for the first time. You'll be prompted to change it after on first login."
+  sensitive   = true
+  value       = module.setup_password.secret_string
+  description = "The password to log into Etleap for the first time. You'll be prompted to change it after on first login."
 }
 
 output "public_subnet_a" {

@@ -32,6 +32,8 @@ export ETLEAP_MAIN_APP_IP="${main_app_ip}"
 export ETLEAP_YSJES_HOSTNAME=$ETLEAP_MAIN_APP_IP
 export ETLEAP_SALESFORCE_EXTRACTOR_ENDPOINT=https://$ETLEAP_MAIN_APP_IP:8000
 export ETLEAP_DEPLOYMENT_ROLE="${deployment_role}"
+export ETLEAP_SETUP_INBOUND_SNS_ARN="${var.inbound_sns_arn}"
+export ETLEAP_SETUP_INBOUND_SQS_ARN="${var.inbound_sqs_arn}"
 
 %{ if var.github_username != null && var.github_access_token_arn != null }
 export ETLEAP_GITHUB_USERNAME="${var.github_username}"
