@@ -16,8 +16,8 @@ resource "aws_emr_cluster" "emr" {
     emr_managed_master_security_group = aws_security_group.emr-master-managed.id
     emr_managed_slave_security_group  = aws_security_group.emr-slave-managed.id
     service_access_security_group     = aws_security_group.emr-service-access-managed.id
-    additional_master_security_groups = aws_security_group.internal.id
-    additional_slave_security_groups  = aws_security_group.internal.id
+    additional_master_security_groups = join(",", concat([aws_security_group.emr.id], var.extra_security_groups))
+    additional_slave_security_groups  = join(",", concat([aws_security_group.emr.id], var.extra_security_groups))
     instance_profile                  = aws_iam_instance_profile.emr_profile.name
   }
 

@@ -32,8 +32,9 @@ variable "last_name" {
 variable "email" {
 }
 
-variable "vpn_cidr_block" {
-  default = "0.0.0.0/32"
+variable "extra_security_groups" {
+  description = "Grant access to the DB, EC2 instance, and EMR cluster to the specified Security Groups."
+  default     = []
 }
 
 variable "ssl_key" {
