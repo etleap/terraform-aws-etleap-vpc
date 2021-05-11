@@ -122,6 +122,13 @@ variable "connection_secrets" {
   default     = {}
   description = "A map between environment variables and Secrets Manager Secret ARN for secrets to be injected into the application."
 }
+
+variable "resource_tags" {
+  default     = {}
+  description = "Resource tags to be applied to all resources create by this template."
+  type        = map(string)
+}
+
 // -----------------------------
 // End of configurable variables
 
