@@ -1,7 +1,7 @@
 resource "aws_security_group" "app" {
   name        = "Etleap App"
   description = "Etleap App"
-  vpc_id      = aws_vpc.etleap.id
+  vpc_id      = local.vpc_id
 
   tags = {
     Name = "Etleap App"
@@ -11,7 +11,7 @@ resource "aws_security_group" "app" {
 resource "aws_security_group" "db" {
   name        = "Etleap DB"
   description = "Etleap DB"
-  vpc_id      = aws_vpc.etleap.id
+  vpc_id      = local.vpc_id
 
   tags = {
     Name = "Etleap DB"
@@ -21,7 +21,7 @@ resource "aws_security_group" "db" {
 resource "aws_security_group" "emr" {
   name        = "Etleap EMR"
   description = "Etleap EMR Security Group"
-  vpc_id      = aws_vpc.etleap.id
+  vpc_id      = local.vpc_id
 
   tags = {
     Name = "Etleap EMR"
@@ -31,7 +31,7 @@ resource "aws_security_group" "emr" {
 resource "aws_security_group" "emr-master-managed" {
   name                   = "EMR Master Managed"
   description            = "Rules managed by EMR for EMR master"
-  vpc_id                 = aws_vpc.etleap.id
+  vpc_id                 = local.vpc_id
   revoke_rules_on_delete = true
 
   tags = {
@@ -42,7 +42,7 @@ resource "aws_security_group" "emr-master-managed" {
 resource "aws_security_group" "emr-slave-managed" {
   name                   = "EMR Slave Managed"
   description            = "Rules managed by EMR for EMR slave"
-  vpc_id                 = aws_vpc.etleap.id
+  vpc_id                 = local.vpc_id
   revoke_rules_on_delete = true
 
   tags = {
@@ -53,7 +53,7 @@ resource "aws_security_group" "emr-slave-managed" {
 resource "aws_security_group" "emr-service-access-managed" {
   name                   = "EMR Service Access Managed"
   description            = "Rules managed by EMR for EMR service access"
-  vpc_id                 = aws_vpc.etleap.id
+  vpc_id                 = local.vpc_id
   revoke_rules_on_delete = true
 
   tags = {

@@ -25,15 +25,6 @@ variable "ssl_key" {
 variable "region" {
 }
 
-variable "vpc_cidr_block_1" {
-}
-
-variable "vpc_cidr_block_2" {
-}
-
-variable "vpc_cidr_block_3" {
-}
-
 variable "instance_type" {
 }
 
@@ -83,7 +74,7 @@ write_files:
     region = ${var.region}
 
 runcmd:
-- "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.2\"]/g' /etc/docker/daemon.json"
+- "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"169.254.169.253\"]/g' /etc/docker/daemon.json"
 - "service docker restart"
 - ${var.db_init}
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''

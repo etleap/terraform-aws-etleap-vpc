@@ -45,10 +45,6 @@ module "main_app" {
   region        = var.region
   instance_type = var.app_instance_type
 
-  vpc_cidr_block_1 = var.vpc_cidr_block_1
-  vpc_cidr_block_2 = var.vpc_cidr_block_2
-  vpc_cidr_block_3 = var.vpc_cidr_block_3
-
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
     deployment_role = "customervpc",
@@ -75,10 +71,6 @@ module "ha_app" {
   region        = var.region
   instance_type = var.app_instance_type
 
-  vpc_cidr_block_1 = var.vpc_cidr_block_1
-  vpc_cidr_block_2 = var.vpc_cidr_block_2
-  vpc_cidr_block_3 = var.vpc_cidr_block_3
-
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
     deployment_role = "customervpc_ha",
@@ -90,13 +82,13 @@ module "ha_app" {
 resource "aws_network_interface" "main_app" {
   private_ips       = var.app_private_ip != null ? [var.app_private_ip] : null
   private_ips_count = 0
-  subnet_id         = aws_subnet.b_public.id
+  subnet_id         = local.subnet_b_public_id
   security_groups   = [aws_security_group.app.id]
 }
 
 resource "aws_network_interface" "ha_app" {
   count           = var.ha_mode ? 1 : 0
-  subnet_id       = aws_subnet.a_public.id
+  subnet_id       = local.subnet_a_public_id
   security_groups = [aws_security_group.app.id]
 }
 
@@ -116,7 +108,7 @@ resource "aws_lb" "app" {
   name               = "etleap-app-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = [aws_subnet.a_public.id, aws_subnet.b_public.id]
+  subnets            = [local.subnet_a_public_id, local.subnet_b_public_id]
   security_groups    = [aws_security_group.app.id]
 }
 
@@ -125,7 +117,7 @@ resource "aws_lb_target_group" "app" {
   name     = "Etleap-App"
   port     = 443
   protocol = "HTTPS"
-  vpc_id   = aws_vpc.etleap.id
+  vpc_id   = local.vpc_id
 
   health_check {
     path     = "/__ver"

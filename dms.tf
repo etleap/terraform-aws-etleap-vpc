@@ -18,7 +18,7 @@ resource "aws_dms_replication_instance" "dms" {
 resource "aws_dms_replication_subnet_group" "dms" {
   replication_subnet_group_description = "DMS Subnet Group"
   replication_subnet_group_id          = "etleap-dms${local.resource_name_suffix}"
-  subnet_ids                           = [aws_subnet.a_private.id, aws_subnet.b_private.id]
+  subnet_ids                           = [local.subnet_a_private_id, local.subnet_b_private_id]
   tags = {
     Name = "Etleap DMS Subnet Group"
   }
@@ -27,7 +27,7 @@ resource "aws_dms_replication_subnet_group" "dms" {
 resource "aws_security_group" "dms" {
   name        = "Etleap-DMS"
   description = "DMS group"
-  vpc_id      = aws_vpc.etleap.id
+  vpc_id      = local.vpc_id
 
   egress {
     from_port   = 0

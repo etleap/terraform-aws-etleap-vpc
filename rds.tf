@@ -23,7 +23,7 @@ resource "aws_db_instance" "db" {
 
 resource "aws_db_subnet_group" "db" {
   name       = "etleap_db_${random_id.deployment_random.hex}"
-  subnet_ids = [aws_subnet.a_private.id, aws_subnet.b_private.id]
+  subnet_ids = [local.subnet_a_private_id, local.subnet_b_private_id]
 }
 
 resource "aws_db_parameter_group" "mysql5-6-etleap" {

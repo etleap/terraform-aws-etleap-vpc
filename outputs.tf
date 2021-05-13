@@ -25,31 +25,31 @@ output "setup_password" {
 }
 
 output "public_subnet_a" {
-  value = aws_subnet.a_public.id
+  value = local.subnet_a_public_id
 }
 
 output "public_subnet_b" {
-  value = aws_subnet.b_public.id
+  value = local.subnet_b_public_id
 }
 
 output "private_subnet_a" {
-  value = aws_subnet.a_private.id
+  value = local.subnet_a_private_id
 }
 
 output "private_subnet_b" {
-  value = aws_subnet.b_private.id
+  value = local.subnet_b_private_id
 }
 
 output "public_route_table_id" {
-  value = aws_route_table.public.id
+  value = var.vpc_id == null ? aws_route_table.public[0].id : "Not managed by this Module"
 }
 
 output "private_route_table_id" {
-  value = aws_route_table.private.id
+  value = var.vpc_id == null ? aws_route_table.private[0].id : "Not managed by this Module"
 }
 
 output "vpc_id" {
-  value = aws_vpc.etleap.id
+  value = local.vpc_id
 }
 
 output "emr_cluster_id" {

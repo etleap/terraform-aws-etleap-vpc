@@ -12,7 +12,7 @@ resource "aws_emr_cluster" "emr" {
 
   ec2_attributes {
     key_name                          = var.key_name
-    subnet_id                         = aws_subnet.b_private.id
+    subnet_id                         = local.subnet_b_private_id
     emr_managed_master_security_group = aws_security_group.emr-master-managed.id
     emr_managed_slave_security_group  = aws_security_group.emr-slave-managed.id
     service_access_security_group     = aws_security_group.emr-service-access-managed.id

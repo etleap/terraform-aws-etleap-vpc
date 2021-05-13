@@ -129,6 +129,53 @@ variable "resource_tags" {
   type        = map(string)
 }
 
+variable "vpc_id" {
+  default     = null
+  description = "Existing VPC to deploy Etleap in."
+  type        = string
+
+  validation {
+    condition     = var.vpc_id == null ? true : can(regex("^vpc-", var.vpc_id))
+    error_message = "Invalid VPC ID."
+  }
+}
+
+variable "public_subnets" {
+  default     = null
+  description = "Existing public subnets to deploy Etleap in."
+  type        = list(string)
+
+  validation {
+    condition = var.public_subnets == null ? true : (length(var.public_subnets) == 2 && alltrue([
+      for s in var.public_subnets : can(regex("^subnet-", s))
+    ]))
+    error_message = "We require 2 valid public subnet ID's to be provided."
+  }
+}
+
+variable "private_subnets" {
+  default     = null
+  description = "Existing private subnets to deploy Etleap in."
+  type        = list(string)
+
+  validation {
+    condition = var.private_subnets == null ? true : (length(var.private_subnets) == 2 && alltrue([
+      for s in var.private_subnets : can(regex("^subnet-", s))
+    ]))
+    error_message = "We require 2 valid private subnet ID's to be provided."
+  }
+}
+
+# here we are validating the VPC config is valid, and that we have 4 subnets if the user is specifying a VPC ID.
+locals {
+  validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 2) && (var.private_subnets == null ? false : length(var.private_subnets) == 2)
+  validate_vpc_msg = "The VPC ID has been specified, but the public and private subnets have not"
+}
+
+resource "null_resource" "is_vpc_spec_valid" {
+  count = local.validate_vpc_cnd ? 0 : local.validate_vpc_msg
+}
+
 // -----------------------------
 // End of configurable variables
 
