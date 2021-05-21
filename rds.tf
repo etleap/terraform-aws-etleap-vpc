@@ -19,6 +19,13 @@ resource "aws_db_instance" "db" {
   deletion_protection          = true
   performance_insights_enabled = true
   multi_az                     = var.ha_mode
+
+  lifecycle {
+    ignore_changes = [
+      identifier_prefix,
+      name
+    ]
+  }
 }
 
 resource "aws_db_subnet_group" "db" {

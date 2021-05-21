@@ -11,6 +11,12 @@ resource "aws_s3_bucket" "intermediate" {
       days = 90
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      bucket
+    ]
+  }
 }
 
 resource "aws_iam_role" "intermediate" {
