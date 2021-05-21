@@ -9,15 +9,29 @@ variable "deployment_id" {
 
 variable "vpc_cidr_block_1" {
   description = "The first octet of the CIDR block of the desired VPC's address space."
+  default = 10
+  validation {
+    condition     = var.vpc_cidr_block_1 == 10 || var.vpc_cidr_block_1 == 172 || var.vpc_cidr_block_1 == 192
+    error_message = "First octet must one of 10, 172 or 192."
+  }
 }
 
 variable "vpc_cidr_block_2" {
   description = "The second octet of the CIDR block of the desired VPC's address space."
+  default = 10
+  validation {
+    condition     = var.vpc_cidr_block_2 >= 0 && var.vpc_cidr_block_2 <= 255
+    error_message = "Second octet must be in the [0, 255] range."
+  }
 }
 
 variable "vpc_cidr_block_3" {
   description = "The third octet of the CIDR block of the desired VPC's address space. Must be divisible by 4 because Etleap creates 4 /24 blocks."
-  default     = "0"
+  default     = 0
+  validation {
+    condition     = var.vpc_cidr_block_3 >= 0 && var.vpc_cidr_block_3 < 256 && var.vpc_cidr_block_3 % 4 == 0
+    error_message = "Third octet must be in the [0, 255] range, and divisible by 4 to allow for a /22 VPC CIDR range."
+  }
 }
 
 variable "key_name" {
@@ -169,11 +183,23 @@ variable "private_subnets" {
 # here we are validating the VPC config is valid, and that we have 4 subnets if the user is specifying a VPC ID.
 locals {
   validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 2) && (var.private_subnets == null ? false : length(var.private_subnets) == 2)
-  validate_vpc_msg = "The VPC ID has been specified, but the public and private subnets have not"
+  validate_vpc_msg = "The VPC ID has been specified, but the public and private subnets have not."
 }
 
 resource "null_resource" "is_vpc_spec_valid" {
   count = local.validate_vpc_cnd ? 0 : local.validate_vpc_msg
+}
+
+locals {
+  is_valid_10_subnet_range  = var.vpc_cidr_block_1 == 10
+  is_valid_172_subnet_range = var.vpc_cidr_block_1 == 172 && var.vpc_cidr_block_2 >= 16 && var.vpc_cidr_block_2 <= 32
+  is_valid_192_subnet_range = var.vpc_cidr_block_1 == 192 && var.vpc_cidr_block_2 == 168
+  is_cidr_range_valid_cnd   = var.vpc_id == null ? (local.is_valid_10_subnet_range || local.is_valid_172_subnet_range || local.is_valid_192_subnet_range) : true
+  is_cidr_range_valid_msg   = "CIDR blocks must be in the following ranges: 10.0.0.0/8, 172.16.0.0/12 or 192.168.0.0/16."
+}
+
+resource "null_resource" "are_cidr_ranges_valid" {
+  count = local.is_cidr_range_valid_cnd ? 0 : local.is_cidr_range_valid_msg
 }
 
 // -----------------------------
