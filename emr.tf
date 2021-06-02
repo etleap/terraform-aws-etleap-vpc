@@ -9,6 +9,7 @@ resource "aws_emr_cluster" "emr" {
   log_uri                           = "s3://${aws_s3_bucket.intermediate.id}/emr-logs/"
   service_role                      = aws_iam_role.emr_default_role.name
   autoscaling_role                  = aws_iam_role.emr_autoscaling_default_role.name
+  security_configuration            = var.emr_security_configuration_name
 
   ec2_attributes {
     key_name                          = var.key_name
