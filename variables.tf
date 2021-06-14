@@ -52,9 +52,18 @@ variable "extra_security_groups" {
 }
 
 variable "ssl_key" {
+  default     = null
+  description = "Deprecated. Private key to use for signing SSL requests. Replaced by using an ACM managed certificate."
 }
 
 variable "ssl_pem" {
+  default     = null
+  description = "Deprecated. Certificate to user for signing SSL requests. Replaced by using an ACM managed certificate."
+}
+
+locals {
+  ssl_key = var.ssl_key == null ? file("${path.module}/ssl/key.pem") : var.ssl_key
+  ssl_pem = var.ssl_pem == null ? file("${path.module}/ssl/cert.pem") : var.ssl_pem
 }
 
 variable "github_access_token" {
@@ -213,6 +222,11 @@ variable "roles_allowed_to_be_assumed" {
 variable "enable_public_access" {
   default     = true
   description = "Enable public access to the Etleap deployment. This will place the application instance(s) in the public subnet and adding an Elastic IP for each. Defaults to true."
+}
+
+variable "acm_certificate_arn" {
+  default     = null
+  description = "ARN Certificate to use for SSL. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template."
 }
 
 # here we are validating the VPC config is valid, and that we have 4 subnets if the user is specifying a VPC ID.

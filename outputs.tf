@@ -1,5 +1,5 @@
 output "app_public_address" {
-  value = var.ha_mode ? aws_lb.app[0].dns_name : module.main_app.app_public_ip_address
+  value = aws_lb.app.dns_name
 }
 
 output "s3_input_role_arn" {

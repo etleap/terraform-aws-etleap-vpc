@@ -1,5 +1,5 @@
 locals {
-  default_hostname = var.ha_mode ? aws_lb.app[0].dns_name : "$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)"
+  default_hostname = aws_lb.app.dns_name
   context = {
     deployment_id                 = var.deployment_id
     db_password_arn               = module.db_password.arn
@@ -42,8 +42,8 @@ module "main_app" {
 
   ami                  = var.amis["app"]
   key_name             = var.key_name
-  ssl_pem              = var.ssl_pem
-  ssl_key              = var.ssl_key
+  ssl_pem              = local.ssl_pem
+  ssl_key              = local.ssl_key
   region               = var.region
   instance_type        = var.app_instance_type
   enable_public_access = var.enable_public_access
@@ -69,8 +69,8 @@ module "ha_app" {
 
   ami                  = var.amis["app"]
   key_name             = var.key_name
-  ssl_pem              = var.ssl_pem
-  ssl_key              = var.ssl_key
+  ssl_pem              = local.ssl_pem
+  ssl_key              = local.ssl_key
   region               = var.region
   instance_type        = var.app_instance_type
   enable_public_access = var.enable_public_access
@@ -96,11 +96,14 @@ resource "aws_network_interface" "ha_app" {
   security_groups = [aws_security_group.app.id]
 }
 
-resource "aws_iam_server_certificate" "etleap" {
-  count            = var.ha_mode ? 1 : 0
-  name_prefix      = "Etleap_App_Cert_"
-  private_key      = var.ssl_key
-  certificate_body = var.ssl_pem
+resource "aws_acm_certificate" "etleap" {
+  count            = var.acm_certificate_arn == null ? 1 : 0
+  private_key      = local.ssl_key
+  certificate_body = local.ssl_pem
+
+  tags = {
+    Name = "Etleap Default"
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -108,7 +111,6 @@ resource "aws_iam_server_certificate" "etleap" {
 }
 
 resource "aws_lb" "app" {
-  count              = var.ha_mode ? 1 : 0
   name               = "etleap-app-alb"
   internal           = var.enable_public_access ? false : true
   load_balancer_type = "application"
@@ -117,7 +119,6 @@ resource "aws_lb" "app" {
 }
 
 resource "aws_lb_target_group" "app" {
-  count    = var.ha_mode ? 1 : 0
   name     = "Etleap-App"
   port     = 443
   protocol = "HTTPS"
@@ -131,29 +132,27 @@ resource "aws_lb_target_group" "app" {
 }
 
 resource "aws_lb_listener" "app" {
-  count             = var.ha_mode ? 1 : 0
-  load_balancer_arn = aws_lb.app[0].arn
+  load_balancer_arn = aws_lb.app.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_iam_server_certificate.etleap[0].arn
+  certificate_arn   = var.acm_certificate_arn == null ? aws_acm_certificate.etleap[0].arn : var.acm_certificate_arn
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.app[0].arn
+    target_group_arn = aws_lb_target_group.app.arn
   }
 }
 
 resource "aws_lb_target_group_attachment" "main_app" {
-  count            = var.ha_mode ? 1 : 0
-  target_group_arn = aws_lb_target_group.app[0].arn
+  target_group_arn = aws_lb_target_group.app.arn
   target_id        = module.main_app.instance_id
   port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "ha_app" {
   count            = var.ha_mode ? 1 : 0
-  target_group_arn = aws_lb_target_group.app[0].arn
+  target_group_arn = aws_lb_target_group.app.arn
   target_id        = module.ha_app[0].instance_id
   port             = 443
 }
