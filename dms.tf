@@ -1,4 +1,5 @@
 resource "aws_dms_replication_instance" "dms" {
+  count                        = var.disable_cdc_support ? 0 : 1
   replication_instance_class   = var.dms_instance_type
   engine_version               = "3.4.4"
   allocated_storage            = 50
@@ -6,8 +7,8 @@ resource "aws_dms_replication_instance" "dms" {
   availability_zone            = "${var.region}b"
   preferred_maintenance_window = "sun:10:30-sun:14:30"
   replication_instance_id      = "etleap-dms${local.resource_name_suffix}"
-  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms.id
-  vpc_security_group_ids       = [aws_security_group.dms.id]
+  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id
+  vpc_security_group_ids       = [aws_security_group.dms[0].id]
   publicly_accessible          = true
 
   tags = {
@@ -16,6 +17,7 @@ resource "aws_dms_replication_instance" "dms" {
 }
 
 resource "aws_dms_replication_subnet_group" "dms" {
+  count                                = var.disable_cdc_support ? 0 : 1
   replication_subnet_group_description = "DMS Subnet Group"
   replication_subnet_group_id          = "etleap-dms${local.resource_name_suffix}"
   subnet_ids                           = [local.subnet_a_private_id, local.subnet_b_private_id]
@@ -25,6 +27,7 @@ resource "aws_dms_replication_subnet_group" "dms" {
 }
 
 resource "aws_security_group" "dms" {
+  count       = var.disable_cdc_support ? 0 : 1
   name        = "Etleap-DMS"
   description = "DMS group"
   vpc_id      = local.vpc_id
@@ -55,35 +58,37 @@ data "aws_iam_policy_document" "dms_assume_role" {
 }
 
 resource "aws_iam_role" "dms-vpc-role" {
-    count              = var.dms_roles_to_be_created ? 1 : 0
+    count              = var.dms_roles_to_be_created && !var.disable_cdc_support ? 1 : 0
     name               = "dms-vpc-role"
     assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
-  count      = var.dms_roles_to_be_created ? 1 : 0
+  count      = var.dms_roles_to_be_created && !var.disable_cdc_support ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
   role       = aws_iam_role.dms-vpc-role[0].name
 }
 
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {
-    count              = var.dms_roles_to_be_created ? 1 : 0
+    count              = var.dms_roles_to_be_created && !var.disable_cdc_support ? 1 : 0
     name               = "dms-cloudwatch-logs-role"
     assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
-  count      = var.dms_roles_to_be_created ? 1 : 0
+  count      = var.dms_roles_to_be_created && !var.disable_cdc_support? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
   role       = aws_iam_role.dms-cloudwatch-logs-role[0].name
 }
 
 resource "aws_iam_role" "dms" {
+  count              = var.disable_cdc_support ? 0 : 1
   name               = "Etleap-dms-role${local.resource_name_suffix}"
   assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
 }
 
 resource "aws_iam_policy" "dms_s3" {
+  count  = var.disable_cdc_support ? 0 : 1
   name   = "Etleap-DMS-S3-Access${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -110,6 +115,7 @@ EOF
 }
 
 resource "aws_iam_policy" "job_manage_dms" {
+  count  = var.disable_cdc_support ? 0 : 1
   name   = "Etleap-Manage-DMS${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -137,7 +143,7 @@ resource "aws_iam_policy" "job_manage_dms" {
         "iam:GetRole",
         "iam:PassRole"
       ],
-      "Resource": "${aws_iam_role.dms.arn}"
+      "Resource": "${aws_iam_role.dms[0].arn}"
     }
   ]
 }
@@ -146,11 +152,13 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "dms_s3" {
-  role       = aws_iam_role.dms.name
-  policy_arn = aws_iam_policy.dms_s3.arn
+  count      = var.disable_cdc_support ? 0 : 1
+  role       = aws_iam_role.dms[0].name
+  policy_arn = aws_iam_policy.dms_s3[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "app_dms" {
+  count      = var.disable_cdc_support ? 0 : 1
   role       = aws_iam_role.app.name
-  policy_arn = aws_iam_policy.job_manage_dms.arn
+  policy_arn = aws_iam_policy.job_manage_dms[0].arn
 }

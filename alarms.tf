@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
-  alarm_name          = "${var.deployment_id} - EMR Cluster Running"
+  alarm_name          = "Etleap - ${var.deployment_id} - EMR Cluster Running"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "CoreNodesRunning"
@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
-  alarm_name          = "${var.deployment_id} - 60% Disk EMR HDFS"
+  alarm_name          = "Etleap - ${var.deployment_id} - 60% Disk EMR HDFS"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "HDFSUtilization"
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
-  alarm_name          = "${var.deployment_id} - EMR Unhealthy Nodes"
+  alarm_name          = "Etleap - ${var.deployment_id} - EMR Unhealthy Nodes"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "MRUnhealthyNodes"
@@ -51,7 +51,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
-  alarm_name          = "${var.deployment_id} - EMR Missing Blocks"
+  alarm_name          = "Etleap - ${var.deployment_id} - EMR Missing Blocks"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "MissingBlocks"
@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
-  alarm_name          = "${var.deployment_id} - RDS CPU 90%"
+  alarm_name          = "Etleap - ${var.deployment_id} - RDS CPU 90%"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_disk" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
-  alarm_name          = "${var.deployment_id} - RDS Freeable Memory"
+  alarm_name          = "Etleap - ${var.deployment_id} - RDS Freeable Memory"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "FreeableMemory"
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
-  alarm_name          = "${var.deployment_id} - Main Node 80% CPU"
+  alarm_name          = "Etleap - ${var.deployment_id} - Main Node 80% CPU"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
@@ -137,7 +137,7 @@ resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
 
 resource "aws_cloudwatch_metric_alarm" "ha_node_cpu" {
   count               = var.ha_mode ? 1 : 0
-  alarm_name          = "${var.deployment_id} - HA Node 80% CPU"
+  alarm_name          = "Etleap - ${var.deployment_id} - HA Node 80% CPU"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
@@ -154,7 +154,7 @@ resource "aws_cloudwatch_metric_alarm" "ha_node_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
-  alarm_name          = "${var.deployment_id} - Main Node 90% Disk Root"
+  alarm_name          = "Etleap - ${var.deployment_id} - Main Node 90% Disk Root"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Disk"
@@ -172,7 +172,7 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
-  alarm_name          = "${var.deployment_id} - Main Node 90% Disk Docker"
+  alarm_name          = "Etleap - ${var.deployment_id} - Main Node 90% Disk Docker"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Disk"
@@ -191,7 +191,7 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
 
 resource "aws_cloudwatch_metric_alarm" "ha_app_disk_root" {
   count               = var.ha_mode ? 1 : 0
-  alarm_name          = "${var.deployment_id} - HA Node 90% Disk Root"
+  alarm_name          = "Etleap - ${var.deployment_id} - HA Node 90% Disk Root"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Disk"
@@ -210,7 +210,7 @@ resource "aws_cloudwatch_metric_alarm" "ha_app_disk_root" {
 
 resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
   count               = var.ha_mode ? 1 : 0
-  alarm_name          = "${var.deployment_id} - HA Node 90% Disk Docker"
+  alarm_name          = "Etleap - ${var.deployment_id} - HA Node 90% Disk Docker"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Disk"
@@ -228,7 +228,7 @@ resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "app_running" {
-  alarm_name = "${var.deployment_id} - App is running"
+  alarm_name = "Etleap - ${var.deployment_id} - App is running"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "5"
   metric_name         = "AppRunning"

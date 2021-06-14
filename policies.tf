@@ -16,10 +16,10 @@ resource "aws_iam_policy_attachment" "cloudwatch_metric_data" {
   policy_arn = aws_iam_policy.cloudwatch_metric_data.arn
 }
 
-resource "aws_iam_policy_attachment" "assume_any_role" {
+resource "aws_iam_policy_attachment" "assume_roles" {
   name       = "App and EMR assume any role"
   roles      = [aws_iam_role.app.name, aws_iam_role.emr.name, aws_iam_role.emr_default_role.name]
-  policy_arn = aws_iam_policy.assume_any_role.arn
+  policy_arn = aws_iam_policy.assume_roles.arn
 }
 
 resource "aws_iam_role_policy_attachment" "emr_profile_policy" {
@@ -74,7 +74,7 @@ resource "aws_iam_policy" "get_secrets" {
                 "secretsmanager:GetSecretValue"
             ],
             "Resource": [
-                "*"
+                "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:Etleap*"
             ]
         }
     ]
@@ -162,20 +162,30 @@ EOF
 
 }
 
-resource "aws_iam_policy" "assume_any_role" {
-  name   = "Etleap_assume_any_role${local.resource_name_suffix}"
+resource "aws_iam_policy" "assume_roles" {
+  name   = "Etleap_assume_roles${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "AllowEtleapRoles",
       "Effect": "Allow",
       "Action": [
         "sts:AssumeRole"
       ],
       "Resource": [
-        "*"
+        "arn:aws:iam::841591717599:role/*",
+        "${aws_iam_role.intermediate.arn}"
       ]
+    },
+    {
+      "Sid": "AllowOtherRoles",
+      "Effect": "Allow",
+      "Action": [
+        "sts:AssumeRole"
+      ],
+      "Resource": ${jsonencode(var.roles_allowed_to_be_assumed)}
     }
   ]
 }

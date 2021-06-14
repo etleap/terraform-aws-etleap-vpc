@@ -28,6 +28,9 @@ variable "region" {
 variable "instance_type" {
 }
 
+variable "enable_public_access" {
+}
+
 resource "aws_instance" "app" {
   instance_type        = var.instance_type
   ami                  = var.ami
@@ -98,6 +101,7 @@ EOF
 }
 
 resource "aws_eip" "app" {
+  count    = var.enable_public_access ? 1 : 0
   instance = aws_instance.app.id
   vpc      = true
 }
@@ -107,6 +111,6 @@ output "instance_id" {
 }
 
 output "app_public_ip_address" {
-  value       = aws_eip.app.public_ip
-  description = "App IP Address"
+  value       = var.enable_public_access ? aws_eip.app[0].public_ip : null
+  description = "App Public IP Address, or null if the deployment is not publicly accessible"
 }

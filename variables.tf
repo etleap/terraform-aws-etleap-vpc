@@ -9,7 +9,7 @@ variable "deployment_id" {
 
 variable "vpc_cidr_block_1" {
   description = "The first octet of the CIDR block of the desired VPC's address space."
-  default = 10
+  default     = 10
   validation {
     condition     = var.vpc_cidr_block_1 == 10 || var.vpc_cidr_block_1 == 172 || var.vpc_cidr_block_1 == 192
     error_message = "First octet must one of 10, 172 or 192."
@@ -18,7 +18,7 @@ variable "vpc_cidr_block_1" {
 
 variable "vpc_cidr_block_2" {
   description = "The second octet of the CIDR block of the desired VPC's address space."
-  default = 10
+  default     = 10
   validation {
     condition     = var.vpc_cidr_block_2 >= 0 && var.vpc_cidr_block_2 <= 255
     error_message = "Second octet must be in the [0, 255] range."
@@ -183,6 +183,36 @@ variable "private_subnets" {
 variable "emr_security_configuration_name" {
   default     = null
   description = "Specify the name of the security configuration to use when creating the EMR cluster."
+}
+
+variable "s3_kms_encryption_key" {
+  default     = null
+  description = "The key to use to encrypt S3 objects in the intermediate bucket."
+}
+
+variable "disable_cdc_support" {
+  default     = false
+  description = "Set to true if this deployment will not use CDC pipelines. This will cause the DMS Replication Instance and associated resources not to be created. Defaults to false."
+}
+
+variable "app_access_cidr_blocks" {
+  default     = ["0.0.0.0/0"]
+  description = "CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses."
+}
+
+variable "ssh_access_cidr_blocks" {
+  default     = ["0.0.0.0/0"]
+  description = "CIDR ranges that have SSH access to the application instance(s). Defaults to allowing all IP addresses."
+}
+
+variable "roles_allowed_to_be_assumed" {
+  default     = ["*"]
+  description = "A list of roles that can be assumed by the app. When not specified, it defaults to all roles (*)."
+}
+
+variable "enable_public_access" {
+  default     = true
+  description = "Enable public access to the Etleap deployment. This will place the application instance(s) in the public subnet and adding an Elastic IP for each. Defaults to true."
 }
 
 # here we are validating the VPC config is valid, and that we have 4 subnets if the user is specifying a VPC ID.

@@ -20,9 +20,13 @@ export ETLEAP_SETUP_PASSWORD="${var.setup_password}"
 export ETLEAP_SETUP_ADMIN_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.admin_password_arn} | jq -r .SecretString)"
 export ETLEAP_SETUP_INTERMEDIATE_BUCKET="${var.s3_bucket}"
 export ETLEAP_SETUP_INTERMEDIATE_ROLE_ARN="${var.s3_role}"
+
+%{ if var.has_dms_instance }
 export ETLEAP_DMS_ROLE_ARN="${var.dms_role}"
 export ETLEAP_DMS_INSTANCE_ARN="${var.dms_replication_instance_arn}"
 export ETLEAP_DMS_INSTANCE_NAME="${var.dms_replication_instance_name}"
+%{ endif }
+
 export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"
 export MARKETPLACE_DEPLOYMENT="false"
 export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${var.deployment_secret_arn} | jq -r .SecretString)"
@@ -34,6 +38,10 @@ export ETLEAP_SALESFORCE_EXTRACTOR_ENDPOINT=https://$ETLEAP_MAIN_APP_IP:8000
 export ETLEAP_DEPLOYMENT_ROLE="${deployment_role}"
 export ETLEAP_SETUP_INBOUND_SNS_ARN="${var.inbound_sns_arn}"
 export ETLEAP_SETUP_INBOUND_SQS_ARN="${var.inbound_sqs_arn}"
+
+%{ if var.use_s3_kms_sse_key }
+export USE_SSE_KMS="1"
+%{ endif }
 
 %{ if var.github_username != null && var.github_access_token_arn != null }
 export ETLEAP_GITHUB_USERNAME="${var.github_username}"

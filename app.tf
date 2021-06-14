@@ -13,9 +13,10 @@ locals {
     setup_password                = module.setup_password.secret_string
     s3_bucket                     = aws_s3_bucket.intermediate.id
     s3_role                       = aws_iam_role.intermediate.arn
-    dms_role                      = aws_iam_role.dms.arn
-    dms_replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
-    dms_replication_instance_name = lower(aws_dms_replication_instance.dms.replication_instance_id)
+    has_dms_instance              = !var.disable_cdc_support
+    dms_role                      = var.disable_cdc_support ? null : aws_iam_role.dms[0].arn
+    dms_replication_instance_arn  = var.disable_cdc_support ? null : aws_dms_replication_instance.dms[0].replication_instance_arn
+    dms_replication_instance_name = var.disable_cdc_support ? null : lower(aws_dms_replication_instance.dms[0].replication_instance_id)
     account_id                    = data.aws_caller_identity.current.account_id
     db_address                    = aws_db_instance.db.address
     emr_cluster                   = aws_emr_cluster.emr.master_public_dns
@@ -25,6 +26,7 @@ locals {
     connection_secrets            = var.connection_secrets
     inbound_sns_arn               = module.inbound_queue.sns_topic_arn
     inbound_sqs_arn               = module.inbound_queue.sqs_queue_arn
+    use_s3_kms_sse_key            = var.s3_kms_encryption_key != null
   }
 }
 
@@ -38,12 +40,13 @@ module "main_app" {
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.main_app.id
 
-  ami           = var.amis["app"]
-  key_name      = var.key_name
-  ssl_pem       = var.ssl_pem
-  ssl_key       = var.ssl_key
-  region        = var.region
-  instance_type = var.app_instance_type
+  ami                  = var.amis["app"]
+  key_name             = var.key_name
+  ssl_pem              = var.ssl_pem
+  ssl_key              = var.ssl_key
+  region               = var.region
+  instance_type        = var.app_instance_type
+  enable_public_access = var.enable_public_access
 
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
@@ -64,12 +67,13 @@ module "ha_app" {
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.ha_app[0].id
 
-  ami           = var.amis["app"]
-  key_name      = var.key_name
-  ssl_pem       = var.ssl_pem
-  ssl_key       = var.ssl_key
-  region        = var.region
-  instance_type = var.app_instance_type
+  ami                  = var.amis["app"]
+  key_name             = var.key_name
+  ssl_pem              = var.ssl_pem
+  ssl_key              = var.ssl_key
+  region               = var.region
+  instance_type        = var.app_instance_type
+  enable_public_access = var.enable_public_access
 
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
@@ -82,13 +86,13 @@ module "ha_app" {
 resource "aws_network_interface" "main_app" {
   private_ips       = var.app_private_ip != null ? [var.app_private_ip] : null
   private_ips_count = 0
-  subnet_id         = local.subnet_b_public_id
+  subnet_id         = var.enable_public_access ? local.subnet_b_public_id : local.subnet_b_private_id
   security_groups   = [aws_security_group.app.id]
 }
 
 resource "aws_network_interface" "ha_app" {
   count           = var.ha_mode ? 1 : 0
-  subnet_id       = local.subnet_a_public_id
+  subnet_id       = var.enable_public_access ? local.subnet_a_public_id : local.subnet_b_private_id
   security_groups = [aws_security_group.app.id]
 }
 
@@ -106,9 +110,9 @@ resource "aws_iam_server_certificate" "etleap" {
 resource "aws_lb" "app" {
   count              = var.ha_mode ? 1 : 0
   name               = "etleap-app-alb"
-  internal           = false
+  internal           = var.enable_public_access ? false : true
   load_balancer_type = "application"
-  subnets            = [local.subnet_a_public_id, local.subnet_b_public_id]
+  subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
   security_groups    = [aws_security_group.app.id]
 }
 

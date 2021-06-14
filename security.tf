@@ -139,7 +139,7 @@ resource "aws_security_group_rule" "app-allow-ssh" {
   to_port           = 22
   protocol          = "tcp"
   security_group_id = aws_security_group.app.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = var.ssh_access_cidr_blocks
 }
 
 resource "aws_security_group_rule" "app-allow-web-ssl" {
@@ -148,23 +148,5 @@ resource "aws_security_group_rule" "app-allow-web-ssl" {
   to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.app.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "app-allow-web-ysjes-rest-api" {
-  type              = "ingress"
-  from_port         = 8080
-  to_port           = 8080
-  protocol          = "tcp"
-  security_group_id = aws_security_group.app.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "app-allow-web-ysjes-healthchecks" {
-  type              = "ingress"
-  from_port         = 8081
-  to_port           = 8081
-  protocol          = "tcp"
-  security_group_id = aws_security_group.app.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = var.app_access_cidr_blocks
 }

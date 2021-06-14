@@ -31,6 +31,13 @@ resource "aws_db_instance" "db" {
 resource "aws_db_subnet_group" "db" {
   name       = "etleap_db_${random_id.deployment_random.hex}"
   subnet_ids = [local.subnet_a_private_id, local.subnet_b_private_id]
+  
+  lifecycle {
+    ignore_changes = [
+      name,
+      description
+    ]
+  }
 }
 
 resource "aws_db_parameter_group" "mysql5-6-etleap" {
