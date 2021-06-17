@@ -229,6 +229,11 @@ variable "acm_certificate_arn" {
   description = "ARN Certificate to use for SSL. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template."
 }
 
+variable "rds_backup_retention_period" {
+  default     = 7
+  description = "The number of days to retain the automated database snapshots. Defaults to 7 days."
+}
+
 # here we are validating the VPC config is valid, and that we have 4 subnets if the user is specifying a VPC ID.
 locals {
   validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 2) && (var.private_subnets == null ? false : length(var.private_subnets) == 2)

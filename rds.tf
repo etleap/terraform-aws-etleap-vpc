@@ -11,7 +11,7 @@ resource "aws_db_instance" "db" {
   db_subnet_group_name         = aws_db_subnet_group.db.name
   parameter_group_name         = aws_db_parameter_group.mysql5-6-etleap.name
   vpc_security_group_ids       = [aws_security_group.db.id]
-  backup_retention_period      = 7
+  backup_retention_period      = var.rds_backup_retention_period
   auto_minor_version_upgrade   = false
   storage_encrypted            = true
   skip_final_snapshot          = true
