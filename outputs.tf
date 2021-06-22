@@ -73,3 +73,29 @@ output "main_app_instance_id" {
   value       = module.main_app.instance_id
   description = "The instance ID of the main application instance."
 }
+
+output "kms_policy" {
+  value = var.s3_kms_encryption_key == null ? null : <<EOF
+{
+    "Sid": "Allow Etleap roles use of the key",
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": [
+            "${aws_iam_role.app.arn}",
+            "${aws_iam_role.emr.arn}",
+            "${aws_iam_role.intermediate.arn}",
+            "${aws_iam_role.emr_default_role.arn}"
+        ]
+    },
+    "Action": [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+    ],
+    "Resource": "${var.s3_kms_encryption_key}"
+}
+EOF
+  description = "Statement to add to the KMS key if using a Customer-Manager SSE KMS key for encrypting S3 data."
+}

@@ -26,7 +26,7 @@ locals {
     connection_secrets            = var.connection_secrets
     inbound_sns_arn               = module.inbound_queue.sns_topic_arn
     inbound_sqs_arn               = module.inbound_queue.sqs_queue_arn
-    use_s3_kms_sse_key            = var.s3_kms_encryption_key != null
+    s3_kms_sse_key                = var.s3_kms_encryption_key
   }
 }
 
