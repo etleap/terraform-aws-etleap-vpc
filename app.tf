@@ -111,7 +111,7 @@ resource "aws_acm_certificate" "etleap" {
 }
 
 resource "aws_lb" "app" {
-  name               = "etleap-app-alb"
+  name               = "etleap-app-alb${local.resource_name_suffix}"
   internal           = var.enable_public_access ? false : true
   load_balancer_type = "application"
   subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
@@ -119,7 +119,7 @@ resource "aws_lb" "app" {
 }
 
 resource "aws_lb_target_group" "app" {
-  name     = "Etleap-App"
+  name     = "Etleap-App${local.resource_name_suffix}"
   port     = 443
   protocol = "HTTPS"
   vpc_id   = local.vpc_id
