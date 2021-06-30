@@ -91,9 +91,11 @@ resource "aws_network_interface" "main_app" {
 }
 
 resource "aws_network_interface" "ha_app" {
-  count           = var.ha_mode ? 1 : 0
-  subnet_id       = var.enable_public_access ? local.subnet_a_public_id : local.subnet_b_private_id
-  security_groups = [aws_security_group.app.id]
+  count             = var.ha_mode ? 1 : 0
+  private_ips       = var.ha_app_private_ip != null ? [var.ha_app_private_ip] : null
+  private_ips_count = 0
+  subnet_id         = var.enable_public_access ? local.subnet_a_public_id : local.subnet_a_private_id
+  security_groups   = [aws_security_group.app.id]
 }
 
 resource "aws_acm_certificate" "etleap" {

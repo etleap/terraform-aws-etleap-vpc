@@ -2,9 +2,11 @@
 // ---------------------------------
 
 variable "region" {
+  description = "The region Etleap is deployed in."
 }
 
 variable "deployment_id" {
+  description = "The Deployment ID for this deployment. If you don't have one, please contact Etleap Support."
 }
 
 variable "vpc_cidr_block_1" {
@@ -35,15 +37,19 @@ variable "vpc_cidr_block_3" {
 }
 
 variable "key_name" {
+  description = "The AWS Key Pair to use for SSH access into the EC2 instances."
 }
 
 variable "first_name" {
+  description = "The first name to use when creating the first Etleap user account."
 }
 
 variable "last_name" {
+  description = "The last name to use when creating the first Etleap user account."
 }
 
 variable "email" {
+  description = "The email to use when creating the first Etleap user account."
 }
 
 variable "extra_security_groups" {
@@ -71,19 +77,28 @@ variable "github_access_token" {
 }
 
 variable "app_hostname" {
-  default = null
+  default     = null
+  description = "The hostname where Etleap will be accessible from."
 }
 
 variable "ha_mode" {
-  default = false
+  default     = false
+  description = "Enables High Availability mode with will run 2 Application nodes and set the DB to multi-az. Defaults to false."
 }
 
 variable "app_private_ip" {
-  default = null
+  default     = null
+  description = "The private IP to assign to the Main App instance."
 }
 
 variable "nat_private_ip" {
-  default = null
+  default     = null
+  description = "The private IP to assign to the NAT instance."
+}
+
+variable "ha_app_private_ip" {
+  default     = null
+  description = "The private IP to assign to the High Availability App instance."
 }
 
 variable "non_critical_cloudwatch_alarm_sns_topics" {
