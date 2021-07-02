@@ -56,7 +56,7 @@ module "main_app" {
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
 
-module "ha_app" {
+module "secondary_app" {
   count = var.ha_mode ? 1 : 0
   depends_on = [
     aws_route.prod_public,
@@ -65,7 +65,7 @@ module "ha_app" {
 
   source            = "./modules/app/"
   instance_profile  = aws_iam_instance_profile.app.name
-  network_interface = aws_network_interface.ha_app[0].id
+  network_interface = aws_network_interface.secondary_app[0].id
 
   ami                  = var.amis["app"]
   key_name             = var.key_name
@@ -86,15 +86,15 @@ module "ha_app" {
 resource "aws_network_interface" "main_app" {
   private_ips       = var.app_private_ip != null ? [var.app_private_ip] : null
   private_ips_count = 0
-  subnet_id         = var.enable_public_access ? local.subnet_b_public_id : local.subnet_b_private_id
+  subnet_id         = local.subnet_b_private_id
   security_groups   = [aws_security_group.app.id]
 }
 
-resource "aws_network_interface" "ha_app" {
+resource "aws_network_interface" "secondary_app" {
   count             = var.ha_mode ? 1 : 0
-  private_ips       = var.ha_app_private_ip != null ? [var.ha_app_private_ip] : null
+  private_ips       = var.secondary_app_private_ip != null ? [var.secondary_app_private_ip] : null
   private_ips_count = 0
-  subnet_id         = var.enable_public_access ? local.subnet_a_public_id : local.subnet_a_private_id
+  subnet_id         = local.subnet_a_private_id
   security_groups   = [aws_security_group.app.id]
 }
 
@@ -114,9 +114,9 @@ resource "aws_acm_certificate" "etleap" {
 
 resource "aws_lb" "app" {
   name_prefix        = "etleap"
-  internal           = var.enable_public_access ? false : true
+  internal           = !var.enable_public_access
   load_balancer_type = "application"
-  subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
+  subnets            = [local.subnet_a_public_id, local.subnet_b_public_id]
   security_groups    = [aws_security_group.app.id]
 }
 
@@ -152,10 +152,10 @@ resource "aws_lb_target_group_attachment" "main_app" {
   port             = 443
 }
 
-resource "aws_lb_target_group_attachment" "ha_app" {
+resource "aws_lb_target_group_attachment" "secondary_app" {
   count            = var.ha_mode ? 1 : 0
   target_group_arn = aws_lb_target_group.app.arn
-  target_id        = module.ha_app[0].instance_id
+  target_id        = module.secondary_app[0].instance_id
   port             = 443
 }
 

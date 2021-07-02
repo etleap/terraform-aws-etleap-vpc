@@ -64,14 +64,14 @@ output "deployment_id" {
   value = var.deployment_id
 }
 
-output "main_app_ip" {
-  value       = module.main_app.app_public_ip_address
-  description = "The IP of the main application instance."
-}
-
 output "main_app_instance_id" {
   value       = module.main_app.instance_id
   description = "The instance ID of the main application instance."
+}
+
+output "secondary_app_instance_id" {
+  value       = var.ha_mode ? module.secondary_app[0].instance_id : null
+  description = "The instance ID of the secondary application instance."
 }
 
 output "kms_policy" {

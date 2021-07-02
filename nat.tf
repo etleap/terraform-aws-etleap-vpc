@@ -47,7 +47,7 @@ resource "aws_security_group_rule" "nat-ingress" {
   to_port           = 65535
   protocol          = "tcp"
   security_group_id = aws_security_group.nat[0].id
-  cidr_blocks       = [aws_subnet.b_private[0].cidr_block]
+  cidr_blocks       = [aws_subnet.a_private[0].cidr_block, aws_subnet.b_private[0].cidr_block]
 }
 
 resource "aws_eip" "nat" {

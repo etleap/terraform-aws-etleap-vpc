@@ -96,9 +96,9 @@ variable "nat_private_ip" {
   description = "The private IP to assign to the NAT instance."
 }
 
-variable "ha_app_private_ip" {
+variable "secondary_app_private_ip" {
   default     = null
-  description = "The private IP to assign to the High Availability App instance."
+  description = "The private IP to assign to the Secondary App instance."
 }
 
 variable "non_critical_cloudwatch_alarm_sns_topics" {

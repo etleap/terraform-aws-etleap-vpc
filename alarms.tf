@@ -135,15 +135,15 @@ resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
   insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
-resource "aws_cloudwatch_metric_alarm" "ha_node_cpu" {
+resource "aws_cloudwatch_metric_alarm" "secondary_node_cpu" {
   count               = var.ha_mode ? 1 : 0
-  alarm_name          = "Etleap - ${var.deployment_id} - HA Node 80% CPU"
+  alarm_name          = "Etleap - ${var.deployment_id} - Secondary Node 80% CPU"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
   dimensions = {
-    InstanceId = module.ha_app[0].instance_id
+    InstanceId = module.secondary_app[0].instance_id
   }
   period                    = "300"
   statistic                 = "Average"
@@ -189,15 +189,15 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
-resource "aws_cloudwatch_metric_alarm" "ha_app_disk_root" {
+resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_root" {
   count               = var.ha_mode ? 1 : 0
-  alarm_name          = "Etleap - ${var.deployment_id} - HA Node 90% Disk Root"
+  alarm_name          = "Etleap - ${var.deployment_id} - Secondary Node 90% Disk Root"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Disk"
   namespace           = "Etleap/EC2"
   dimensions = {
-    InstanceId = module.ha_app[0].instance_id
+    InstanceId = module.secondary_app[0].instance_id
     Device     = "Root"
   }
   period                    = "60"
@@ -208,7 +208,7 @@ resource "aws_cloudwatch_metric_alarm" "ha_app_disk_root" {
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
-resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
+resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_docker" {
   count               = var.ha_mode ? 1 : 0
   alarm_name          = "Etleap - ${var.deployment_id} - HA Node 90% Disk Docker"
   comparison_operator = "GreaterThanThreshold"
@@ -216,7 +216,7 @@ resource "aws_cloudwatch_metric_alarm" "ha_app_disk_docker" {
   metric_name         = "Disk"
   namespace           = "Etleap/EC2"
   dimensions = {
-    InstanceId = module.ha_app[0].instance_id
+    InstanceId = module.secondary_app[0].instance_id
     Device     = "Docker"
   }
   period                    = "60"

@@ -100,17 +100,6 @@ EOF
   }
 }
 
-resource "aws_eip" "app" {
-  count    = var.enable_public_access ? 1 : 0
-  instance = aws_instance.app.id
-  vpc      = true
-}
-
 output "instance_id" {
   value = aws_instance.app.id
-}
-
-output "app_public_ip_address" {
-  value       = var.enable_public_access ? aws_eip.app[0].public_ip : null
-  description = "App Public IP Address, or null if the deployment is not publicly accessible"
 }
