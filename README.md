@@ -9,7 +9,7 @@ This will create a new VPC, and deploy Etleap and its associated resources insid
 
 ```
 module "etleap" {
-  source  = "app.terraform.io/etleap/etleap-vpc/aws"
+  source  = "etleap/etleap-vpc/aws"
   version = "1.0.0"
 
   region           = "us-east-1"
