@@ -42,6 +42,11 @@ resource "aws_iam_role_policy_attachment" "emr_autoscaling_default_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforAutoScalingRole"
 }
 
+resource "aws_iam_role_policy_attachment" "allow_sns_put" {
+  role       = aws_iam_role.app.name
+  policy_arn = aws_iam_policy.allow_sns_put.arn
+}
+
 resource "aws_iam_role" "emr" {
   name               = "EtleapEMR${local.resource_name_suffix}"
   assume_role_policy = <<EOF
@@ -193,6 +198,22 @@ EOF
 
 }
 
+resource "aws_iam_policy" "allow_sns_put" {
+  name = "Etleap_sns_put${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Id": "SnsAllowOutboundMessages",
+  "Statement": [{
+    "Sid": "SnsAllowPublishToAny",
+    "Effect": "Allow",
+    "Action": "sns:Publish",
+    "Resource": "*"
+  }]
+}
+EOF
+}
+
 resource "aws_iam_role" "emr_default_role" {
   name               = "EtleapEMR_DefaultRole${local.resource_name_suffix}"
   assume_role_policy = <<EOF
@@ -210,7 +231,6 @@ resource "aws_iam_role" "emr_default_role" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role" "emr_autoscaling_default_role" {
