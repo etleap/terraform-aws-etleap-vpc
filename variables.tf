@@ -81,6 +81,11 @@ variable "app_hostname" {
   description = "The hostname where Etleap will be accessible from."
 }
 
+variable "app_available" {
+  default     = true
+  description = "Enable or disable to start or destroy the app instance."
+}
+
 variable "ha_mode" {
   default     = false
   description = "Enables High Availability mode. This will run two redundant Etleap instances in 2 availability zones, and set the RDS instace to \"multi-az\" mode."
@@ -247,6 +252,11 @@ variable "acm_certificate_arn" {
 variable "rds_backup_retention_period" {
   default     = 7
   description = "The number of days to retain the automated database snapshots. Defaults to 7 days."
+}
+
+variable "rds_allow_major_version_upgrade" {
+  default     = false
+  description = "Indicates that major version upgrades are allowed and if an update is required it will be applied immediately."
 }
 
 # here we are validating the VPC config is valid, and that we have 4 subnets if the user is specifying a VPC ID.

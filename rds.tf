@@ -3,13 +3,13 @@ resource "aws_db_instance" "db" {
   allocated_storage            = 500
   storage_type                 = "gp2"
   engine                       = "mysql"
-  engine_version               = "5.6.41"
+  engine_version               = "5.7.34"
   instance_class               = "db.m5.large"
   name                         = "EtleapDB"
   username                     = "root"
   password                     = module.db_root_password.secret_string
   db_subnet_group_name         = aws_db_subnet_group.db.name
-  parameter_group_name         = aws_db_parameter_group.mysql5-6-etleap.name
+  parameter_group_name         = aws_db_parameter_group.mysql5-7-etleap.name
   vpc_security_group_ids       = [aws_security_group.db.id]
   backup_retention_period      = var.rds_backup_retention_period
   auto_minor_version_upgrade   = false
@@ -19,6 +19,9 @@ resource "aws_db_instance" "db" {
   deletion_protection          = true
   performance_insights_enabled = true
   multi_az                     = var.ha_mode
+
+  allow_major_version_upgrade = var.rds_allow_major_version_upgrade
+  apply_immediately           = var.rds_allow_major_version_upgrade
 
   lifecycle {
     ignore_changes = [
@@ -40,10 +43,10 @@ resource "aws_db_subnet_group" "db" {
   }
 }
 
-resource "aws_db_parameter_group" "mysql5-6-etleap" {
-  name        = "etleap-mysql5-6-${random_id.deployment_random.hex}"
-  description = "MySQL 5.6 with Etleap modifications"
-  family      = "mysql5.6"
+resource "aws_db_parameter_group" "mysql5-7-etleap" {
+  name        = "etleap-mysql5-7-${random_id.deployment_random.hex}"
+  description = "MySQL 5.7 with Etleap modifications"
+  family      = "mysql5.7"
 
   parameter {
     name         = "max_allowed_packet"

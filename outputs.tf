@@ -75,7 +75,7 @@ output "deployment_id" {
 }
 
 output "main_app_instance_id" {
-  value       = module.main_app.instance_id
+  value       = var.app_available ? module.main_app[0].instance_id : null
   description = "The instance ID of the main application instance."
 }
 
