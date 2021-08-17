@@ -3,13 +3,13 @@ resource "aws_db_instance" "db" {
   allocated_storage            = 500
   storage_type                 = "gp2"
   engine                       = "mysql"
-  engine_version               = "5.6.41"
+  engine_version               = "5.7.34"
   instance_class               = "db.m5.large"
   name                         = "EtleapDB"
   username                     = "root"
   password                     = module.db_root_password.secret_string
   db_subnet_group_name         = aws_db_subnet_group.db.name
-  parameter_group_name         = aws_db_parameter_group.mysql5-6-etleap.name
+  parameter_group_name         = aws_db_parameter_group.mysql5-7-etleap.name
   vpc_security_group_ids       = [aws_security_group.db.id]
   backup_retention_period      = var.rds_backup_retention_period
   auto_minor_version_upgrade   = false
