@@ -243,3 +243,48 @@ resource "aws_cloudwatch_metric_alarm" "app_running" {
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
+
+resource "aws_cloudwatch_metric_alarm" "dms_cpu" {
+  alarm_name                = "Etleap - ${var.deployment_id} - DMS 80% CPU"
+  comparison_operator       = "GreaterThanThreshold"
+  evaluation_periods        = "5"
+  metric_name               = "CPUUtilization"
+  namespace                 = "AWS/DMS"
+  period                    = "300"
+  statistic                 = "Average"
+  threshold                 = "80"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "dms_disk" {
+  alarm_name          = "Etleap - ${var.deployment_id} - DMS Disk Space 50GB Remaining"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "FreeStorageSpace"
+  namespace           = "AWS/DMS"
+  dimensions = {
+    ReplicationInstanceIdentifier = "prod"
+  }
+  period                    = "300"
+  statistic                 = "Average"
+  threshold                 = "53687091200"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "dms_freeable_memory" {
+  alarm_name                = "Etleap - ${var.deployment_id} - DMS Freeable Memory <= 2GB"
+  comparison_operator       = "LessThanOrEqualToThreshold"
+  evaluation_periods        = "3"
+  metric_name               = "FreeableMemory"
+  namespace                 = "AWS/DMS"
+  period                    = "300"
+  statistic                 = "Average"
+  threshold                 = "2147483648"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
