@@ -142,7 +142,8 @@ Critical alarms are for conditions that cause pipelines to stop.
 | RDS Freeable Memory | No | RDS is running out of disk space | Increase the `allocated_storage` via Terraform, or via the console |
 | * Node 80% CPU | No | CPU usage is consistently high on the specified instance | Upgrade the instance type to a larger one, or one of a newer generation, if available |
 | * 90% Disk * | Yes | Disk is getting full for one of the instances | Increase the EBS size of the attached volumes; contact Etleap Support to diagnose to root cause |
-| App is running | Yes | The main web application is down and not accepting requests | If in single-availability node, reprovision the instace. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
+| App is running | Yes | The main web application is down and not accepting requests | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
+| Job is running | Yes | The data processing application is down | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
 
 ### Reprovisioning a new EMR cluster
 

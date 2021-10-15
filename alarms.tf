@@ -244,6 +244,23 @@ resource "aws_cloudwatch_metric_alarm" "app_running" {
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
+resource "aws_cloudwatch_metric_alarm" "job_running" {
+  alarm_name = "Etleap - ${var.deployment_id} - Job is running"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "10"
+  metric_name         = "JobRunning"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    "Deployment" = var.deployment_id
+  }
+  period                    = "60"
+  statistic                 = "Sum"
+  threshold                 = "1"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
+
 resource "aws_cloudwatch_metric_alarm" "dms_cpu" {
   alarm_name                = "Etleap - ${var.deployment_id} - DMS 80% CPU"
   comparison_operator       = "GreaterThanThreshold"

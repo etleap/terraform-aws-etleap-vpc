@@ -276,7 +276,7 @@ resource "null_resource" "are_cidr_ranges_valid" {
 
 variable "amis" {
   default = {
-    app = "ami-08ce966d848a83907"
+    app = "ami-0554790dd14bba310"
     nat = "ami-00a9d4a05375b2763"
   }
 }
