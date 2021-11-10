@@ -79,8 +79,21 @@ resource "aws_iam_policy" "get_secrets" {
                 "secretsmanager:GetSecretValue"
             ],
             "Resource": [
-                "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:Etleap*"
+                "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:Etleap*",
+                "arn:aws:secretsmanager:${var.region}:062796654603:secret:${var.deployment_id}/*"
             ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "kms:Decrypt"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "kms:ViaService": "secretsmanager.${var.region}.amazonaws.com"
+                }
+            }
         }
     ]
 }
