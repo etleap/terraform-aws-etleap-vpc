@@ -80,7 +80,7 @@ resource "aws_iam_policy" "get_secrets" {
             ],
             "Resource": [
                 "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:Etleap*",
-                "arn:aws:secretsmanager:${var.region}:062796654603:secret:${var.deployment_id}/*"
+                "arn:aws:secretsmanager:${var.region}:841591717599:secret:${var.deployment_id}/*"
             ]
         },
         {
