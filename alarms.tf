@@ -1,4 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
+  count = var.app_available ? 1 : 0
+
   alarm_name          = "Etleap - ${var.deployment_id} - EMR Cluster Running"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "3"
@@ -17,6 +19,8 @@ resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
+  count = var.app_available ? 1 : 0
+
   alarm_name          = "Etleap - ${var.deployment_id} - 60% Disk EMR HDFS"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -34,6 +38,8 @@ resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
+  count = var.app_available ? 1 : 0
+
   alarm_name          = "Etleap - ${var.deployment_id} - EMR Unhealthy Nodes"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -51,6 +57,8 @@ resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
+  count = var.app_available ? 1 : 0
+
   alarm_name          = "Etleap - ${var.deployment_id} - EMR Missing Blocks"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -119,13 +127,15 @@ resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
+  count = var.app_available ? 1 : 0
+
   alarm_name          = "Etleap - ${var.deployment_id} - Main Node 80% CPU"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
   dimensions = {
-    InstanceId = module.main_app.instance_id
+    InstanceId = module.main_app[0].instance_id
   }
   period                    = "300"
   statistic                 = "Average"
@@ -136,7 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "secondary_node_cpu" {
-  count               = var.ha_mode ? 1 : 0
+  count               = var.app_available && var.ha_mode ? 1 : 0
   alarm_name          = "Etleap - ${var.deployment_id} - Secondary Node 80% CPU"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -154,13 +164,15 @@ resource "aws_cloudwatch_metric_alarm" "secondary_node_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
+  count = var.app_available ? 1 : 0
+
   alarm_name          = "Etleap - ${var.deployment_id} - Main Node 90% Disk Root"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Disk"
   namespace           = "Etleap/EC2"
   dimensions = {
-    InstanceId = module.main_app.instance_id
+    InstanceId = module.main_app[0].instance_id
     Device     = "Root"
   }
   period                    = "60"
@@ -172,13 +184,15 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
+  count = var.app_available ? 1 : 0
+
   alarm_name          = "Etleap - ${var.deployment_id} - Main Node 90% Disk Docker"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "Disk"
   namespace           = "Etleap/EC2"
   dimensions = {
-    InstanceId = module.main_app.instance_id
+    InstanceId = module.main_app[0].instance_id
     Device     = "Docker"
   }
   period                    = "60"
@@ -190,7 +204,7 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_root" {
-  count               = var.ha_mode ? 1 : 0
+  count               = var.app_available && var.ha_mode ? 1 : 0
   alarm_name          = "Etleap - ${var.deployment_id} - Secondary Node 90% Disk Root"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -209,7 +223,7 @@ resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_root" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_docker" {
-  count               = var.ha_mode ? 1 : 0
+  count               = var.app_available && var.ha_mode ? 1 : 0
   alarm_name          = "Etleap - ${var.deployment_id} - HA Node 90% Disk Docker"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"

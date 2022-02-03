@@ -65,6 +65,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `private_subnets` | Existing private subnets to deploy Etleap in. | `list(string)` | n/a | no |
 | `extra_security_groups` | Grant access to the DB, EC2 instance, and EMR cluster to the specified Security Groups | `list(string)` | `[]` | no |
 | `app_hostname`| The hostname where Etleap will be accessible from. If left empty, the default Load Balancer DNS name will be used. | `string` | `null` | no |
+| `app_available`| Only use this if instructed by ETLeap support. Enable or disable to start or destroy the app instance. | `boolean` | `true` | yes |
 | `ha_mode`| Enables High Availability mode. This will run two redundant Etleap instances in 2 availability zones, and set the RDS instace to "multi-az" mode. | `boolean` | `false` | no | 
 | `app_private_ip` | The Private IP for the main application instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP. | `string` | `null` | no |
 | `secondary_private_ip`| The Private IP for the seconday application instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP. | `string` | `null` | no |
@@ -89,6 +90,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `enable_public_access` |Enable public access to the Etleap deployment. This will create an _Internet facing_ ALB. Defaults to `true`. | `boolean` | `true` | no |
 | `acm_certificate_arn` | "ARN Certificate to use for SSL. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
 | `rds_backup_retention_period` | The number of days to retain the automated database snapshots. Defaults to 7 days. | `int` | `7` | no |
+| `rds_allow_major_version_upgrade` | Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed and if an update is required it will be applied immediately. | `boolean` | `false` | yes |
 
 ## Outputs
 

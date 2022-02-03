@@ -31,6 +31,8 @@ locals {
 }
 
 module "main_app" {
+  count = var.app_available ? 1 : 0
+
   depends_on = [
     aws_route.prod_public,
     aws_emr_cluster.emr
@@ -57,7 +59,8 @@ module "main_app" {
 }
 
 module "secondary_app" {
-  count = var.ha_mode ? 1 : 0
+  count = var.app_available && var.ha_mode ? 1 : 0
+
   depends_on = [
     aws_route.prod_public,
     aws_emr_cluster.emr
@@ -116,7 +119,7 @@ resource "aws_lb" "app" {
   name_prefix        = "etleap"
   internal           = !var.enable_public_access
   load_balancer_type = "application"
-  subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
+  subnets            = [local.subnet_a_public_id, local.subnet_b_public_id]
   security_groups    = [aws_security_group.app.id]
 }
 
@@ -147,13 +150,14 @@ resource "aws_lb_listener" "app" {
 }
 
 resource "aws_lb_target_group_attachment" "main_app" {
+  count            = var.app_available ? 1 : 0
   target_group_arn = aws_lb_target_group.app.arn
-  target_id        = module.main_app.instance_id
+  target_id        = module.main_app[0].instance_id
   port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "secondary_app" {
-  count            = var.ha_mode ? 1 : 0
+  count            = var.app_available && var.ha_mode ? 1 : 0
   target_group_arn = aws_lb_target_group.app.arn
   target_id        = module.secondary_app[0].instance_id
   port             = 443
