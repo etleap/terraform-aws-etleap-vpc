@@ -1,6 +1,6 @@
 locals {
-  zookeeper_map = local.temporary_enable_public_infra ? { 1 = "zookeeper1", 2 = "zookeeper2", 3 = "zookeeper3" } : {}
-  subnet_ids    = local.temporary_enable_public_infra ? [local.subnet_a_private_id, local.subnet_b_private_id, local.subnet_c_private_id] : []
+  zookeeper_map = { 1 = "zookeeper1", 2 = "zookeeper2", 3 = "zookeeper3" }
+  subnet_ids    = [local.subnet_a_private_id, local.subnet_b_private_id, local.subnet_c_private_id]
   zookeeper_base_hostname = "etleap.internal"
 
   # Generate map of [zk_id => zk_node_ip]

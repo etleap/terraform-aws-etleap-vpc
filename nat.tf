@@ -1,6 +1,6 @@
 # TODO See if it makes sense to use NAT gateway instead, avoids having to manage AMIs
 resource "aws_instance" "nat" {
-  count                       = local.temporary_enable_public_infra ? local.created_vpc_count : 0
+  count                       = local.created_vpc_count
   ami                         = var.amis["nat"]
   instance_type               = var.nat_instance_type
   key_name                    = var.key_name
@@ -47,7 +47,7 @@ resource "aws_security_group_rule" "nat-ingress" {
   to_port           = 65535
   protocol          = "tcp"
   security_group_id = aws_security_group.nat[0].id
-  cidr_blocks       = local.temporary_enable_public_infra ? [aws_subnet.a_private[0].cidr_block, aws_subnet.b_private[0].cidr_block, aws_subnet.c_private[0].cidr_block] : [aws_subnet.a_private[0].cidr_block, aws_subnet.b_private[0].cidr_block]
+  cidr_blocks       = [aws_subnet.a_private[0].cidr_block, aws_subnet.b_private[0].cidr_block, aws_subnet.c_private[0].cidr_block]
 }
 
 resource "aws_eip" "nat" {
@@ -56,7 +56,7 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_eip_association" "nat" {
-  count = local.temporary_enable_public_infra ? 1 : 0
+  count = 1
 
   instance_id   = aws_instance.nat[0].id
   allocation_id = aws_eip.nat[0].id

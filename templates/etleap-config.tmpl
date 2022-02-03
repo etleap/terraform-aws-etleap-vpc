@@ -51,3 +51,6 @@ export ETLEAP_SECRET_GITHUB_ACCESS_TOKEN="$(aws secretsmanager get-secret-value 
 %{ for env_var, secret_arn in var.connection_secrets}
 export ${env_var}="$(aws secretsmanager get-secret-value --secret-id ${secret_arn} | jq -r .SecretString)"
 %{ endfor }
+
+export USE_ZOOKEEPER_CLUSTER=true
+export ZOOKEEPER_CLUSTER_HOSTS=%{for id, addr in zookeeper_hosts_dns ~}server.${id}=${addr}:2181,%{endfor}
