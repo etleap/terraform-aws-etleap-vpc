@@ -23,7 +23,7 @@ resource "aws_emr_cluster" "emr" {
   }
 
   tags = {
-    Name = "Etleap EMR"
+    Name = "Etleap EMR ${var.deployment_id}"
   }
 
   master_instance_group {

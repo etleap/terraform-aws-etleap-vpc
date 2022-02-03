@@ -50,10 +50,13 @@ module "main_app" {
   instance_type        = var.app_instance_type
   enable_public_access = var.enable_public_access
 
+  deployment_id        = var.deployment_id
+
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
     deployment_role = "customervpc",
-    main_app_ip     = "127.0.0.1"
+    main_app_ip     = "127.0.0.1",
+    zookeeper_nodes = local.zookeeper_hosts_dns
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
@@ -78,10 +81,13 @@ module "secondary_app" {
   instance_type        = var.app_instance_type
   enable_public_access = var.enable_public_access
 
+  deployment_id        = var.deployment_id
+
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
     var             = local.context,
     deployment_role = "customervpc_ha",
-    main_app_ip     = element(tolist(aws_network_interface.main_app.private_ips[*]), 0)
+    main_app_ip     = element(tolist(aws_network_interface.main_app.private_ips[*]), 0),
+    zookeeper_nodes = local.zookeeper_hosts_dns
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 }
@@ -119,8 +125,12 @@ resource "aws_lb" "app" {
   name_prefix        = "etleap"
   internal           = !var.enable_public_access
   load_balancer_type = "application"
-  subnets            = [local.subnet_a_public_id, local.subnet_b_public_id]
+  subnets            = local.temporary_enable_public_infra ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
   security_groups    = [aws_security_group.app.id]
+
+  tags = {
+    Name = "Etleap LB ${var.deployment_id}"
+  }
 }
 
 resource "aws_lb_target_group" "app" {

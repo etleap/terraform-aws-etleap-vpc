@@ -1,6 +1,6 @@
 resource "aws_iam_policy_attachment" "secrets" {
   name       = "Get Deployment Secret"
-  roles      = [aws_iam_role.app.name]
+  roles      = [aws_iam_role.app.name, aws_iam_role.zookeeper.name]
   policy_arn = aws_iam_policy.get_secrets.arn
 }
 
@@ -12,7 +12,7 @@ resource "aws_iam_policy_attachment" "ec2_describe" {
 
 resource "aws_iam_policy_attachment" "cloudwatch_metric_data" {
   name       = "Etleap Get and Put Metric Data"
-  roles      = [aws_iam_role.app.name]
+  roles      = [aws_iam_role.app.name, aws_iam_role.zookeeper.name]
   policy_arn = aws_iam_policy.cloudwatch_metric_data.arn
 }
 
@@ -32,6 +32,11 @@ resource "aws_iam_instance_profile" "emr_profile" {
   role = aws_iam_role.emr.name
 }
 
+resource "aws_iam_instance_profile" "zookeeper" {
+  name = "zookeeper_iam_profile"
+  role = aws_iam_role.zookeeper.name
+}
+
 resource "aws_iam_role_policy_attachment" "emr_default_role" {
   role       = aws_iam_role.emr_default_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole"
@@ -46,6 +51,27 @@ resource "aws_iam_role_policy_attachment" "allow_sns_put" {
   role       = aws_iam_role.app.name
   policy_arn = aws_iam_policy.allow_sns_put.arn
 }
+
+resource "aws_iam_role" "zookeeper" {
+  name               = "zookeeper${local.resource_name_suffix}"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+}
+
 
 resource "aws_iam_role" "emr" {
   name               = "EtleapEMR${local.resource_name_suffix}"

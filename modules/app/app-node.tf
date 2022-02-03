@@ -7,6 +7,9 @@ variable "instance_profile" {
 variable "network_interface" {
 }
 
+variable "deployment_id" {
+}
+
 variable "db_init" {
 }
 
@@ -92,7 +95,7 @@ power_state:
 EOF
 
   tags = {
-    Name = "Etleap App"
+    Name = "Etleap App ${var.deployment_id}"
   }
 
   volume_tags = {

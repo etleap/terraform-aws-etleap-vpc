@@ -12,7 +12,7 @@ resource "aws_dms_replication_instance" "dms" {
   publicly_accessible          = true
 
   tags = {
-    Name = "Etleap DMS"
+    Name = "Etleap DMS ${var.deployment_id}"
   }
 }
 

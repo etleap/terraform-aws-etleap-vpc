@@ -36,7 +36,7 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "private" {
-  count                  = local.created_vpc_count
+  count                  = local.temporary_enable_public_infra ? local.created_vpc_count : 0
   route_table_id         = aws_route_table.private[0].id
   destination_cidr_block = "0.0.0.0/0"
   instance_id            = aws_instance.nat[0].id
@@ -71,10 +71,21 @@ resource "aws_subnet" "b_private" {
   }
 }
 
-resource "aws_subnet" "a_public" {
-  count             = local.created_vpc_count
+resource "aws_subnet" "c_private" {
+  count             = local.temporary_enable_public_infra ? local.created_vpc_count : 0
   vpc_id            = aws_vpc.etleap[0].id
   cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 2}.0/24"
+  availability_zone = "${var.region}c"
+
+  tags = {
+    Name = "Etleap C Private"
+  }
+}
+
+resource "aws_subnet" "a_public" {
+  count             = var.temporary_keep_public_subnet ? local.created_vpc_count : 0
+  vpc_id            = aws_vpc.etleap[0].id
+  cidr_block        = var.temporary_keep_public_subnet ? "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 2}.0/24" : "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.0/26"
   availability_zone = "${var.region}a"
 
   tags = {
@@ -83,13 +94,24 @@ resource "aws_subnet" "a_public" {
 }
 
 resource "aws_subnet" "b_public" {
-  count             = local.created_vpc_count
+  count             = var.temporary_keep_public_subnet ? local.created_vpc_count : 0
   vpc_id            = aws_vpc.etleap[0].id
-  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.0/24"
+  cidr_block        = var.temporary_keep_public_subnet ? "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.0/24" : "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.64/26"
   availability_zone = "${var.region}b"
 
   tags = {
     Name = "Etleap B Public"
+  }
+}
+
+resource "aws_subnet" "c_public" {
+  count             = local.temporary_enable_public_infra ? local.created_vpc_count : 0
+  vpc_id            = aws_vpc.etleap[0].id
+  cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.128/26"
+  availability_zone = "${var.region}c"
+
+  tags = {
+    Name = "Etleap C Public"
   }
 }
 
@@ -105,15 +127,27 @@ resource "aws_route_table_association" "b_private" {
   route_table_id = aws_route_table.private[0].id
 }
 
+resource "aws_route_table_association" "c_private" {
+  count          = local.temporary_enable_public_infra ? local.created_vpc_count : 0
+  subnet_id      = aws_subnet.c_private[0].id
+  route_table_id = aws_route_table.private[0].id
+}
+
 resource "aws_route_table_association" "a_public" {
-  count          = local.created_vpc_count
+  count          = local.temporary_enable_public_infra ? local.created_vpc_count : 0
   subnet_id      = aws_subnet.a_public[0].id
   route_table_id = aws_route_table.public[0].id
 }
 
 resource "aws_route_table_association" "b_public" {
-  count          = local.created_vpc_count
+  count          = local.temporary_enable_public_infra ? local.created_vpc_count : 0
   subnet_id      = aws_subnet.b_public[0].id
+  route_table_id = aws_route_table.public[0].id
+}
+
+resource "aws_route_table_association" "c_public" {
+  count          = local.temporary_enable_public_infra ? local.created_vpc_count : 0
+  subnet_id      = aws_subnet.c_public[0].id
   route_table_id = aws_route_table.public[0].id
 }
 
@@ -121,7 +155,9 @@ locals {
   vpc_id              = var.vpc_id == null ? aws_vpc.etleap[0].id : var.vpc_id
   subnet_a_private_id = var.vpc_id == null ? aws_subnet.a_private[0].id : var.private_subnets[0]
   subnet_b_private_id = var.vpc_id == null ? aws_subnet.b_private[0].id : var.private_subnets[1]
-  subnet_a_public_id  = var.vpc_id == null ? aws_subnet.a_public[0].id : var.public_subnets[0]
-  subnet_b_public_id  = var.vpc_id == null ? aws_subnet.b_public[0].id : var.public_subnets[1]
+  subnet_c_private_id = local.temporary_enable_public_infra ? (var.vpc_id == null ? aws_subnet.c_private[0].id : var.private_subnets[2]) : 0
+  subnet_a_public_id  = local.temporary_enable_public_infra ? (var.vpc_id == null ? aws_subnet.a_public[0].id : var.public_subnets[0]) : 0
+  subnet_b_public_id  = local.temporary_enable_public_infra ? (var.vpc_id == null ? aws_subnet.b_public[0].id : var.public_subnets[1]) : 0
+  subnet_c_public_id  = local.temporary_enable_public_infra ? (var.vpc_id == null ? aws_subnet.c_public[0].id : var.public_subnets[2]) : 0
   created_vpc_count   = var.vpc_id == null ? 1 : 0
 }
