@@ -14,6 +14,11 @@ services:
       SERVER_ID: ${zookeeper_id}
       SERVERS: %{ for id, addr in zookeeper_nodes ~}%{if tonumber(id) == tonumber(zookeeper_id)}server.${id}=0.0.0.0%{else}server.${id}=${addr}%{endif}:2888:3888,%{ endfor}
       JVMFLAGS: "-Xmx1G"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: 1
+        max-size: "500m"
 
 volumes:
   zookeeper_data:
