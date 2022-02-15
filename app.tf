@@ -125,7 +125,7 @@ resource "aws_lb" "app" {
   name_prefix        = "etleap"
   internal           = !var.enable_public_access
   load_balancer_type = "application"
-  subnets            = local.temporary_enable_public_infra ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
+  subnets            = (local.temporary_enable_public_infra || var.enable_public_access) ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
   security_groups    = [aws_security_group.app.id]
 
   tags = {
