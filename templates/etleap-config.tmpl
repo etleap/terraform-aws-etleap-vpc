@@ -53,4 +53,4 @@ export ${env_var}="$(aws secretsmanager get-secret-value --secret-id ${secret_ar
 %{ endfor }
 
 export USE_ZOOKEEPER_CLUSTER=true
-export ZOOKEEPER_CLUSTER_HOSTS=%{for id, addr in zookeeper_hosts_dns ~}server.${id}=${addr}:2181,%{endfor}
+export ZOOKEEPER_CLUSTER_HOSTS=%{for id, addr in zookeeper_hosts_dns ~}${addr}:2181,%{endfor}
