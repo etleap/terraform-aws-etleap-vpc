@@ -80,7 +80,7 @@ output "main_app_instance_id" {
 }
 
 output "secondary_app_instance_id" {
-  value       = var.ha_mode ? module.secondary_app[0].instance_id : null
+  value       = var.ha_mode && var.app_available ? module.secondary_app[0].instance_id : null
   description = "The instance ID of the secondary application instance."
 }
 
