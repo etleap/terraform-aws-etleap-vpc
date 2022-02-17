@@ -33,7 +33,7 @@ resource "aws_iam_instance_profile" "emr_profile" {
 }
 
 resource "aws_iam_instance_profile" "zookeeper" {
-  name = "zookeeper_iam_profile"
+  name = "zookeeper_iam_profile${local.resource_name_suffix}"
   role = aws_iam_role.zookeeper.name
 }
 
