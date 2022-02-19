@@ -26,9 +26,6 @@ resource "aws_db_instance" "db" {
       name
     ]
   }
-
-  allow_major_version_upgrade = true
-  apply_immediately           = true
 }
 
 resource "aws_db_subnet_group" "db" {
