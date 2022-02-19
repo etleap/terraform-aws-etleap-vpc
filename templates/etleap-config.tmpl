@@ -1,0 +1,53 @@
+export ETLEAP_DEPLOYMENT_ID=${var.deployment_id}
+export USE_PROD_SECRETS=0
+export JOB_ROLE=customer_job,monitor
+export ETLEAP_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString)"
+export SALESFORCE_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString)"
+export FRONT_END_HOSTNAME="${var.app_hostname}"
+export ETLEAP_HOSTS_ALLOWED="$FRONT_END_HOSTNAME"
+export ETLEAP_FRONT_END_URL="https://$FRONT_END_HOSTNAME"
+export ETLEAP_CORS_ALLOWED_ORIGINS="https://$FRONT_END_HOSTNAME"
+export API_HOSTNAME="$FRONT_END_HOSTNAME"
+export API_URL="https://$FRONT_END_HOSTNAME"
+export ETLEAP_BASE_URL="$API_URL"
+export ETLEAP_CONF_FILE=/opt/etleap/prod-customervpc.conf
+export ETLEAP_HTTP_SESSION_DOMAIN="$FRONT_END_HOSTNAME"
+export ETLEAP_KMS_KEY_VIRGINIA="${var.kms_key}"
+export ETLEAP_SETUP_FIRST_NAME="${var.first_name}"
+export ETLEAP_SETUP_LAST_NAME="${var.last_name}"
+export ETLEAP_SETUP_EMAIL="${var.email}"
+export ETLEAP_SETUP_PASSWORD="${var.setup_password}"
+export ETLEAP_SETUP_ADMIN_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.admin_password_arn} | jq -r .SecretString)"
+export ETLEAP_SETUP_INTERMEDIATE_BUCKET="${var.s3_bucket}"
+export ETLEAP_SETUP_INTERMEDIATE_ROLE_ARN="${var.s3_role}"
+
+%{ if var.has_dms_instance }
+export ETLEAP_DMS_ROLE_ARN="${var.dms_role}"
+export ETLEAP_DMS_INSTANCE_ARN="${var.dms_replication_instance_arn}"
+export ETLEAP_DMS_INSTANCE_NAME="${var.dms_replication_instance_name}"
+%{ endif }
+
+export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"
+export MARKETPLACE_DEPLOYMENT="false"
+export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${var.deployment_secret_arn} | jq -r .SecretString)"
+export ETLEAP_RDS_HOSTNAME="${var.db_address}"
+export ETLEAP_EMR_HOSTNAME="${var.emr_cluster}"
+export ETLEAP_MAIN_APP_IP="${main_app_ip}"
+export ETLEAP_YSJES_HOSTNAME=$ETLEAP_MAIN_APP_IP
+export ETLEAP_SALESFORCE_EXTRACTOR_ENDPOINT=https://$ETLEAP_MAIN_APP_IP:8000
+export ETLEAP_DEPLOYMENT_ROLE="${deployment_role}"
+export ETLEAP_SETUP_INBOUND_SNS_ARN="${var.inbound_sns_arn}"
+export ETLEAP_SETUP_INBOUND_SQS_ARN="${var.inbound_sqs_arn}"
+
+%{ if var.use_s3_kms_sse_key }
+export USE_SSE_KMS="1"
+%{ endif }
+
+%{ if var.github_username != null && var.github_access_token_arn != null }
+export ETLEAP_GITHUB_USERNAME="${var.github_username}"
+export ETLEAP_SECRET_GITHUB_ACCESS_TOKEN="$(aws secretsmanager get-secret-value --secret-id ${var.github_access_token_arn} | jq -r .SecretString)"
+%{ endif }
+
+%{ for env_var, secret_arn in var.connection_secrets}
+export ${env_var}="$(aws secretsmanager get-secret-value --secret-id ${secret_arn} | jq -r .SecretString)"
+%{ endfor }
