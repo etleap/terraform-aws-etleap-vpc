@@ -204,7 +204,7 @@ resource "aws_emr_instance_group" "task_spot" {
     type                 = "gp2"
     volumes_per_instance = 1
   }
-  bid_price          = "0.34"
+  bid_price          = "0.41"
   lifecycle { 
     ignore_changes = [
       instance_count
