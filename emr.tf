@@ -197,14 +197,14 @@ EOF
 resource "aws_emr_instance_group" "task_spot" {
   cluster_id     = aws_emr_cluster.emr.id
   name           = "TASK SPOT"
-  instance_type  = "c5.xlarge"
+  instance_type  = "c5.2xlarge"
   instance_count = "1"
   ebs_config {
     size                 = "128"
     type                 = "gp2"
     volumes_per_instance = 1
   }
-  bid_price          = "0.21"
+  bid_price          = "0.34"
   lifecycle { 
     ignore_changes = [
       instance_count
@@ -214,7 +214,7 @@ resource "aws_emr_instance_group" "task_spot" {
 {
   "Constraints": {
     "MinCapacity": 1,
-    "MaxCapacity": 100
+    "MaxCapacity": 200
   },
   "Rules": [
     {
