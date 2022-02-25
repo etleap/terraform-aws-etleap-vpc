@@ -35,12 +35,12 @@ output "setup-password" {
 
 ## Existing VPC deployment
 
-To deploy Etleap in an existing VPC, replace the `vpc_cird_block_*` variables with:
+To deploy Etleap in an existing VPC, replace the `vpc_cidr_block_*` variables with:
 
 ```
 vpc_id           = "vpc-id"
-public_subnets   = ["subnet-public-1-id", "subnet-public-2-id"]
-private_subnets  = ["subnet-private-1-id", "subnet-private-2-id"]
+public_subnets   = ["subnet-public-1-id", "subnet-public-2-id", "subnet-public-3-id"]
+private_subnets  = ["subnet-private-1-id", "subnet-private-2-id", "subnet-private-3-id"]
 ```
 
 ## Inputs

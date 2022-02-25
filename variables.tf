@@ -189,10 +189,10 @@ variable "public_subnets" {
   type        = list(string)
 
   validation {
-    condition = var.public_subnets == null ? true : (length(var.public_subnets) == 2 && alltrue([
+    condition = var.public_subnets == null ? true : (length(var.public_subnets) == 3 && alltrue([
       for s in var.public_subnets : can(regex("^subnet-", s))
     ]))
-    error_message = "We require 2 valid public subnet ID's to be provided."
+    error_message = "We require 3 valid public subnet ID's to be provided."
   }
 }
 
@@ -202,10 +202,10 @@ variable "private_subnets" {
   type        = list(string)
 
   validation {
-    condition = var.private_subnets == null ? true : (length(var.private_subnets) == 2 && alltrue([
+    condition = var.private_subnets == null ? true : (length(var.private_subnets) == 3 && alltrue([
       for s in var.private_subnets : can(regex("^subnet-", s))
     ]))
-    error_message = "We require 2 valid private subnet ID's to be provided."
+    error_message = "We require 3 valid private subnet ID's to be provided."
   }
 }
 
@@ -259,9 +259,9 @@ variable "rds_allow_major_version_upgrade" {
   description = "Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed and if an update is required it will be applied immediately."
 }
 
-# here we are validating the VPC config is valid, and that we have 4 subnets if the user is specifying a VPC ID.
+# here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.
 locals {
-  validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 2) && (var.private_subnets == null ? false : length(var.private_subnets) == 2)
+  validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 3) && (var.private_subnets == null ? false : length(var.private_subnets) == 3)
   validate_vpc_msg = "The VPC ID has been specified, but the public and private subnets have not."
 }
 
