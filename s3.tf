@@ -38,7 +38,10 @@ resource "aws_iam_role" "intermediate" {
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        "AWS": [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.app.name}",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.emr.name}"
+        ]
       },
       "Action": "sts:AssumeRole",
       "Condition": {
@@ -147,27 +150,10 @@ resource "aws_iam_policy_attachment" "s3_input" {
 }
 
 resource "aws_s3_bucket_policy" "intermediate" {
-  count  = length(var.s3_data_lake_account_ids) > 0 ? 1 : 0
   bucket = aws_s3_bucket.intermediate.id
-  policy = <<EOF
-{
-  "Id": "Intermediate",
-  "Version": "2012-10-17",
-  "Statement":[{
-    "Sid": "S3DataLakeReadAccess",
-    "Effect":"Allow",
-    "Principal": {
-      "AWS": [${join(", ", formatlist("\"arn:aws:iam::%s:root\"", var.s3_data_lake_account_ids))}]
-    },
-    "Action": [
-      "s3:GetObject",
-      "s3:ListBucket"
-    ],
-    "Resource": [
-      "${aws_s3_bucket.intermediate.arn}",
-      "${aws_s3_bucket.intermediate.arn}/*"
-    ]
-  }]
-}
-EOF
+  policy = templatefile("${path.module}/templates/intermediate-bucket-policy.tpl", {
+    s3_data_lake_account_ids = var.s3_data_lake_account_ids,
+    intermediate_bucket_name = aws_s3_bucket.intermediate.id,
+    intermediate_bucket_arn  = aws_s3_bucket.intermediate.arn
+  })
 }

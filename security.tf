@@ -166,13 +166,22 @@ resource "aws_security_group_rule" "zookeeper-allow-ssh" {
 }
 
 # Connections to client port 2181 should be allowed from every running application that needs access to ZK cluster (app, monitor, job, emr, etc.)
-resource "aws_security_group_rule" "zookeeper-in-2181" {
-  type              = "ingress"
-  from_port         = 2181
-  to_port           = 2181
-  protocol          = "tcp"
-  security_group_id = aws_security_group.zookeeper.id
-  cidr_blocks       = var.app_access_cidr_blocks
+resource "aws_security_group_rule" "emr-to-zookeeper" {
+  type                     = "ingress"
+  from_port                = 2181
+  to_port                  = 2181
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.emr.id
+}
+
+resource "aws_security_group_rule" "app-to-zookeeper" {
+  type                     = "ingress"
+  from_port                = 2181
+  to_port                  = 2181
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.app.id
 }
 
 # Connections to admin ports ZK 2888 & 3888 should be only allowed from other ZK nodes
