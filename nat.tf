@@ -56,8 +56,7 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_eip_association" "nat" {
-  count = 1
-
+  count         = local.created_vpc_count
   instance_id   = aws_instance.nat[0].id
   allocation_id = aws_eip.nat[0].id
 }
