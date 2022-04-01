@@ -13,7 +13,8 @@ GRANT ALL PRIVILEGES ON etleap.* TO 'etleap-prod'@'%' WITH GRANT OPTION;
 
 CREATE DATABASE IF NOT EXISTS salesforce;
 USE salesforce;
-GRANT ALL PRIVILEGES ON salesforce.* TO 'salesforce'@'%' IDENTIFIED BY "$SALESFORCE_DB_PASSWORD";
+CREATE USER IF NOT EXISTS 'salesforce'@'%' IDENTIFIED BY '$SALESFORCE_DB_PASSWORD';
+GRANT ALL PRIVILEGES ON salesforce.* TO 'salesforce'@'%' WITH GRANT OPTION;
 CREATE TABLE IF NOT EXISTS jobs (id bigint(20) NOT NULL AUTO_INCREMENT,
   user_hash varchar(64) NOT NULL,
   job_id varchar(64) NOT NULL,
