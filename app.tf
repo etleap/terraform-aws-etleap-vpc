@@ -150,7 +150,9 @@ resource "aws_lb_listener" "app" {
   load_balancer_arn = aws_lb.app.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  # ALB currently does not support TLSv1.3(only NLBs do as of yet), therefore TLSv1.2 ONLY policy is used until the one supporting TLSv1.3 will be released
+  # TODO: https://www.pivotaltracker.com/story/show/181869182
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = var.acm_certificate_arn == null ? aws_acm_certificate.etleap[0].arn : var.acm_certificate_arn
 
   default_action {
