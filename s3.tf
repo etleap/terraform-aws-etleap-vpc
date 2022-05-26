@@ -31,6 +31,11 @@ resource "aws_s3_bucket" "intermediate" {
 
 resource "aws_iam_role" "intermediate" {
   name               = "EtleapIntermediate${local.resource_name_suffix}"
+  lifecycle {
+    ignore_changes = [
+      max_session_duration
+    ]
+  }
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
