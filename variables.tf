@@ -118,12 +118,17 @@ variable "critical_cloudwatch_alarm_sns_topics" {
 
 variable "app_instance_type" {
   default     = "t3.xlarge"
-  description = "The instance type for the main app node(s). Defaults to t3.xlarge. We do not recommend using a smaller instance type."
+  description = "The instance type for the main app node(s). Defaults to `t3.xlarge`. We do not recommend using a smaller instance type."
 }
 
 variable "nat_instance_type" {
   default     = "m5n.large"
   description = "The instance type for the NAT instance. Defaults to `m5n.large`"
+}
+
+variable "rds_instance_type" {
+  default     = "db.m5.large"
+  description = "The instance type for the RDS instance. Defaults to `db.m5.large`. We do not recommend using a smaller instance type."
 }
 
 variable "dms_instance_type" {

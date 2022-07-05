@@ -4,7 +4,7 @@ resource "aws_db_instance" "db" {
   storage_type                 = "gp2"
   engine                       = "mysql"
   engine_version               = "8.0.23"
-  instance_class               = "db.m5.large"
+  instance_class               = var.rds_instance_type
   name                         = "EtleapDB"
   username                     = "root"
   password                     = module.db_root_password.secret_string

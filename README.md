@@ -72,8 +72,9 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `nat_private_ip` | The Private IP for the NAT instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP. | `string` | `null` | no |
 | `non_critical_cloudwatch_alarm_sns_topics` | A list of SNS topics to notify when non critical alarms are triggered. For the list of non-critical alarms, see _CloudWatch Alarms_ under _Monitoring and operation_. | `list(string)` | `[]` | no |
 | `critical_cloudwatch_alarm_sns_topics` | A list of SNS topics to notify when critical alarms are triggered. For the list of critical alarms, see _CloudWatch Alarms_ under _Monitoring and operation_. | `list(string)` | `[]` | no |
-| `app_instance_type` | The instance type for the main app node(s). Defaults to t3.xlarge. We do not recommend using a smaller instance type. | `string` | `t3.xlarge` | no |
+| `app_instance_type` | The instance type for the main app node(s). Defaults to `t3.xlarge`. We do not recommend using a smaller instance type. | `string` | `t3.xlarge` | no |
 | `nat_instance_type` | The instance type for the NAT instance. Defaults to `m5n.large`. | `string` | `m5n.large` | no |
+| `rds_instance_type` | The instance type for the RDS instance. Defaults to `db.m5.large`. We do not recommend using a smaller instance type. | `string` | `db.m5.large` | no |
 | `dms_instance_type` | The instance type for the DMS instance. Defaults to `dms.t2.small`. Not used if `disable_cdc_support` is set to `true`. | `boolean` | `true` | no |
 | `disable_cdc_support` | Set to true if this deployment will not use CDC pipelines. This will cause the DMS Replication Instance and associated resources not to be created. Defaults to `false`. | `boolean` | `false` | no |
 | `dms_roles_to_be_created` | Set to `true` if this template should create the roles required by DMS, `dms-vpc-role` and `dms-cloudwatch-logs-role`. Set to `false` if are already using DMS in the account where you deploy Etleap. | `boolean` | `true` | no |
