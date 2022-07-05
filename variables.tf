@@ -261,7 +261,12 @@ variable "rds_backup_retention_period" {
 
 variable "rds_allow_major_version_upgrade" {
   default     = false
-  description = "Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed and if an update is required it will be applied immediately."
+  description = "Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed."
+}
+
+variable "rds_apply_immediately" {
+  default     = false
+  description = "If any RDS modifications are required they will be applied immediately instead of during the next maintenance window. It is recommended to set this back to `false` once the change has been applied."
 }
 
 # here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.

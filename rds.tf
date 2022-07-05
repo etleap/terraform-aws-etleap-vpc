@@ -21,7 +21,7 @@ resource "aws_db_instance" "db" {
   multi_az                     = var.ha_mode
 
   allow_major_version_upgrade = var.rds_allow_major_version_upgrade
-  apply_immediately           = var.rds_allow_major_version_upgrade
+  apply_immediately           = var.rds_apply_immediately
 
   lifecycle {
     ignore_changes = [
