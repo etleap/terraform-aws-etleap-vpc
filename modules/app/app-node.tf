@@ -81,6 +81,7 @@ write_files:
 
 runcmd:
 - "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"169.254.169.253\"]/g' /etc/docker/daemon.json"
+- ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 - "service docker restart"
 - ${var.db_init}
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
