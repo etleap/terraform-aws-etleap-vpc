@@ -93,6 +93,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `rds_backup_retention_period` | The number of days to retain the automated database snapshots. Defaults to 7 days. | `int` | `7` | no |
 | `rds_allow_major_version_upgrade` | Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed. | `boolean` | `false` | no |
 | `rds_apply_immediately` | If any RDS modifications are required they will be applied immediately instead of during the next maintenance window. It is recommended to set this back to `false` once the change has been applied. | `boolean` | `false` | no |
+| `emr_core_node_count` | The number of EMR core nodes in the EMR cluster. Defaults to 1. | `int` | `1` | no |
 
 ## Outputs
 
@@ -138,7 +139,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | Alarm | Critical | Cause | Resolution |
 |---|---|---|---|
 | EMR Cluster Running | Yes | EMR cluster is not running | See the section on *Reprovisioning a new EMR cluster* |
-| 60% Disk EMR HDFS | No | Not enough core nodes for the workload | Increase the number of core nodes via the console or Terraform |
+| 60% Disk EMR HDFS | No | Not enough core nodes for the workload | Increase the number of core nodes via the console or Terraform variable `emr_core_node_count`. |
 | EMR Unhealthy Nodes | No | EMR cluster is in a bad state | Taint the cluster and see the section on *Reprovisioning a new EMR cluster*  |
 | EMR Missing Blocks | No | Missing HDFS blocks means we lost one or more core nodes | Taint the cluster and the section on *Reprovisioning a new EMR cluster* |
 | RDS CPU 90% | No | RDS instance is saturating CPU | Increase the RDS instance size |

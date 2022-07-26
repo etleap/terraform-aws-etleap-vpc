@@ -269,6 +269,11 @@ variable "rds_apply_immediately" {
   description = "If any RDS modifications are required they will be applied immediately instead of during the next maintenance window. It is recommended to set this back to `false` once the change has been applied."
 }
 
+variable "emr_core_node_count" {
+  default     = 1
+  description = "The number of EMR core nodes in the EMR cluster. Defaults to 1."
+}
+
 # here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.
 locals {
   validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 3) && (var.private_subnets == null ? false : length(var.private_subnets) == 3)
