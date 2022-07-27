@@ -139,7 +139,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | Alarm | Critical | Cause | Resolution |
 |---|---|---|---|
 | EMR Cluster Running | Yes | EMR cluster is not running | See the section on *Reprovisioning a new EMR cluster* |
-| 60% Disk EMR HDFS | No | Not enough core nodes for the workload | Increase the number of core nodes via the console or Terraform variable `emr_core_node_count`. |
+| 60% Disk EMR HDFS | No | Not enough core nodes for the workload | Increase the number of core nodes via the Terraform variable `emr_core_node_count`. |
 | EMR Unhealthy Nodes | No | EMR cluster is in a bad state | Taint the cluster and see the section on *Reprovisioning a new EMR cluster*  |
 | EMR Missing Blocks | No | Missing HDFS blocks means we lost one or more core nodes | Taint the cluster and the section on *Reprovisioning a new EMR cluster* |
 | RDS CPU 90% | No | RDS instance is saturating CPU | Increase the RDS instance size |
