@@ -3,7 +3,7 @@ resource "aws_emr_cluster" "emr" {
     aws_instance.nat
   ]
   name                              = "Etleap EMR"
-  release_label                     = "emr-5.30.0"
+  release_label                     = "emr-5.35.0"
   applications                      = ["Hadoop", "Spark"]
   keep_job_flow_alive_when_no_steps = true
   log_uri                           = "s3://${aws_s3_bucket.intermediate.id}/emr-logs/"
@@ -24,6 +24,10 @@ resource "aws_emr_cluster" "emr" {
 
   tags = {
     Name = "Etleap EMR"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   master_instance_group {
@@ -84,6 +88,12 @@ resource "aws_emr_cluster" "emr" {
   bootstrap_action {
     name = "Copy HDFS init script"
     path = "s3://etleap-emr-${var.region}/conf-hadoop2/copy-hdfs-init.sh"
+  }
+
+  bootstrap_action {
+    name = "Apply EMR hotfix for autoscaling bug"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/replace_hadoop_rpms.sh"
+    args = ["etleap-emr-${var.region}"]
   }
 
   step {
