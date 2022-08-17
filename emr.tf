@@ -129,7 +129,8 @@ resource "aws_emr_cluster" "emr" {
         "yarn.node-labels.am.default-node-label-expression": "CORE_OR_TASK",
         "yarn.nodemanager.node-labels.provider": "config",
         "yarn.nodemanager.node-labels.provider.configured-node-partition": "CORE_OR_TASK",
-        "yarn.resourcemanager.system-metrics-publisher.enabled": "false",
+        "yarn.system-metrics-publisher.enabled": "false",
+        "yarn.timeline-service.enabled": "false",
         "yarn.nodemanager.local-dirs": "/mnt/yarn",
         "yarn.resourcemanager.nodemanager-graceful-decommission-timeout-secs": "-1"
       }
