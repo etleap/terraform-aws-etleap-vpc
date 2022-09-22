@@ -94,6 +94,8 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `rds_allow_major_version_upgrade` | Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed. | `boolean` | `false` | no |
 | `rds_apply_immediately` | If any RDS modifications are required they will be applied immediately instead of during the next maintenance window. It is recommended to set this back to `false` once the change has been applied. | `boolean` | `false` | no |
 | `emr_core_node_count` | The number of EMR core nodes in the EMR cluster. Defaults to 1. | `int` | `1` | no |
+| `iam_devops_role` | Creates an IAM Devops Role to be used by Etleap Devops verified team. | `boolean` | `true` | no |
+| `emr_task_node_instance_type` | The EMR Task Group Instance Type to use. Defaults to `c5.2xlarge`. | `string` | `c5.2xlarge` | no |
 
 ## Outputs
 

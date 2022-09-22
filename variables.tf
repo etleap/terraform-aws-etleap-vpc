@@ -274,6 +274,11 @@ variable "emr_core_node_count" {
   description = "The number of EMR core nodes in the EMR cluster. Defaults to 1."
 }
 
+variable "emr_task_node_instance_type" {
+  default     = "c5.2xlarge"
+  description = "The instance type to use for EMR Task nodes. Defaults to `c5.2xlarge`."
+}
+
 variable "iam_devops_role" {
   default     = true
   description = "Creates an IAM Devops Role to be used by Etleap Devops verified team"

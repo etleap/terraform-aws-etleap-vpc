@@ -208,7 +208,7 @@ EOF
 resource "aws_emr_instance_group" "task_spot" {
   cluster_id     = aws_emr_cluster.emr.id
   name           = "TASK SPOT"
-  instance_type  = "c5.2xlarge"
+  instance_type  = var.emr_task_node_instance_type
   instance_count = "1"
   ebs_config {
     size                 = "128"
