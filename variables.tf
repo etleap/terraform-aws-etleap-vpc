@@ -279,6 +279,11 @@ variable "emr_task_node_instance_type" {
   description = "The instance type to use for EMR Task nodes. Defaults to `c5.2xlarge`."
 }
 
+variable "emr_task_node_bid_price" {
+  default     = "0.41"
+  description = "The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed."
+}
+
 variable "iam_devops_role" {
   default     = true
   description = "Creates an IAM Devops Role to be used by Etleap Devops verified team"

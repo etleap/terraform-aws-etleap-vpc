@@ -96,6 +96,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `emr_core_node_count` | The number of EMR core nodes in the EMR cluster. Defaults to 1. | `int` | `1` | no |
 | `iam_devops_role` | Creates an IAM Devops Role to be used by Etleap Devops verified team. | `boolean` | `true` | no |
 | `emr_task_node_instance_type` | The EMR Task Group Instance Type to use. Defaults to `c5.2xlarge`. | `string` | `c5.2xlarge` | no |
+| `emr_task_node_bid_price` | The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed. | `string` | `0.41` | no |
 
 ## Outputs
 
