@@ -1,7 +1,7 @@
 resource "aws_dms_replication_instance" "dms" {
   count                        = var.disable_cdc_support ? 0 : 1
   replication_instance_class   = var.dms_instance_type
-  engine_version               = "3.4.6"
+  engine_version               = "3.4.7"
   allocated_storage            = 50
   apply_immediately            = true
   preferred_maintenance_window = "sun:10:30-sun:14:30"
