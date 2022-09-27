@@ -1,6 +1,6 @@
-// Role Devops allows to be assumed by users from the account 223848809711 logged with active MFA
+// Role Devops allows to be assumed by users from the account 841591717599 (vpcdeployments) logged with active MFA
 resource "aws_iam_role" "etleap-role-devops" {
-  count       = var.iam_devops_role ? 1 : 0
+  count       = var.allow_iam_devops_role ? 1 : 0
   name        = "Etleap-${var.deployment_id}-Devops-Role"
   description = "Role for Etleap Devops users"
   assume_role_policy = <<EOF
@@ -10,7 +10,7 @@ resource "aws_iam_role" "etleap-role-devops" {
         {
           "Effect": "Allow",
           "Principal": {
-            "AWS": "arn:aws:iam::223848809711:root"
+            "AWS": "arn:aws:iam::841591717599:root"
           },
           "Action": "sts:AssumeRole",
           "Condition": {
@@ -25,11 +25,11 @@ EOF
 
 output "iam_role_devops_arn" {
   description = "IAM Devops Role ARN to be used by Etleap Devops users"
-  value       = var.iam_devops_role ? aws_iam_role.etleap-role-devops[0].arn : null
+  value       = var.allow_iam_devops_role ? aws_iam_role.etleap-role-devops[0].arn : null
 }
 
 resource "aws_iam_role_policy_attachment" "devops-admin-access" {
-  count       = var.iam_devops_role ? 1 : 0
+  count       = var.allow_iam_devops_role ? 1 : 0
 
   role       = aws_iam_role.etleap-role-devops[0].name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"

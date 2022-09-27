@@ -94,7 +94,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `rds_allow_major_version_upgrade` | Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed. | `boolean` | `false` | no |
 | `rds_apply_immediately` | If any RDS modifications are required they will be applied immediately instead of during the next maintenance window. It is recommended to set this back to `false` once the change has been applied. | `boolean` | `false` | no |
 | `emr_core_node_count` | The number of EMR core nodes in the EMR cluster. Defaults to 1. | `int` | `1` | no |
-| `iam_devops_role` | Creates an IAM Devops Role to be used by Etleap Devops verified team. | `boolean` | `true` | no |
+| `allow_iam_devops_role` | Enable access to the deployment for Etleap by creating an IAM role that Etleap's ops team can assume. Defaults to false. | `boolean` | `false` | no |
 | `emr_task_node_instance_type` | The EMR Task Group Instance Type to use. Defaults to `c5.2xlarge`. | `string` | `c5.2xlarge` | no |
 | `emr_task_node_bid_price` | The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed. | `string` | `0.41` | no |
 

@@ -274,6 +274,11 @@ variable "emr_core_node_count" {
   description = "The number of EMR core nodes in the EMR cluster. Defaults to 1."
 }
 
+variable "allow_iam_devops_role" {
+  default     = false
+  description = "Enable access to the deployment for Etleap by creating an IAM role that Etleap's ops team can assume."
+}
+
 variable "emr_task_node_instance_type" {
   default     = "c5.2xlarge"
   description = "The instance type to use for EMR Task nodes. Defaults to `c5.2xlarge`."
@@ -282,11 +287,6 @@ variable "emr_task_node_instance_type" {
 variable "emr_task_node_bid_price" {
   default     = "0.41"
   description = "The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed."
-}
-
-variable "iam_devops_role" {
-  default     = true
-  description = "Creates an IAM Devops Role to be used by Etleap Devops verified team"
 }
 
 # here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.
