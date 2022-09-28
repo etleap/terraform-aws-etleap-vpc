@@ -27,6 +27,10 @@ export ETLEAP_DMS_INSTANCE_ARN="${var.dms_replication_instance_arn}"
 export ETLEAP_DMS_INSTANCE_NAME="${var.dms_replication_instance_name}"
 %{ endif }
 
+%{ if var.has_downgraded_dms_instace }
+export ETLEAP_DOWNGRADED_DMS_INSTANCE_ARN="${var.dms_downgraded_replication_instance_arn}"
+%{ endif }
+
 export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"
 export MARKETPLACE_DEPLOYMENT="false"
 export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${var.deployment_secret_arn} | jq -r .SecretString)"
