@@ -29,6 +29,7 @@ export ETLEAP_DMS_INSTANCE_NAME="${var.dms_replication_instance_name}"
 
 %{ if var.has_downgraded_dms_instace }
 export ETLEAP_DOWNGRADED_DMS_INSTANCE_ARN="${var.dms_downgraded_replication_instance_arn}"
+export ETLEAP_DOWNGRADED_DMS_INSTANCE_NAME="${var.dms_downgraded_replication_instance_name}"
 %{ endif }
 
 export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"
