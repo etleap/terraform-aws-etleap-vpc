@@ -54,7 +54,7 @@ resource "aws_instance" "zookeeper" {
     file_docker_compose = templatefile("${path.module}/templates/zookeeper-docker-compose.yml.tpl", {
       zookeeper_id = each.key
       zookeeper_nodes = local.zookeeper_hosts_dns
-      zookeeper_version = "3.5.9"
+      zookeeper_version = "3.5.10"
     }),
     config = templatefile("${path.module}/templates/zookeeper-config.tmpl", {
       deployment_id = var.deployment_id,
