@@ -58,12 +58,15 @@ zookeeper.tracelog.dir=.
 zookeeper.tracelog.file=zookeeper_trace.log
 
 # DEFAULT: console appender only
-log4j.rootLogger=WARN, CONSOLE
-
+log4j.rootLogger=INFO, CONSOLE
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
-log4j.appender.CONSOLE.Threshold=WARN
+log4j.appender.CONSOLE.Threshold=INFO
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-log4j.appender.CONSOLE.layout.ConversionPattern=%d{ISO8601} [myid:%X{myid}] - %-5p [%t:%C{1}@%L] - %m%n
+log4j.appender.CONSOLE.layout.ConversionPattern=%d{ISO8601} [myid:%X{myid}] - %-5p [%t:%C@%L] - %m%n
+
+log4j.logger.org.apache.zookeeper.server.NIOServerCnxn=ERROR
+log4j.logger.org.apache.zookeeper.server.command=WARN
+log4j.logger.org.apache.zookeeper.server.ContainerManager=WARN
 EOF
 
 chown ubuntu:ubuntu /home/ubuntu/zookeeper-log4j.properties

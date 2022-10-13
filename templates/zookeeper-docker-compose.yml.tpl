@@ -18,7 +18,7 @@ services:
       driver: "json-file"
       options:
         max-file: "1"
-        max-size: "500m"
+        max-size: "1024m"
 
 volumes:
   zookeeper_data:
