@@ -43,8 +43,9 @@ resource "aws_iam_role" "intermediate" {
       "Effect": "Allow",
       "Principal": {
         "AWS": [
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.app.name}",
-          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.emr.name}"
+          "${aws_iam_role.app.arn}",
+          "${aws_iam_role.emr.arn}",
+          "${var.enable_streaming_ingestion ? module.elva[0].etleap_streaming_ingestion_user.arn : aws_iam_role.app.arn}"
         ]
       },
       "Action": "sts:AssumeRole",

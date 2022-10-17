@@ -97,6 +97,9 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `allow_iam_devops_role` | Enable access to the deployment for Etleap by creating an IAM role that Etleap's ops team can assume. Defaults to false. | `boolean` | `false` | no |
 | `emr_task_node_instance_type` | The EMR Task Group Instance Type to use. Defaults to `c5.2xlarge`. | `string` | `c5.2xlarge` | no |
 | `emr_task_node_bid_price` | The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed. | `string` | `0.41` | no |
+| `enable_streaming_ingestion` | Enable support and required infrastructure for streaming ingestion sources. | `boolean` | `false` | no |
+| `disable_ssm_access` | Disable SSM profile attachment to the main app role. To be used in case you want to opt-out of SSM based access to Etleap instances. | `boolean` | `false` | no |
+
 
 ## Outputs
 

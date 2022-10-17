@@ -294,6 +294,16 @@ variable "emr_task_node_bid_price" {
   description = "The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed."
 }
 
+variable "enable_streaming_ingestion" {
+  default     = false
+  description = "Enable support and required infrastructure for streaming ingestion sources."
+}
+
+variable "disable_ssm_access" {
+  default     = false
+  description = "Disable SSM profile attachment to the main app role. To be used in case you want to opt-out of SSM based access to Etleap instances."
+}
+
 # here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.
 locals {
   validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 3) && (var.private_subnets == null ? false : length(var.private_subnets) == 3)

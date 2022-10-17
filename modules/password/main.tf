@@ -19,7 +19,7 @@ resource "random_password" "secret_value" {
   length  = var.length
   special = false
   lifecycle {
-    ignore_changes = [id, length, lower, min_lower, min_numeric, min_special, min_upper, number, special, upper, keepers]
+    ignore_changes = [length, lower, min_lower, min_numeric, min_special, min_upper, numeric, special, upper, keepers]
   }
 }
 
