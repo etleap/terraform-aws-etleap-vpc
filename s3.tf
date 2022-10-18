@@ -29,6 +29,11 @@ resource "aws_s3_bucket" "intermediate" {
   }
 }
 
+locals {
+  // Enable elva user to assume role if streaming ingestion is enabled
+  intermediate_role_assumer_arns = var.enable_streaming_ingestion ? [aws_iam_role.app.arn, aws_iam_role.emr.arn, module.elva[0].etleap_streaming_ingestion_user.arn] : [aws_iam_role.app.arn, aws_iam_role.emr.arn]
+}
+
 resource "aws_iam_role" "intermediate" {
   name               = "EtleapIntermediate${local.resource_name_suffix}"
   max_session_duration = 14400
@@ -42,11 +47,7 @@ resource "aws_iam_role" "intermediate" {
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": [
-          "${aws_iam_role.app.arn}",
-          "${aws_iam_role.emr.arn}",
-          "${var.enable_streaming_ingestion ? module.elva[0].etleap_streaming_ingestion_user.arn : aws_iam_role.app.arn}"
-        ]
+        "AWS": ${jsonencode(local.intermediate_role_assumer_arns)}
       },
       "Action": "sts:AssumeRole",
       "Condition": {

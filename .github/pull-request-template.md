@@ -15,9 +15,7 @@
 
 ### Development
 
-- [ ] The code changed/added as part of this pull request has been covered with tests.
-- [ ] All tests related to the changed code pass in development.
-- [ ] All tests except for unrelated flaky tests pass in CircleCI.
+- [ ] Validated working in a test VPC.
 
 ### Code review 
 

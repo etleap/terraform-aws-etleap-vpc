@@ -155,6 +155,9 @@ Critical alarms are for conditions that cause pipelines to stop.
 | * 90% Disk * | Yes | Disk is getting full for one of the instances | Increase the EBS size of the attached volumes; contact Etleap Support to diagnose to root cause |
 | App is running | Yes | The main web application is down and not accepting requests | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
 | Job is running | Yes | The data processing application is down | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
+| High Elva Latency | Yes | Streaming ingestion infrastructure is overloaded. | Contact Support |
+| Elva FluentD Errors | Yes | Streaming ingestion infrasture is failing to accept events. | Contact Support |
+| Elva Healthy Host Count | Yes | The number of streaming ingestion nodes is too low. | Contact Support |
 
 ### Reprovisioning a new EMR cluster
 

@@ -1,5 +1,5 @@
 resource "aws_autoscaling_group" "elva" {
-  vpc_zone_identifier       = [var.subnet_a_id, var.subnet_b_id, var.subnet_c_id]
+  vpc_zone_identifier       = [var.subnet_a_id, var.subnet_b_id]
   min_size                  = 4
   max_size                  = 100
   health_check_type         = "ELB"

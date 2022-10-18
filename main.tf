@@ -15,7 +15,6 @@ module "elva" {
   key_name              = var.key_name
   subnet_a_id           = local.subnet_a_private_id
   subnet_b_id           = local.subnet_b_private_id
-  subnet_c_id           = local.subnet_c_private_id
   load_balancer         = aws_lb.app
   app_listener_arn      = aws_lb_listener.app.arn
   region                = var.region
