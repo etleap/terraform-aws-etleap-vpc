@@ -1,3 +1,12 @@
+locals {
+  // Ubuntu 14.04 LTS EBS AMIs, find and update AMIs from https://cloud-images.ubuntu.com/locator/ec2/
+  ami = {
+    // us-east-1 AMI http://cloud-images-archive.ubuntu.com/releases/trusty/release-20140829/ legacy release
+    us-east-1 = "ami-08389d60"
+    eu-west-3 = "ami-0a930ecbcb574cb4e"
+  }
+}
+
 resource "aws_autoscaling_group" "elva" {
   vpc_zone_identifier       = [var.subnet_a_id, var.subnet_b_id]
   min_size                  = 4
@@ -38,7 +47,7 @@ resource "aws_autoscaling_policy" "elva" {
 
 resource "aws_launch_configuration" "elva" {
   name_prefix          = "elva-vpc"
-  image_id             = "ami-08389d60"
+  image_id             = local.ami[var.region]
   instance_type        = "m1.medium"
   iam_instance_profile = aws_iam_instance_profile.elva.name
   key_name             = var.key_name
