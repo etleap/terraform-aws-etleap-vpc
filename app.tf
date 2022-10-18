@@ -165,7 +165,7 @@ resource "aws_lb" "app" {
   internal           = !var.enable_public_access
   load_balancer_type = "application"
   subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
-  security_groups    = [aws_security_group.app.id, module.elva[0].elva_elb_security_group.id]
+  security_groups    = var.enable_streaming_ingestion ? [aws_security_group.app.id, module.elva[0].elva_elb_security_group.id] : [aws_security_group.app.id]
 
   tags = {
     Name = "Etleap LB ${var.deployment_id}"
