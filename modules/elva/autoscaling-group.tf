@@ -1,8 +1,7 @@
 locals {
-  // Ubuntu 14.04 LTS EBS AMIs, find and update AMIs from https://cloud-images.ubuntu.com/locator/ec2/
+  // Ubuntu 14.04 LTS EBS AMIs, find and update AMIs from https://cloud-images.ubuntu.com/locator/ec2/ - must be hvm type for new instance types
   ami = {
-    // us-east-1 AMI http://cloud-images-archive.ubuntu.com/releases/trusty/release-20140829/ legacy release
-    us-east-1 = "ami-08389d60"
+    us-east-1 = "ami-07957d39ebba800d5"
     eu-west-3 = "ami-0a930ecbcb574cb4e"
   }
 }
@@ -48,7 +47,7 @@ resource "aws_autoscaling_policy" "elva" {
 resource "aws_launch_configuration" "elva" {
   name_prefix          = "elva-vpc"
   image_id             = local.ami[var.region]
-  instance_type        = "m1.medium"
+  instance_type        = "t3.medium"
   iam_instance_profile = aws_iam_instance_profile.elva.name
   key_name             = var.key_name
   security_groups      = [aws_security_group.elva-node.id]
@@ -63,11 +62,11 @@ curl https://get.docker.com | /bin/bash
 sudo usermod -aG docker ubuntu
 
 sudo apt-get install unzip
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.8.3.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
 
-aws ecr get-login-password | sudo -H docker login --username AWS --password-stdin 841591717599.dkr.ecr.us-east-1.amazonaws.com && sudo -H docker pull 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva
+aws ecr get-login-password --region us-east-1 | sudo -H docker login --username AWS --password-stdin 841591717599.dkr.ecr.us-east-1.amazonaws.com && sudo -H docker pull 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva
 
 sudo docker run -d -e AWS_REGION=${var.region} -e ELVA_ENV=vpc -e CONFIG_BUCKET_NAME=${var.config_bucket.bucket} -e AWS_ACCESS_KEY=${aws_iam_access_key.elva.id} -e AWS_SECRET_KEY=${aws_iam_access_key.elva.secret} -p 3000:3000 -p 8889:8889 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva 
 EOF
