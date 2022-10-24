@@ -4,7 +4,7 @@ resource "aws_lb_listener" "elva_http" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "fixed-response"
+    type           = "fixed-response"
 
     fixed_response {
       content_type = "text/plain"
@@ -47,7 +47,7 @@ resource "aws_lb_listener_rule" "elva_http" {
 }
 
 resource "aws_lb_target_group" "elva" {
-  name        = "elva"
+  name        = "EtleapElva${var.deployment_id}"
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id

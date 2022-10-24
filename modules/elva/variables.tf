@@ -33,3 +33,6 @@ variable "non_critical_cloudwatch_alarm_sns_topics" {
 
 variable "critical_cloudwatch_alarm_sns_topics" {
 }
+
+variable "deployment_id" {
+}

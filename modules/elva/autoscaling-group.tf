@@ -31,7 +31,7 @@ resource "aws_autoscaling_group" "elva" {
 }
 
 resource "aws_autoscaling_policy" "elva" {
-  name = "Target Tracking Policy"
+  name = "Etleap Elva Target Tracking Policy ${var.deployment_id}"
   autoscaling_group_name = aws_autoscaling_group.elva.name
   policy_type = "TargetTrackingScaling"
   estimated_instance_warmup = 300
@@ -45,7 +45,7 @@ resource "aws_autoscaling_policy" "elva" {
 }
 
 resource "aws_launch_configuration" "elva" {
-  name_prefix          = "elva-vpc"
+  name_prefix          = "etleap-${var.deployment_id}-elva-vpc"
   image_id             = local.ami[var.region]
   instance_type        = "t3.medium"
   iam_instance_profile = aws_iam_instance_profile.elva.name

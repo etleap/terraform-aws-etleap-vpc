@@ -19,6 +19,7 @@ module "elva" {
   app_listener_arn      = aws_lb_listener.app.arn
   region                = var.region
   config_bucket         = aws_s3_bucket.intermediate
+  deployment_id         = var.deployment_id
   critical_cloudwatch_alarm_sns_topics = var.critical_cloudwatch_alarm_sns_topics
   non_critical_cloudwatch_alarm_sns_topics = var.non_critical_cloudwatch_alarm_sns_topics
 }
