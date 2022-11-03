@@ -96,6 +96,11 @@ resource "aws_emr_cluster" "emr" {
     args = ["etleap-emr-${var.region}"]
   }
 
+  bootstrap_action {
+    name = "Install HDFS crontab"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-hdfs-crontab.sh"
+  }
+
   step {
     action_on_failure = "CANCEL_AND_WAIT"
     name = "Initialize HDFS"
@@ -168,7 +173,9 @@ resource "aws_emr_cluster" "emr" {
       "Classification": "hdfs-site",
       "Properties": {
         "dfs.datanode.data.dir": "file:///mnt1/hdfs",
-        "dfs.namenode.name.dir": "file:///mnt/namenode"
+        "dfs.namenode.name.dir": "file:///mnt/namenode",
+        "dfs.namenode.num.extra.edits.retained": "100000",
+        "dfs.namenode.max.extra.edits.segments.retained": "1000"
       }
     },
     {
@@ -278,4 +285,11 @@ resource "aws_emr_instance_group" "task_spot" {
 }
 EOF
 
+}
+
+data "aws_instance" "emr-master" {
+  filter {
+    name   = "network-interface.private-dns-name"
+    values = [aws_emr_cluster.emr.master_public_dns]
+  }
 }

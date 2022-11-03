@@ -148,6 +148,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | 60% Disk EMR HDFS | No | Not enough core nodes for the workload | Increase the number of core nodes via the Terraform variable `emr_core_node_count`. |
 | EMR Unhealthy Nodes | No | EMR cluster is in a bad state | Taint the cluster and see the section on *Reprovisioning a new EMR cluster*  |
 | EMR Missing Blocks | No | Missing HDFS blocks means we lost one or more core nodes | Taint the cluster and the section on *Reprovisioning a new EMR cluster* |
+| 80% Disk EMR NameNode | Yes | The disk is filling up on the name ndoe | Taint the cluster and the section on *Reprovisioning a new EMR cluster* |
 | RDS CPU 90% | No | RDS instance is saturating CPU | Increase the RDS instance size |
 | RDS Disk Space | Yes | RDS is running out of disk space | Increase the `allocated_storage` via Terraform, or via the console |
 | RDS Freeable Memory | No | RDS is running out of disk space | Increase the `allocated_storage` via Terraform, or via the console |

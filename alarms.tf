@@ -75,6 +75,25 @@ resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
   insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
 }
 
+
+resource aws_cloudwatch_metric_alarm "emr_namenode_disk" {
+  alarm_name          = "Etleap - ${var.deployment_id} - 80% Disk EMR NameNode"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "Disk"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    InstanceId = data.aws_instance.emr-master.id
+    Device     = "NameNode"
+  }
+  period                    = "600"
+  statistic                 = "Maximum"
+  threshold                 = "80"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
+
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   alarm_name          = "Etleap - ${var.deployment_id} - RDS CPU 90%"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -93,7 +112,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_disk" {
-  alarm_name          = "${var.deployment_id} - RDS Disk Space"
+  alarm_name          = "Etleap - ${var.deployment_id} - RDS Disk Space"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "FreeStorageSpace"
