@@ -4,10 +4,10 @@ resource "aws_cloudwatch_metric_alarm" "elva_healthyhosts" {
   metric_name         = "HealthyHostCount"
   namespace           = "AWS/ApplicationELB"
   period              = "60"
-  datapoints_to_alarm = "5"
-  evaluation_periods  = "5"
+  datapoints_to_alarm = "3"
+  evaluation_periods  = "3"
   statistic           = "Average"
-  threshold           = "2"
+  threshold           = "1"
   alarm_description   = "Number of healthy nodes in Target Group"
   alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics

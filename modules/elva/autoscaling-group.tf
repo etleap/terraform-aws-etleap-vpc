@@ -66,9 +66,12 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.8.3.zip" -o "awscli
 unzip awscliv2.zip
 sudo ./aws/install
 
-aws ecr get-login-password --region us-east-1 | sudo -H docker login --username AWS --password-stdin 841591717599.dkr.ecr.us-east-1.amazonaws.com && sudo -H docker pull 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva
+for i in 1 2 3; do
+  aws ecr get-login-password --region us-east-1 | sudo -H docker login --username AWS --password-stdin 841591717599.dkr.ecr.us-east-1.amazonaws.com && sudo -H docker pull 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva && break || sleep 3;
+done
 
-sudo docker run -d -e AWS_REGION=${var.region} -e ELVA_ENV=vpc -e CONFIG_BUCKET_NAME=${var.config_bucket.bucket} -e AWS_ACCESS_KEY=${aws_iam_access_key.elva.id} -e AWS_SECRET_KEY=${aws_iam_access_key.elva.secret} -p 3000:3000 -p 8889:8889 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva 
+sudo docker run -d -e AWS_REGION=${var.region} -e ELVA_ENV=vpc -e CONFIG_BUCKET_NAME=${var.config_bucket.bucket} -e AWS_ACCESS_KEY=${aws_iam_access_key.elva.id} -e AWS_SECRET_KEY=${aws_iam_access_key.elva.secret} -p 3000:3000 -p 8889:8889 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva && break || sleep 3;
+
 EOF
 
 
