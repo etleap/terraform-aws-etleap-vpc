@@ -149,7 +149,9 @@ resource "aws_iam_policy" "job_manage_dms" {
         "dms:DescribeEndpoints",
         "dms:CreateEndpoint",
         "dms:DeleteEndpoint",
-        "dms:DescribeTableStatistics"
+        "dms:DescribeTableStatistics",
+        "dms:TestConnection",
+        "dms:DescribeConnections"
       ],
       "Resource": "*"
   },
