@@ -2,16 +2,6 @@ resource "aws_s3_bucket" "intermediate" {
   bucket        = "etleap-intermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
   force_destroy = true
 
-  lifecycle_rule {
-    id      = "emr-logs"
-    enabled = true
-    prefix  = "emr-logs/"
-
-    expiration {
-      days = 90
-    }
-  }
-
   lifecycle {
     ignore_changes = [
       bucket,
@@ -25,6 +15,22 @@ resource "aws_s3_bucket" "intermediate" {
         kms_master_key_id = var.s3_kms_encryption_key
         sse_algorithm     = var.s3_kms_encryption_key == null ? "AES256" : "aws:kms"
       }
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "intermediate-lifecycle" {
+  bucket = aws_s3_bucket.intermediate.id
+
+  rule {
+    id      = "emr-logs"
+    status  = "Enabled"
+    filter {
+      prefix  = "emr-logs/"
+    }
+
+    expiration {
+      days = 90
     }
   }
 }

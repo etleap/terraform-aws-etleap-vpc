@@ -5,7 +5,7 @@ resource "aws_db_instance" "db" {
   engine                       = "mysql"
   engine_version               = "8.0.23"
   instance_class               = var.rds_instance_type
-  name                         = "EtleapDB"
+  db_name                      = "EtleapDB"
   username                     = "root"
   password                     = module.db_root_password.secret_string
   db_subnet_group_name         = aws_db_subnet_group.db.name
@@ -26,7 +26,7 @@ resource "aws_db_instance" "db" {
   lifecycle {
     ignore_changes = [
       identifier_prefix,
-      name
+      db_name
     ]
   }
 }
