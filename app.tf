@@ -42,6 +42,7 @@ module "main_app" {
     aws_emr_cluster.emr
   ]
 
+  name              = "main"
   source            = "./modules/app/"
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.main_app.id
@@ -63,6 +64,11 @@ module "main_app" {
     zookeeper_hosts_dns = local.zookeeper_hosts_dns
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
+
+  tags = {
+    Deployment = var.deployment_id
+    AppRole = "main"
+  }
 }
 
 module "secondary_app" {
@@ -73,6 +79,7 @@ module "secondary_app" {
     aws_emr_cluster.emr
   ]
 
+  name              = "secondary"
   source            = "./modules/app/"
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.secondary_app[0].id
@@ -94,6 +101,11 @@ module "secondary_app" {
     zookeeper_hosts_dns = local.zookeeper_hosts_dns
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
+
+  tags = {
+    Deployment = var.deployment_id
+    AppRole = "secondary"
+  }
 }
 
 resource "aws_network_interface" "main_app" {

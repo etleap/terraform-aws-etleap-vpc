@@ -24,6 +24,7 @@ resource "aws_emr_cluster" "emr" {
 
   tags = {
     Name = "Etleap EMR ${var.deployment_id}"
+    Deployment = var.deployment_id
   }
 
   lifecycle {

@@ -12,6 +12,7 @@ resource "aws_instance" "nat" {
 
   tags = {
     Name = "Etleap NAT ${var.deployment_id}"
+    Deployment = var.deployment_id
   }
 
   volume_tags = {
