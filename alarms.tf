@@ -339,14 +339,18 @@ resource "aws_cloudwatch_metric_alarm" "dms_freeable_memory" {
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
-resource "aws_cloudwatch_metric_alarm" "zookeeper_status_down" {
+resource "aws_cloudwatch_metric_alarm" "zookeeper_unhealthy_nodes" {
   for_each = local.zookeeper_map
 
   alarm_name                = "Etleap - ${var.deployment_id} - ${each.value} is down"
   comparison_operator       = "LessThanThreshold"
-  evaluation_periods        = "3"
+  evaluation_periods        = "10"
   metric_name               = "Ruok"
   namespace                 = "Etleap/ZooKeeper"
+  dimensions = {
+    Node = "zookeeper"
+    Instance = "${each.value}"
+  }
   period                    = "60"
   statistic                 = "Average"
   threshold                 = "1"

@@ -157,6 +157,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | App is running | Yes | The main web application is down and not accepting requests | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
 | Job is running | Yes | The data processing application is down | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
 | Elva Healthy Host Count | Yes | The number of streaming ingestion nodes is too low. | Contact Support |
+| Zookepeer Unhealthy Nodes | Yes | Zookeeper cluster has Unhealthy Nodes | Contact Support |
 
 ### Reprovisioning a new EMR cluster
 
