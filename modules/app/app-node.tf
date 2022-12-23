@@ -52,6 +52,7 @@ resource "aws_instance" "app" {
     device_index         = 0
   }
 
+  user_data_replace_on_change = true
   user_data = <<EOF
 #cloud-config 
 # -*- YAML -*-
