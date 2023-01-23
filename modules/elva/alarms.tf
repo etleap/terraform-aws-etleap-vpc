@@ -14,6 +14,6 @@ resource "aws_cloudwatch_metric_alarm" "elva_healthyhosts" {
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
   dimensions = {
     TargetGroup  = aws_lb_target_group.elva.arn_suffix
-    LoadBalancer = var.load_balancer.arn_suffix
+    LoadBalancer = aws_lb.elva.arn_suffix
   }
 }

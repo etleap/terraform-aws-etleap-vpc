@@ -1,13 +1,10 @@
+variable deployment_random {
+}
+
 variable resource_name_suffix {
 }
 
 variable app_role_name {
-}
-
-variable load_balancer {
-}
-
-variable app_listener_arn {
 }
 
 variable vpc_id {
@@ -16,10 +13,16 @@ variable vpc_id {
 variable key_name {   
 }
 
-variable subnet_a_id {
+variable subnet_a_public_id {
 }
 
-variable subnet_b_id {
+variable subnet_a_private_id {
+}
+
+variable subnet_b_public_id {
+}
+
+variable subnet_b_private_id {
 }
 
 variable region {
@@ -35,4 +38,13 @@ variable "critical_cloudwatch_alarm_sns_topics" {
 }
 
 variable "deployment_id" {
+}
+
+variable "acm_certificate_arn" {
+}
+
+variable "streaming_endpoint_access_cidr_blocks" {
+}
+
+variable "app_security_group_id" {
 }

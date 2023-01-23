@@ -89,7 +89,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `ssh_access_cidr_blocks` | CIDR ranges that have SSH access to the application instance(s) (port 22).  Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
 | `roles_allowed_to_be_assumed` |A list of external roles that can be assumed by the app. When not specified, it defaults to all roles (*) | `list(string)` | `[]` | no |
 | `enable_public_access` |Enable public access to the Etleap deployment. This will create an _Internet facing_ ALB. Defaults to `true`. | `boolean` | `true` | no |
-| `acm_certificate_arn` | "ARN Certificate to use for SSL. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
+| `acm_certificate_arn` | "ARN Certificate to use for SSL connections to the Etleap UI. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
 | `rds_backup_retention_period` | The number of days to retain the automated database snapshots. Defaults to 7 days. | `int` | `7` | no |
 | `rds_allow_major_version_upgrade` | Only use this if instructed by ETLeap support. Indicates that major version upgrades are allowed. | `boolean` | `false` | no |
 | `rds_apply_immediately` | If any RDS modifications are required they will be applied immediately instead of during the next maintenance window. It is recommended to set this back to `false` once the change has been applied. | `boolean` | `false` | no |
@@ -98,6 +98,9 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `emr_task_node_instance_type` | The EMR Task Group Instance Type to use. Defaults to `c5.2xlarge`. | `string` | `c5.2xlarge` | no |
 | `emr_task_node_bid_price` | The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed. | `string` | `0.41` | no |
 | `enable_streaming_ingestion` | Enable support and required infrastructure for streaming ingestion sources. Currently only supported in `us-east-1` and `eu-west-3` regions. | `boolean` | `false` | no |
+| `streaming_endpoint_hostname` | The hostname the streaming ingestion webhook will be accessible from. Only has an effect if `enable_streaming_ingestion` is set to `true`. If left empty, the default Load Balancer DNS name will be used. | `string` | `null` | no |
+| `streaming_endpoint_acm_certificate_arn` | ARN Certificate to use for SSL connections to the streaming ingestion webhook. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
+| `streaming_endpoint_access_cidr_blocks` | CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses. | `list(string)` | ``["0.0.0.0/0"]`` | no |
 | `disable_ssm_access` | Disable SSM profile attachment to the main app role. To be used in case you want to opt-out of SSM based access to Etleap instances. | `boolean` | `false` | no |
 
 
@@ -105,7 +108,8 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 
 | Name | Description |
 |------|-------------|
-| `app_public_address` | The DNS address of the ALB |
+| `app_public_address` | The DNS address of the ALB that serves the Etleap Web UI. |
+| `streaming_endpoint_public_address` | The DNS address of the ALB that serves the streaming ingestion webhook. |
 | `s3_input_role_arn` | Role to use when setting up S3 Input connections with a bucket from a different AWS account. |
 | `s3_input_bucket_policy` | Policies that need to applied to the S3 buckets specified by 's3_input_buckets' so Etleap's role can read from them. |
 | `setup_password` | The password to log into Etleap for the first time. You'll be prompted to change it after on first login. |

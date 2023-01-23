@@ -256,7 +256,7 @@ variable "enable_public_access" {
 
 variable "acm_certificate_arn" {
   default     = null
-  description = "ARN Certificate to use for SSL. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template."
+  description = "ARN Certificate to use for SSL connections to the Etleap UI. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template."
 }
 
 variable "rds_backup_retention_period" {
@@ -297,6 +297,21 @@ variable "emr_task_node_bid_price" {
 variable "enable_streaming_ingestion" {
   default     = false
   description = "Enable support and required infrastructure for streaming ingestion sources."
+}
+
+variable "streaming_endpoint_hostname" {
+  default     = null
+  description = "The hostname the streaming ingestion webhook will be accessible from. Only has an effect if `enable_streaming_ingestion` is set to `true`."
+}
+
+variable "streaming_endpoint_acm_certificate_arn" {
+  default     = null
+  description = "ARN Certificate to use for SSL connections to the streaming ingestion webhook. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template."
+}
+
+variable "streaming_endpoint_access_cidr_blocks" {
+  default     = ["0.0.0.0/0"]
+  description = "CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses."
 }
 
 variable "disable_ssm_access" {

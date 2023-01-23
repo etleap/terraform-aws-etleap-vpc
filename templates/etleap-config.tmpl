@@ -21,7 +21,8 @@ export ETLEAP_SETUP_ADMIN_PASSWORD="$(aws secretsmanager get-secret-value --secr
 export ETLEAP_SETUP_INTERMEDIATE_BUCKET="${var.s3_bucket}"
 export ETLEAP_SETUP_INTERMEDIATE_ROLE_ARN="${var.s3_role}"
 export ETLEAP_SETUP_STREAMING_INGESTION_ENABLED="${var.streaming_ingestion_enabled}"
-export ETLEAP_ELVA_BASE_HTTP_ENDPOINT="http://$FRONT_END_HOSTNAME/in"
+export ETLEAP_ELVA_BASE_HTTP_ENDPOINT="http://${elva_lb_internal_address}"
+export ETLEAP_ELVA_PUBLIC_ENDPOINT="http://${var.streaming_endpoint_hostname}"
 
 %{ if var.has_dms_instance }
 export ETLEAP_DMS_ROLE_ARN="${var.dms_role}"

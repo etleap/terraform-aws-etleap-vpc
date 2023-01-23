@@ -1,5 +1,8 @@
 locals {
-  default_hostname = aws_lb.app.dns_name
+  default_hostname                    = aws_lb.app.dns_name
+  default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : null
+  elva_lb_internal_address_a          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_a : null
+  elva_lb_internal_address_b          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_b : null
   context = {
     deployment_id                            = var.deployment_id
     db_password_arn                          = module.db_password.arn
@@ -31,6 +34,7 @@ locals {
     inbound_sqs_arn                          = module.inbound_queue.sqs_queue_arn
     s3_kms_sse_key                           = var.s3_kms_encryption_key
     streaming_ingestion_enabled              = var.enable_streaming_ingestion
+    streaming_endpoint_hostname              = var.streaming_endpoint_hostname == null ? local.default_streaming_endpoint_hostname : var.streaming_endpoint_hostname
   }
 }
 
@@ -58,10 +62,11 @@ module "main_app" {
   deployment_id = var.deployment_id
 
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
-    var                 = local.context,
-    deployment_role     = "customervpc",
-    main_app_ip         = "127.0.0.1",
-    zookeeper_hosts_dns = local.zookeeper_hosts_dns
+    var                      = local.context,
+    deployment_role          = "customervpc",
+    main_app_ip              = "127.0.0.1",
+    zookeeper_hosts_dns      = local.zookeeper_hosts_dns
+    elva_lb_internal_address = local.elva_lb_internal_address_b
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 
@@ -95,10 +100,11 @@ module "secondary_app" {
   deployment_id = var.deployment_id
 
   config = templatefile("${path.module}/templates/etleap-config.tmpl", {
-    var                 = local.context,
-    deployment_role     = "customervpc_ha",
-    main_app_ip         = element(tolist(aws_network_interface.main_app.private_ips[*]), 0),
-    zookeeper_hosts_dns = local.zookeeper_hosts_dns
+    var                      = local.context,
+    deployment_role          = "customervpc_ha",
+    main_app_ip              = element(tolist(aws_network_interface.main_app.private_ips[*]), 0),
+    zookeeper_hosts_dns      = local.zookeeper_hosts_dns
+    elva_lb_internal_address = local.elva_lb_internal_address_a
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 
@@ -178,7 +184,7 @@ resource "aws_lb" "app" {
   internal           = !var.enable_public_access
   load_balancer_type = "application"
   subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
-  security_groups    = var.enable_streaming_ingestion ? [aws_security_group.app.id, module.elva[0].elva_elb_security_group.id] : [aws_security_group.app.id]
+  security_groups    = [aws_security_group.app.id]
   idle_timeout       = 300
 
   tags = {

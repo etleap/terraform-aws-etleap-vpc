@@ -7,7 +7,8 @@ locals {
 }
 
 resource "aws_autoscaling_group" "elva" {
-  vpc_zone_identifier       = [var.subnet_a_id, var.subnet_b_id]
+  depends_on                = [aws_lb_listener.elva_https, aws_lb_listener.elva_http]
+  vpc_zone_identifier       = [var.subnet_a_private_id, var.subnet_b_private_id]
   min_size                  = 4
   max_size                  = 100
   health_check_type         = "ELB"
@@ -39,7 +40,7 @@ resource "aws_autoscaling_policy" "elva" {
     target_value = 6000
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label = "${var.load_balancer.arn_suffix}/${aws_lb_target_group.elva.arn_suffix}"
+      resource_label = "${aws_lb.elva.arn_suffix}/${aws_lb_target_group.elva.arn_suffix}"
     }
   }
 }

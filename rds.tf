@@ -32,7 +32,7 @@ resource "aws_db_instance" "db" {
 }
 
 resource "aws_db_subnet_group" "db" {
-  name       = "etleap_db_${random_id.deployment_random.hex}"
+  name       = "etleap_db_${local.deployment_random}"
   subnet_ids = [local.subnet_a_private_id, local.subnet_b_private_id]
   
   lifecycle {
@@ -44,7 +44,7 @@ resource "aws_db_subnet_group" "db" {
 }
 
 resource "aws_db_parameter_group" "mysql8-0-etleap" {
-  name        = "etleap-mysql8-0-${random_id.deployment_random.hex}"
+  name        = "etleap-mysql8-0-${local.deployment_random}"
   description = "MySQL 8.0 with Etleap modifications"
   family      = "mysql8.0"
 
@@ -140,7 +140,7 @@ resource "aws_db_parameter_group" "mysql8-0-etleap" {
 }
 
 resource "aws_db_parameter_group" "mysql5-7-etleap" {
-  name        = "etleap-mysql5-7-${random_id.deployment_random.hex}"
+  name        = "etleap-mysql5-7-${local.deployment_random}"
   description = "MySQL 5.7 with Etleap modifications"
   family      = "mysql5.7"
 
@@ -236,7 +236,7 @@ resource "aws_db_parameter_group" "mysql5-7-etleap" {
 }
 
 resource "aws_db_parameter_group" "mysql5-6-etleap" {
-  name        = "etleap-mysql5-6-${random_id.deployment_random.hex}"
+  name        = "etleap-mysql5-6-${local.deployment_random}"
   description = "MySQL 5.6 with Etleap modifications"
   family      = "mysql5.6"
 

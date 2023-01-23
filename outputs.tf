@@ -2,6 +2,10 @@ output "app_public_address" {
   value = aws_lb.app.dns_name
 }
 
+output "streaming_endpoint_public_address" {
+  value = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : null
+}
+
 output "s3_input_role_arn" {
   value       = length(var.s3_input_buckets) > 0 ? aws_iam_role.s3_input_role[0].arn : null
   description = "Role to use when setting up \"S3 Input\" connections with a bucket from a different AWS account."

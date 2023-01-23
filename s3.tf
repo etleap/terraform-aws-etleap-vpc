@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "intermediate" {
-  bucket        = "etleap-intermediate-${var.deployment_id}-${random_id.deployment_random.hex}"
+  bucket        = "etleap-intermediate-${var.deployment_id}-${local.deployment_random}"
   force_destroy = true
 
   lifecycle {

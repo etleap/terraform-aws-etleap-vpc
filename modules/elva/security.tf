@@ -5,26 +5,32 @@ resource "aws_security_group" "elva-elb" {
 
   # For event traffic over HTTP
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks     = var.streaming_endpoint_access_cidr_blocks
+    # For internal access from app
+    security_groups = [var.app_security_group_id]
   }
 
   # For event traffic over HTTPS
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    cidr_blocks     = var.streaming_endpoint_access_cidr_blocks
+    # For internal access from app
+    security_groups = [var.app_security_group_id]
   }
 
   # For FluentD logs
   ingress {
-    from_port   = 24224
-    to_port     = 24224
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 24224
+    to_port         = 24224
+    protocol        = "tcp"
+    cidr_blocks     = var.streaming_endpoint_access_cidr_blocks
+    # For internal access from app
+    security_groups = [var.app_security_group_id]
   }
 }
 
