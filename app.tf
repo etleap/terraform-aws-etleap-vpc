@@ -130,7 +130,7 @@ resource "aws_network_interface" "secondary_app" {
 }
 
 resource "aws_acm_certificate" "etleap" {
-  count            = var.acm_certificate_arn == null ? 1 : 0
+  count            = var.acm_certificate_arn == null || var.streaming_endpoint_acm_certificate_arn == null ? 1 : 0
   private_key      = local.ssl_key
   certificate_body = local.ssl_pem
 
