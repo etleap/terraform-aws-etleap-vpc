@@ -358,3 +358,43 @@ resource "aws_cloudwatch_metric_alarm" "zookeeper_unhealthy_nodes" {
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
+
+resource "aws_cloudwatch_metric_alarm" "kinesis_running_main_app" {
+  count = var.app_available ? 1 : 0
+
+  alarm_name                = "Etleap - ${var.deployment_id} - main_app - Kinesis Agent not running"
+  comparison_operator       = "LessThanThreshold"
+  evaluation_periods        = "10"
+  metric_name               = "AwsKinesisRunning"
+  namespace                 = "Etleap/EC2"
+  dimensions = {
+    InstanceId = module.main_app[0].instance_id
+    Deployment = var.deployment_id
+  }
+  period                    = "60"
+  statistic                 = "Average"
+  threshold                 = "1"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "kinesis_running_secondary_app" {
+  count = var.enable_kinesis_alarms && var.app_available && var.ha_mode ? 1 : 0
+
+  alarm_name                = "Etleap - ${var.deployment_id} - secondary_app - Kinesis not running"
+  comparison_operator       = "LessThanThreshold"
+  evaluation_periods        = "10"
+  metric_name               = "AwsKinesisRunning"
+  namespace                 = "Etleap/EC2"
+  dimensions = {
+    InstanceId = module.secondary_app[0].instance_id
+    Deployment = var.deployment_id
+  }
+  period                    = "60"
+  statistic                 = "Average"
+  threshold                 = "1"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}

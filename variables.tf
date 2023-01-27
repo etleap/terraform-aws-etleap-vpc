@@ -319,6 +319,11 @@ variable "disable_ssm_access" {
   description = "Disable SSM profile attachment to the main app role. To be used in case you want to opt-out of SSM based access to Etleap instances."
 }
 
+variable "enable_kinesis_alarms" {
+  default     = true
+  description = "Enable Kinesis agent alarms."
+}
+
 # here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.
 locals {
   validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 3) && (var.private_subnets == null ? false : length(var.private_subnets) == 3)
