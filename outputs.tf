@@ -113,3 +113,7 @@ output "kms_policy" {
 EOF
   description = "Statement to add to the KMS key if using a Customer-Manager SSE KMS key for encrypting S3 data."
 }
+
+output "kms_key_arn" {
+  value = aws_kms_key.etleap_encryption_key.arn
+}
