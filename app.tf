@@ -1,8 +1,9 @@
 locals {
+  ssm_parameter_prefix                = "/etleap/${var.deployment_id}"
   default_hostname                    = aws_lb.app.dns_name
-  default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : null
-  elva_lb_internal_address_a          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_a : null
-  elva_lb_internal_address_b          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_b : null
+  default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : ""
+  elva_lb_internal_address_a          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_a : ""
+  elva_lb_internal_address_b          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_b : ""
   context = {
     deployment_id                            = var.deployment_id
     db_password_arn                          = module.db_password.arn
@@ -25,7 +26,7 @@ locals {
     dms_downgraded_replication_instance_arn  = (!var.disable_cdc_support && var.downgrade_cdc) ? aws_dms_replication_instance.dms_downgraded[0].replication_instance_arn : null
     account_id                               = data.aws_caller_identity.current.account_id
     db_address                               = aws_db_instance.db.address
-    emr_cluster                              = aws_emr_cluster.emr.master_public_dns
+    emr_cluster_config_name                  = "${local.ssm_parameter_prefix}/emr_cluster_dns"
     app_hostname                             = var.app_hostname == null ? local.default_hostname : var.app_hostname
     github_username                          = var.github_username
     github_access_token_arn                  = var.github_access_token_arn

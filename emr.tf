@@ -288,6 +288,17 @@ EOF
 
 }
 
+resource "aws_ssm_parameter" "emr_public_dns" {
+  name        = local.context.emr_cluster_config_name
+  description = "Etleap ${var.deployment_id} - EMR public DNS"
+  type        = "String"
+  value       = aws_emr_cluster.emr.master_public_dns
+
+  tags = {
+    Deployment = var.deployment_id
+  }
+}
+
 data "aws_instance" "emr-master" {
   filter {
     name   = "network-interface.private-dns-name"
