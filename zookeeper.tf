@@ -26,6 +26,8 @@ resource "aws_instance" "zookeeper" {
   key_name      = var.key_name
   iam_instance_profile = aws_iam_instance_profile.zookeeper.name
 
+  user_data_replace_on_change = true
+
   tags = {
     Name = "Etleap ${each.value} ${var.deployment_id}"
     Deployment = var.deployment_id
@@ -55,7 +57,7 @@ resource "aws_instance" "zookeeper" {
     file_docker_compose = templatefile("${path.module}/templates/zookeeper-docker-compose.yml.tpl", {
       zookeeper_id = each.key
       zookeeper_nodes = local.zookeeper_hosts_dns
-      zookeeper_version = "3.5.10"
+      zookeeper_version = "3.7.1"
     }),
     config = templatefile("${path.module}/templates/zookeeper-config.tmpl", {
       deployment_id = var.deployment_id,
