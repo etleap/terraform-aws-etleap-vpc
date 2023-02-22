@@ -102,7 +102,6 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `streaming_endpoint_acm_certificate_arn` | ARN Certificate to use for SSL connections to the streaming ingestion webhook. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
 | `streaming_endpoint_access_cidr_blocks` | CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses. | `list(string)` | ``["0.0.0.0/0"]`` | no |
 | `disable_ssm_access` | Disable SSM profile attachment to the main app role. To be used in case you want to opt-out of SSM based access to Etleap instances. | `boolean` | `false` | no |
-| `enable_kinesis_alarms` | Enable Kinesis agent alarms. | `boolean` | `false` | no |
 
 
 ## Outputs
@@ -163,8 +162,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | Job is running                         | Yes | The data processing application is down                     | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage |
 | Elva Healthy Host Count                | Yes | The number of streaming ingestion nodes is too low.         | Contact Support                                                                                                                                                                   |
 | Zookepeer Unhealthy Nodes              | Yes | Zookeeper cluster has Unhealthy Nodes                       | Contact Support                                                                                                                                                                   |
-| Main App Kinesis Agent is running      | Yes | The main node kinesis agent is not running                  | Contact Support                                                                                                                        |
-| Secondary App Kinesis Agent is running | Yes | The secondary node kinesis agent is not running             | Contact Support                                                                                                                       |
+| * App Kinesis logger agent is running  | Yes | A Kinesis logger agent is not running                       | Contact Support                                                                                                                        |
 
 ### Reprovisioning a new EMR cluster
 

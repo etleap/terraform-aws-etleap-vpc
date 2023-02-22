@@ -377,10 +377,12 @@ resource "aws_cloudwatch_metric_alarm" "kinesis_running_main_app" {
   alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+
+  treat_missing_data = "notBreaching"
 }
 
 resource "aws_cloudwatch_metric_alarm" "kinesis_running_secondary_app" {
-  count = var.enable_kinesis_alarms && var.app_available && var.ha_mode ? 1 : 0
+  count = var.app_available && var.ha_mode ? 1 : 0
 
   alarm_name                = "Etleap - ${var.deployment_id} - secondary_app - Kinesis not running"
   comparison_operator       = "LessThanThreshold"
@@ -397,4 +399,6 @@ resource "aws_cloudwatch_metric_alarm" "kinesis_running_secondary_app" {
   alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+
+  treat_missing_data = "notBreaching"
 }
