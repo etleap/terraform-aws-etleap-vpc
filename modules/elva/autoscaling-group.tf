@@ -1,8 +1,8 @@
 locals {
-  // Ubuntu 14.04 LTS EBS AMIs, find and update AMIs from https://cloud-images.ubuntu.com/locator/ec2/ - must be hvm type for new instance types
+  // Ubuntu 20.04 LTS - amd64, find and update AMIs from https://cloud-images.ubuntu.com/locator/ec2/ - must be hvm type for new instance types
   ami = {
-    us-east-1 = "ami-07957d39ebba800d5"
-    eu-west-3 = "ami-0a930ecbcb574cb4e"
+    us-east-1 = "ami-0c1704bac156af62c"
+    eu-west-3 = "ami-07c3b0c60cfea48b5"
   }
 }
 
@@ -56,13 +56,12 @@ resource "aws_launch_configuration" "elva" {
   user_data            = <<EOF
 #!/bin/bash
 sudo apt-get update
-sudo apt-get install ntp -y
-export VERSION=18.06.1-ce
+sudo apt-get install ntp unzip -y
+export VERSION=20.10.22
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 curl https://get.docker.com | /bin/bash
 sudo usermod -aG docker ubuntu
 
-sudo apt-get install unzip
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.8.3.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
