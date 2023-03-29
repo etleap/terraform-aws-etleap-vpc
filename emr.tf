@@ -102,6 +102,11 @@ resource "aws_emr_cluster" "emr" {
     path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-hdfs-crontab.sh"
   }
 
+  bootstrap_action {
+    name = "Install DBT"
+    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-dbt.sh"
+  }
+
   step {
     action_on_failure = "CANCEL_AND_WAIT"
     name = "Initialize HDFS"
