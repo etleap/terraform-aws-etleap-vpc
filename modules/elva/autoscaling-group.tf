@@ -59,7 +59,9 @@ sudo apt-get update
 sudo apt-get install ntp unzip -y
 export VERSION=20.10.22
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-curl https://get.docker.com | /bin/bash
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+sudo apt update
+sudo apt install docker-ce -y
 sudo usermod -aG docker ubuntu
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.8.3.zip" -o "awscliv2.zip"
