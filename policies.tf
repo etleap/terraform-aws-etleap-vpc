@@ -33,7 +33,7 @@ resource "aws_iam_instance_profile" "emr_profile" {
 }
 
 resource "aws_iam_instance_profile" "zookeeper" {
-  name = "zookeeper_iam_profile${local.resource_name_suffix}"
+  name = "Etleap-Zookeeper_iam_profile${local.resource_name_suffix}"
   role = aws_iam_role.zookeeper.name
 }
 
@@ -53,7 +53,7 @@ resource "aws_iam_role_policy_attachment" "allow_sns_put" {
 }
 
 resource "aws_iam_role" "zookeeper" {
-  name               = "zookeeper${local.resource_name_suffix}"
+  name               = "Etleapzookeeper${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -69,6 +69,10 @@ resource "aws_iam_role" "zookeeper" {
   ]
 }
 EOF
+
+lifecycle {
+  ignore_changes = ["description", "tags"]
+}
 
 }
 

@@ -3,7 +3,7 @@ resource "aws_db_instance" "db" {
   allocated_storage            = 500
   storage_type                 = "gp2"
   engine                       = "mysql"
-  engine_version               = "8.0.23"
+  engine_version               = "8.0.28"
   instance_class               = var.rds_instance_type
   name                         = "EtleapDB"
   username                     = "root"

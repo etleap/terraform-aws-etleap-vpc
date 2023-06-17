@@ -30,6 +30,10 @@ resource "aws_instance" "zookeeper" {
     Name = "Etleap ${each.value} ${var.deployment_id}"
   }
 
+  volume_tags = {
+    Name = "Etleap ${each.value} ${var.deployment_id}"
+  }
+
   network_interface {
     network_interface_id = aws_network_interface.zookeeper[each.key].id
     device_index         = 0

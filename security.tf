@@ -149,11 +149,17 @@ resource "aws_security_group_rule" "app-allow-web-ssl" {
   protocol          = "tcp"
   security_group_id = aws_security_group.app.id
   cidr_blocks       = var.app_access_cidr_blocks
+  lifecycle {
+    ignore_changes = [ description ]
+  }
 }
 
 resource "aws_security_group" "zookeeper" {
-  name   = "zookeeper"
+  name   = "Etleap zookeeper"
   vpc_id = local.vpc_id
+  lifecycle {
+    ignore_changes = [name, description, tags, tags_all] 
+  }
 }
 
 resource "aws_security_group_rule" "zookeeper-allow-ssh" {
