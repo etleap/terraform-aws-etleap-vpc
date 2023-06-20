@@ -152,8 +152,11 @@ resource "aws_security_group_rule" "app-allow-web-ssl" {
 }
 
 resource "aws_security_group" "zookeeper" {
-  name   = "zookeeper"
+  name   = "Etleap zookeeper"
   vpc_id = local.vpc_id
+  lifecycle {
+    ignore_changes = [name, description, tags, tags_all] 
+  }
 }
 
 resource "aws_security_group_rule" "zookeeper-allow-ssh" {
