@@ -52,6 +52,11 @@ resource "aws_iam_role_policy_attachment" "allow_sns_put" {
   policy_arn = aws_iam_policy.allow_sns_put.arn
 }
 
+resource "aws_iam_role_policy_attachment" "dynamodb_crud" {
+  role       = aws_iam_role.app.name
+  policy_arn = aws_iam_policy.dynamodb_crud.arn
+}
+
 resource "aws_iam_role" "zookeeper" {
   name               = "Etleapzookeeper${local.resource_name_suffix}"
   assume_role_policy = <<EOF
@@ -253,6 +258,37 @@ resource "aws_iam_policy" "allow_sns_put" {
     "Action": "sns:Publish",
     "Resource": "*"
   }]
+}
+EOF
+}
+
+resource aws_iam_policy "dynamodb_crud" {
+  name = "Etleap-dynamodb-crud"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DynamoDBTableAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:PutItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:Query",
+        "dynamodb:UpdateItem"
+      ],
+      "Resource": [
+        "${aws_dynamodb_table.activity-log.arn}",
+        "${aws_dynamodb_table.activity-log.arn}/index/*"
+      ]
+    }
+  ]
 }
 EOF
 }

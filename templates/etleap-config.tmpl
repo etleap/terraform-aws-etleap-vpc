@@ -47,6 +47,9 @@ export ETLEAP_DEPLOYMENT_ROLE="${deployment_role}"
 export ETLEAP_SETUP_INBOUND_SNS_ARN="${var.inbound_sns_arn}"
 export ETLEAP_SETUP_INBOUND_SQS_ARN="${var.inbound_sqs_arn}"
 
+export ETLEAP_DYNAMODB_ENABLED=true
+export ETLEAP_DYNAMODB_ACTIVITY_LOG_TABLE_NAME="${var.activity_log_table_name}"
+
 %{ if var.s3_kms_sse_key != null }
 export USE_SSE_KMS="true"
 %{ endif }

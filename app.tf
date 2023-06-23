@@ -36,6 +36,7 @@ locals {
     s3_kms_sse_key                           = var.s3_kms_encryption_key
     streaming_ingestion_enabled              = var.enable_streaming_ingestion
     streaming_endpoint_hostname              = var.streaming_endpoint_hostname == null ? local.default_streaming_endpoint_hostname : var.streaming_endpoint_hostname
+    activity_log_table_name                  = aws_dynamodb_table.activity-log.id
   }
 }
 
