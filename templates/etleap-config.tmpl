@@ -59,6 +59,10 @@ export ETLEAP_GITHUB_USERNAME="${var.github_username}"
 export ETLEAP_SECRET_GITHUB_ACCESS_TOKEN="$(aws secretsmanager get-secret-value --secret-id ${var.github_access_token_arn} | jq -r .SecretString)"
 %{ endif }
 
+%{ if var.dms_proxy_bucket != null }
+export ETLEAP_DMS_PROXY_BUCKET_NAME="${var.dms_proxy_bucket}"
+%{ endif }
+
 %{ for env_var, secret_arn in var.connection_secrets}
 export ${env_var}="$(aws secretsmanager get-secret-value --secret-id ${secret_arn} | jq -r .SecretString)"
 %{ endfor }
