@@ -263,7 +263,7 @@ EOF
 }
 
 resource aws_iam_policy "dynamodb_crud" {
-  name = "Etleap-dynamodb-crud"
+  name = "Etleap-dynamodb-crud${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",

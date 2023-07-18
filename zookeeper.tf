@@ -71,7 +71,8 @@ resource "aws_instance" "zookeeper" {
 
 }
 
-output "zookeeper_private_ips" {
-  value       = toset([ for i in aws_network_interface.zookeeper : i.private_dns_name ])
-  description = "Zookeeper ensemble private ips"
+resource "aws_iam_role_policy_attachment" "zookeeper-ssm" {
+  count      = var.disable_ssm_access ? 0 : 1
+  role       = aws_iam_role.zookeeper.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }

@@ -117,3 +117,8 @@ EOF
 output "kms_key_arn" {
   value = aws_kms_key.etleap_encryption_key.arn
 }
+
+output "zookeeper_private_ips" {
+  value       = toset([ for i in aws_network_interface.zookeeper : i.private_dns_name ])
+  description = "Zookeeper ensemble private ips"
+}
