@@ -309,17 +309,18 @@ resource "aws_cloudwatch_metric_alarm" "dms_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dms_disk" {
-  alarm_name          = "Etleap - ${var.deployment_id} - DMS Disk Space 50GB Remaining"
+  count               = var.disable_cdc_support ? 0 : 1
+  alarm_name          = "Etleap - ${var.deployment_id} - DMS Disk Space 30GB Remaining"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "FreeStorageSpace"
   namespace           = "AWS/DMS"
   dimensions = {
-    ReplicationInstanceIdentifier = "prod"
+    ReplicationInstanceIdentifier = aws_dms_replication_instance.dms[0].id
   }
   period                    = "300"
   statistic                 = "Average"
-  threshold                 = "53687091200"
+  threshold                 = "32212254720"
   alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
