@@ -151,12 +151,6 @@ resource "aws_iam_instance_profile" "app" {
   role = aws_iam_role.app.name
 }
 
-resource "aws_iam_role_policy_attachment" "ssm" {
-  count      = var.disable_ssm_access ? 0 : 1
-  role       = aws_iam_role.app.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
 resource "aws_iam_role_policy_attachment" "ecr_readonly_access" {
   role       = aws_iam_role.app.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"

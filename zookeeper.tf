@@ -70,9 +70,3 @@ resource "aws_instance" "zookeeper" {
   })
 
 }
-
-resource "aws_iam_role_policy_attachment" "zookeeper-ssm" {
-  count      = var.disable_ssm_access ? 0 : 1
-  role       = aws_iam_role.zookeeper.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
