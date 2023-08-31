@@ -355,3 +355,8 @@ variable "amis" {
     nat = "ami-0c65039d08fea77c7"
   }
 }
+
+data "aws_ec2_instance_type" "dms_instance_type" {
+  // DMS instance types are prefixed with "dms.", which isn't supported by "aws_ec2_instance_type" data source
+  instance_type = replace(var.dms_instance_type, "dms.", "")
+}
