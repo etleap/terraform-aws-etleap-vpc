@@ -1,6 +1,7 @@
 export ETLEAP_DEPLOYMENT_ID=${var.deployment_id}
 export USE_PROD_SECRETS=0
 export JOB_ROLE=customer_job,monitor
+export ETLEAP_VPC_SUBNET_CIDR="${var.vpc_cidr_block}"
 export ETLEAP_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString)"
 export SALESFORCE_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString)"
 export FRONT_END_HOSTNAME="${var.app_hostname}"
