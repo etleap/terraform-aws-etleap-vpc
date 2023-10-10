@@ -423,3 +423,44 @@ resource "aws_cloudwatch_metric_alarm" "kinesis_running_secondary_app" {
 
   treat_missing_data = "notBreaching"
 }
+
+resource "aws_cloudwatch_metric_alarm" "job_gc" {
+  count = var.app_available ? 1 : 0
+
+  alarm_name                = "Etleap - ${var.deployment_id} - High Job GC Activity"
+  comparison_operator       = "GreaterThanThreshold"
+  evaluation_periods        = "10"
+  threshold                 = "25"
+  datapoints_to_alarm       = "10"
+  treat_missing_data        = "missing"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+
+  metric_query {
+    id          = "e1"
+    // this uses the same formula as the one in the Etleap_Ops dashboard
+    expression  = "100*(((RATE(m1)+ABS(RATE(m1)))/2)/1000)"
+    label       = "GC Stop-the-World Pct"
+    return_data = true
+  }
+
+  metric_query {
+    id          = "m1"
+
+    metric {
+      stat        = "Maximum"
+      metric_name = "GC Stop-the-World Time"
+      period      = "60"
+      namespace   = "Etleap/Java"
+      dimensions  = {
+        local-hostname = module.main_app[0].instance_private_dns
+        level          = "INFO"
+        type           = "GAUGE"
+        Env            = var.deployment_id
+        id             = "gcMetrics"
+        class          = "JVMMetricsService"
+      }
+    }
+  }
+}

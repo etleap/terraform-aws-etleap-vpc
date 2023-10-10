@@ -115,3 +115,7 @@ EOF
 output "instance_id" {
   value = aws_instance.app.id
 }
+
+output "instance_private_dns" {
+  value = aws_instance.app.private_dns
+}
