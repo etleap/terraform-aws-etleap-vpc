@@ -1,7 +1,7 @@
 
 resource "aws_ssm_document" "portforward_socks" {
   count         = var.disable_ssm_access ? 0 : 1
-  name          = "PortForwardingSocks"
+  name          = "PortForwardingSocks-${var.deployment_id}"
   document_type = "Session"
 
   content = <<DOC
