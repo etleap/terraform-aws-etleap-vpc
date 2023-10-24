@@ -7,6 +7,9 @@ locals {
   app_main_private_ip                 = element(tolist(aws_network_interface.main_app.private_ips[*]), 0)
   app_private_ip_config_name          = "${local.ssm_parameter_prefix}/app_private_ip"
 
+  rds_hostname_config_name            = "${local.ssm_parameter_prefix}/rds_hostname"
+  rds_password_arn_config_name        = "${local.ssm_parameter_prefix}/rds_password_arn"
+
   default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : ""
   elva_lb_internal_address_a          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_a : ""
   elva_lb_internal_address_b          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_b : ""

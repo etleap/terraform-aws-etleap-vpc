@@ -138,3 +138,26 @@ resource "aws_db_parameter_group" "mysql8-0-etleap" {
     apply_method = "pending-reboot"
   }
 }
+
+resource "aws_ssm_parameter" "rds_hostname" {
+  name        = local.rds_hostname_config_name
+  description = "Etleap ${var.deployment_id} - RDS Hostname"
+  type        = "String"
+  value       = local.context.db_address
+
+  tags = {
+    Deployment = var.deployment_id
+  }
+}
+
+resource "aws_ssm_parameter" "rds_password_arn" {
+  name        = local.rds_password_arn_config_name
+  description = "Etleap ${var.deployment_id} - RDS Password ARN"
+  type        = "String"
+  value       = local.context.db_password_arn
+
+  tags = {
+    Deployment = var.deployment_id
+  }
+}
+
