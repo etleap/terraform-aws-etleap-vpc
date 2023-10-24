@@ -95,6 +95,9 @@ runcmd:
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
 - "apt-get update && apt-get -y upgrade"
+- echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
+- service ntp restart
+- ntpq -pn
 
 power_state:
   delay: "now"

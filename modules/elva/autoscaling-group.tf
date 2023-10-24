@@ -64,6 +64,10 @@ sudo apt update
 sudo apt install docker-ce -y
 sudo usermod -aG docker ubuntu
 
+sudo echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
+sudo service ntp restart
+sudo ntpq -pn
+
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.8.3.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
