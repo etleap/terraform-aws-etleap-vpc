@@ -1,7 +1,7 @@
 # TODO See if it makes sense to use NAT gateway instead, avoids having to manage AMIs
 resource "aws_instance" "nat" {
   count                       = local.created_vpc_count
-  ami                         = var.amis["nat"]
+  ami                         = data.aws_ami.nat.id
   instance_type               = var.nat_instance_type
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.nat[0].id]
@@ -17,6 +17,38 @@ resource "aws_instance" "nat" {
 
   volume_tags = {
     Name = "Etleap NAT"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes = [ ami ]
+  }
+}
+
+# Automates a manual search through this list: https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#Images:visibility=public-images;search=amzn-ami-vpc-nat-hvm*;sort=desc:name
+data "aws_ami" "nat" {
+  most_recent      = true
+  name_regex       = "^amzn-ami-vpc-nat-*"
+  owners           = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn-ami-vpc-nat-*"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 }
 

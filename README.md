@@ -127,6 +127,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `main_app_instance_id` | The instance ID of the main application instance. |
 | `secondary_app_instance_id` | The instance ID of the secondary application instance. |
 | `kms_policy` | Statement to add to the KMS key if using a Customer-Manager SSE KMS key for encrypting S3 data. |
+| `nat_ami` | Status of the NAT AMI (if created) |
 
 # Connecting to the Etleap deployment
 
