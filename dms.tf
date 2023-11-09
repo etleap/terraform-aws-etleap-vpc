@@ -156,6 +156,11 @@ resource "aws_iam_policy" "job_manage_dms" {
       "Resource": "*"
   },
   {
+    "Effect": "Allow",
+      "Action": "logs:FilterLogEvents",
+      "Resource": "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:dms-tasks-${aws_dms_replication_instance.dms[0].replication_instance_id}:*"
+  },
+  {
       "Effect": "Allow",
       "Action": [
         "iam:GetRole",
