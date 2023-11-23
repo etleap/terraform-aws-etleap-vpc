@@ -63,7 +63,7 @@ resource "aws_db_parameter_group" "mysql8-0-etleap" {
   parameter {
     name         = "collation_server"
     value        = "latin1_swedish_ci"
-    apply_method = "immediate"
+    apply_method = "pending-reboot"
   }
 
   parameter {
