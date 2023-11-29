@@ -28,7 +28,9 @@ module "main_app" {
     zookeeper_hosts_dns      = local.zookeeper_hosts_dns
     elva_lb_internal_address = local.elva_lb_internal_address_b
   })
-  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
+
+  # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, SALESFORCE_DB_PASSWORD, ORG_NAME, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_PASSWORD
+  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address} $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
 
   tags = {
     Deployment = var.deployment_id
@@ -66,7 +68,9 @@ module "secondary_app" {
     zookeeper_hosts_dns      = local.zookeeper_hosts_dns
     elva_lb_internal_address = local.elva_lb_internal_address_a
   })
-  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
+
+  # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, SALESFORCE_DB_PASSWORD, ORG_NAME, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_PASSWORD
+  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address} $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
 
   tags = {
     Deployment = var.deployment_id

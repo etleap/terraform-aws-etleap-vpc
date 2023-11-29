@@ -95,13 +95,13 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `rds_apply_immediately` | If any RDS modifications are required they will be applied immediately instead of during the next maintenance window. It is recommended to set this back to `false` once the change has been applied. | `boolean` | `false` | no |
 | `emr_core_node_count` | The number of EMR core nodes in the EMR cluster. Defaults to 1. | `int` | `1` | no |
 | `allow_iam_devops_role` | Enable access to the deployment for Etleap by creating an IAM role that Etleap's ops team can assume. Defaults to false. | `boolean` | `false` | no |
+| `disable_iam_support_role` | Disable access to the deployment for Etleap by creating an IAM role that Etleap's support team can assume. Defaults to false. | `boolean` | `false` | no |
 | `emr_task_node_instance_type` | The EMR Task Group Instance Type to use. Defaults to `c5.2xlarge`. | `string` | `c5.2xlarge` | no |
 | `emr_task_node_bid_price` | The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed. | `string` | `0.41` | no |
 | `enable_streaming_ingestion` | Enable support and required infrastructure for streaming ingestion sources. Currently only supported in `us-east-1` and `eu-west-3` regions. | `boolean` | `false` | no |
 | `streaming_endpoint_hostname` | The hostname the streaming ingestion webhook will be accessible from. Only has an effect if `enable_streaming_ingestion` is set to `true`. If left empty, the default Load Balancer DNS name will be used. | `string` | `null` | no |
 | `streaming_endpoint_acm_certificate_arn` | ARN Certificate to use for SSL connections to the streaming ingestion webhook. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
 | `streaming_endpoint_access_cidr_blocks` | CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses. | `list(string)` | ``["0.0.0.0/0"]`` | no |
-| `disable_ssm_access` | Disable SSM profile attachment to the main app role. To be used in case you want to opt-out of SSM based access to Etleap instances. | `boolean` | `false` | no |
 
 
 ## Outputs

@@ -126,3 +126,12 @@ output "zookeeper_private_ips" {
 output "nat_ami" {
   value = local.created_vpc_count == 0 ? "NAT not created" : (data.aws_ami.nat.id == aws_instance.nat[0].ami ? "Up to date" : "Update available: ${data.aws_ami.nat.id}")
 }
+
+output "db_password_arn" {
+  value = local.rds_password_arn_config_name
+}
+
+output "iam_role_support_arn" {
+  value       = var.disable_iam_support_role ? null : aws_iam_role.support[0].arn
+  description = "IAM role that Etleap's support team can assume"
+}
