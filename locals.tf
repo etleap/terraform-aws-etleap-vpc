@@ -1,5 +1,4 @@
 locals {
-  account_id                          = data.aws_caller_identity.current.account_id
   ssm_parameter_prefix                = "/etleap/${var.deployment_id}"
   vpc_cidr_block                      = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.0/22"
   vpc_cidr_block_config_name          = "${local.ssm_parameter_prefix}/vpc_cidr"
@@ -9,10 +8,7 @@ locals {
   app_private_ip_config_name          = "${local.ssm_parameter_prefix}/app_private_ip"
 
   rds_hostname_config_name            = "${local.ssm_parameter_prefix}/rds_hostname"
-  rds_username_config_name            = "${local.ssm_parameter_prefix}/rds_username"
   rds_password_arn_config_name        = "${local.ssm_parameter_prefix}/rds_password_arn"
-  rds_support_username_config_name    = "${local.ssm_parameter_prefix}/rds_support_username"
-  rds_support_password_arn_config_name= "${local.ssm_parameter_prefix}/rds_support_password_arn"
 
   default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : ""
   elva_lb_internal_address_a          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_a : ""
@@ -21,10 +17,7 @@ locals {
   context = {
     deployment_id                            = var.deployment_id
     vpc_cidr_block                           = local.vpc_cidr_block
-    db_username_arn                          = "etleap-prod"
     db_password_arn                          = module.db_password.arn
-    db_support_username_arn                  = "etleap_support"
-    db_support_password_arn                  = module.db_support_password.arn
     db_salesforce_password_arn               = module.db_salesforce_password.arn
     admin_password_arn                       = module.admin_password.arn
     deployment_secret_arn                    = module.deployment_secret.arn
