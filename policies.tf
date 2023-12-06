@@ -1,7 +1,7 @@
 resource "aws_iam_policy_attachment" "secrets" {
   name       = "Get Deployment Secret"
   roles      = [aws_iam_role.app.name, aws_iam_role.zookeeper.name]
-  policy_arn = aws_iam_policy.get_secrets.arn
+  policy_arn = aws_iam_policy.get_secrets_and_params.arn
 }
 
 resource "aws_iam_policy_attachment" "ec2_describe" {
@@ -119,8 +119,8 @@ EOF
 
 }
 
-resource "aws_iam_policy" "get_secrets" {
-  name   = "EtleapEC2Secrets${local.resource_name_suffix}"
+resource "aws_iam_policy" "get_secrets_and_params" {
+  name   = "EtleapEC2SecretsAndParams${local.resource_name_suffix}"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -133,6 +133,15 @@ resource "aws_iam_policy" "get_secrets" {
             "Resource": [
                 "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:Etleap*",
                 "arn:aws:secretsmanager:${var.region}:841591717599:secret:${var.deployment_id}/*"
+            ]
+        },
+         {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": [
+                "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/etleap*"
             ]
         },
         {
