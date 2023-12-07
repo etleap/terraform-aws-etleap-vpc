@@ -17,6 +17,7 @@
 
 - [ ] Validated working in a test VPC.
 - [ ] `CHANGELOG.md` has been updated.
+- [ ] `README.md` has been updated with the new version; variables and outputs has been added/updated if needed.
 
 ### Code review 
 

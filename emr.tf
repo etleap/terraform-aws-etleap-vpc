@@ -42,7 +42,7 @@ resource "aws_emr_cluster" "emr" {
 
   core_instance_group {
     name           = "CORE"
-    instance_type  = "c5.xlarge"
+    instance_type  = "r5.xlarge"
     instance_count = var.emr_core_node_count
 
     # /mnt

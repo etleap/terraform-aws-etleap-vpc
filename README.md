@@ -10,7 +10,7 @@ This will create a new VPC, and deploy Etleap and its associated resources insid
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.0.9"
+  version = "1.6.19"
 
   region           = "us-east-1"
   deployment_id    = "deployment" # This will be provided by Etleap
@@ -24,12 +24,12 @@ module "etleap" {
 }
 
 output "app-hostname" {
-  value = module.vpc.app_public_address
+  value = module.etleap.app_public_address
 }
 
 output "setup-password" {
   sensitive = true
-  value     = module.vpc.setup_password
+  value     = module.etleap.setup_password
 }
 ```
 
@@ -53,7 +53,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 |------|-------------|------|---------|----------|
 | `region` | The region Etleap is deployed in. | `string` | n/a | yes |
 | `deployment_id` | The Deployment ID for this deployment. If you don't have one, please contact Etleap Support. | `string` | n/a | yes |
-| `vpc_cidr_block_1` | The frist octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
+| `vpc_cidr_block_1` | The first octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
 | `vpc_cidr_block_2` | The second octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
 | `vpc_cidr_block_3` | The third octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
 | `key_name` | The AWS Key Pair to use for SSH access into the EC2 instances. | `string` | n/a | yes |
@@ -202,24 +202,21 @@ Expected Downtime:
 
 ### Step 1: Regular and HA Mode
 
-1. Taint the main application instance: `terraform taint module.vpc.module.main_app[0].aws_instance.app`;
+1. Run terraform to replace the main application instance: `terraform apply -replace 'module.etleap.module.main_app[0].aws_instance.app'`;
 
-2. Run `terraform apply`. 
-
-3. Once the apply finishes, check if the application is online:
+2. Once the apply finishes, check if the application is online:
 
     a. In the AWS EC2 Console, go to "Target Groups" 
 
-    b. Select the "Etleap*" Target group. To get the exact name run: `terraform state show module.vpc.aws_lb_target_group.app`.
+    b. Select the "Etleap*" Target group. To get the exact name run: `terraform state show module.etleap.aws_lb_target_group.app`.
 
     c. Under the "Targets" tab, check that all instances are "Healthy". 
 
-4. Once all instances are healthy, you can continue with the next step.
+3. Once all instances are healthy, you can continue with the next step.
 
 ### Step 2: HA Mode only
 
-1. Taint the secondary instance: `terraform taint module.vpc.module.secondary_app[0].aws_instance.app`;
-2. Run `terraform apply`.
+1. Run terraform to replace the secondary instance: `terraform apply -replace 'module.etleap.module.secondary_app[0].aws_instance.app'`;
 
 ## Upgrading the Zookeeper Cluster
 
@@ -231,36 +228,31 @@ Downtime: none
 
 1. Check the maximum of the `Etleap/Zookeeper Ruok` metric is 1 for all 3 instances. If this is not the case, contact support@etleap.com before proceeding. 
 
-2. Taint the zookeeper instance: `terraform taint module.vpc.aws_instance.zookeeper[\"1\"]`
+2. Taint the zookeeper instance: `terraform apply -replace 'module.etleap.aws_instance.zookeeper["1"]'`
 
 3. Run `terraform apply`;
 
 4. Wait for at least 10 minutes, and monitor until the `Etleap/Zookeeper Ruok` metric is 1 for the instance that was replaced. If the metric doesn't recover after 20 minutes, contact support@etleap.com before proceeding further. 
 
-5. Repeat steps 1-4 for the remaining 2 instances: `module.vpc.aws_instance.zookeeper[\"2\"]` and `module.vpc.aws_instance.zookeeper[\"3\"]`.
+5. Repeat steps 1-4 for the remaining 2 instances: `'module.etleap.aws_instance.zookeeper["2"]'` and `'module.etleap.aws_instance.zookeeper["3"]'`.
 
 ## Upgrading the EMR Cluster
 
 Downtime:
-- API and Web UI: 
-  - HA Mode: none
-  - Regular Mode: 10-15 minutes
+- API and Web UI: none
 - Pipelines: 10-15 minutes
 
-> **Note**
-> Replacing the EMR cluster will require replacing the application instances. 
+1. Remove the old cluster from the state: `terraform state rm module.etleap.aws_emr_cluster.emr` and `terraform state rm module.etleap.aws_emr_instance_group.task_spot`;
 
-1. Remove the old cluster from the state: `terraform state rm module.vpc.aws_emr_cluster.emr` and `terraform state rm module.vpc.aws_emr_instance_group.task_spot`;
+2. Run `terraform apply -target module.etleap.aws_emr_cluster.emr -target module.etleap.aws_emr_instance_group.task_spot` to create a new cluster;
 
-2. Run `terraform apply -target module.vpc.aws_emr_cluster.emr -target module.vpc.aws_emr_instance_group.task_spot` to create a new cluster;
-
-3. Once the the apply completes, replace the main application instance: `terraform apply -target module.vpc.module.main_app[0].aws_instance.app -target module.vpc.aws_lb_target_group_attachment.main_app[0]`;
+3. Once the the apply completes, replace the main application instance: `terraform apply -target module.etleap.module.main_app[0].aws_instance.app -target module.etleap.aws_lb_target_group_attachment.main_app[0]`;
 
 4. Monitor that the instance comes online:
 
     a. In the AWS EC2 Console, go to "Target Groups" 
 
-    b. Select the "Etleap*" Target group. To get the exact name run: `terraform state show module.vpc.aws_lb_target_group.app`.
+    b. Select the "Etleap*" Target group. To get the exact name run: `terraform state show module.etleap.aws_lb_target_group.app`.
 
     c. Under the "Targets" tab, check that all instances are "Health". 
 
