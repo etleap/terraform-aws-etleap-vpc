@@ -11,8 +11,6 @@ locals {
   rds_password_arn_config_name        = "${local.ssm_parameter_prefix}/rds_password_arn"
 
   default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : ""
-  elva_lb_internal_address_a          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_a : ""
-  elva_lb_internal_address_b          = var.enable_streaming_ingestion ? module.elva[0].elva_lb_private_address_b : ""
 
   context = {
     deployment_id                            = var.deployment_id

@@ -1,3 +1,9 @@
+# Release 1.6.20
+
+When running health checks for the streaming ingestion infrastructure, use the load balancer's DNS address rather than a private IP address. This change is because the private IP address might change at any time.
+
+Updated the AWS provider minimum version to 4.59, to support deletion protection when creating/updating a DynamoDB table.
+
 # Release 1.6.19
 
 Upgrading the EMR Core nodes from `c5.xlarge` to `r5.xlarge` to prevent cluster failures due to memory pressure on the Core nodes.

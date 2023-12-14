@@ -26,7 +26,6 @@ module "main_app" {
     deployment_role          = "customervpc",
     main_app_ip              = "127.0.0.1",
     zookeeper_hosts_dns      = local.zookeeper_hosts_dns
-    elva_lb_internal_address = local.elva_lb_internal_address_b
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 
@@ -64,7 +63,6 @@ module "secondary_app" {
     deployment_role          = "customervpc_ha",
     main_app_ip              = local.app_main_private_ip
     zookeeper_hosts_dns      = local.zookeeper_hosts_dns
-    elva_lb_internal_address = local.elva_lb_internal_address_a
   })
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
 
