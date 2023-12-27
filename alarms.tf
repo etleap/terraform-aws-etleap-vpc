@@ -105,7 +105,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   }
   period                    = "300"
   statistic                 = "Average"
-  threshold                 = "100"
+  threshold                 = "90"
   alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics

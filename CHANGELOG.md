@@ -1,3 +1,7 @@
+# Release 1.6.21
+
+Fixing the RDS CPU alarm threshold. Setting it to the correct value of 90%, instead of the current value of 100%. 
+
 # Release 1.6.20
 
 When running health checks for the streaming ingestion infrastructure, use the load balancer's DNS address rather than a private IP address. This change is because the private IP address might change at any time.
