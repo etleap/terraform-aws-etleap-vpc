@@ -123,6 +123,3 @@ output "zookeeper_private_ips" {
   description = "Zookeeper ensemble private ips"
 }
 
-output "nat_ami" {
-  value = local.created_vpc_count == 0 ? "NAT not created" : (data.aws_ami.nat.id == aws_instance.nat[0].ami ? "Up to date" : "Update available: ${data.aws_ami.nat.id}")
-}

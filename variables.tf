@@ -352,6 +352,7 @@ resource "null_resource" "are_cidr_ranges_valid" {
 variable "amis" {
   default = {
     app = "ami-0a45bb0027bebfe43" # Ubuntu 20.04 LTS
+    nat = "ami-00a9d4a05375b2763"
   }
 }
 

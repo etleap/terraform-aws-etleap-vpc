@@ -1,3 +1,7 @@
+# Release 1.6.22
+
+Remove search for AWS's NAT image, as it has been removed from their catalog (although the image still exists), causing Terraform to fail when trying to apply. The NAT image ID is hardcoded for now, and we will provide a new image soon.
+
 # Release 1.6.21
 
 Fixing the RDS CPU alarm threshold. Setting it to the correct value of 90%, instead of the current value of 100%. 
