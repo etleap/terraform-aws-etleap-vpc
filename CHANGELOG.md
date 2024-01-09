@@ -1,3 +1,15 @@
+# Release 1.7.1
+Upgrades DMS instance version to 3.5.1.
+
+Upgrade procedure:
+1. Before changing the module version, set `app_available=false` and run `terraform apply` to stop the application instances.
+2. Stop all DMS tasks via the AWS console.
+3. Update module version and run `terraform apply`.
+4. Resume all DMS tasks via the AWS console.
+5. Set `app_available=true` and run `terraform apply` to bring up the application instances.
+
+During the upgrade expect ~1 hour of downtime for the UI, API and pipelines.
+
 # Release 1.7.0
 
 
