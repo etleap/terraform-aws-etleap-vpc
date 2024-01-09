@@ -8,7 +8,6 @@ resource "aws_emr_cluster" "emr" {
   keep_job_flow_alive_when_no_steps = true
   log_uri                           = "s3://${aws_s3_bucket.intermediate.id}/emr-logs/"
   service_role                      = aws_iam_role.emr_default_role.name
-  autoscaling_role                  = aws_iam_role.emr_autoscaling_default_role.name
   security_configuration            = var.emr_security_configuration_name
 
   ec2_attributes {
@@ -31,33 +30,48 @@ resource "aws_emr_cluster" "emr" {
     create_before_destroy = true
   }
 
-  master_instance_group {
-    instance_type = "m5.xlarge"
-    ebs_config {
-      size                 = "128"
-      type                 = "gp2"
-      volumes_per_instance = 1
+  master_instance_fleet {
+    name = "MASTER"
+
+    launch_specifications {
+      on_demand_specification {
+        allocation_strategy = "lowest-price"
+      }
     }
+
+    instance_type_configs {
+      instance_type = "m5.xlarge"
+      ebs_config {
+        size                 = "128"
+        type                 = "gp2"
+        volumes_per_instance = 1
+      }
+    }
+
+    target_on_demand_capacity = 1
   }
 
-  core_instance_group {
-    name           = "CORE"
-    instance_type  = "r5.xlarge"
-    instance_count = var.emr_core_node_count
+  core_instance_fleet {
+    name = "CORE"
 
-    # /mnt
-    ebs_config {
-      size                 = "128"
-      type                 = "gp2"
-      volumes_per_instance = 1
+    launch_specifications {
+      on_demand_specification {
+        allocation_strategy = "lowest-price"
+      }
     }
 
-    # /mnt1
-    ebs_config {
-      size                 = "512"
-      type                 = "gp2"
-      volumes_per_instance = 1
+    instance_type_configs {
+      instance_type = "r5.xlarge"
+
+      # /mnt and /mnt1
+      ebs_config {
+        size                 = "512"
+        type                 = "gp2"
+        volumes_per_instance = 2
+      }
     }
+
+    target_on_demand_capacity = var.emr_core_node_count
   }
 
   bootstrap_action {
@@ -218,79 +232,326 @@ EOF
 
 }
 
-resource "aws_emr_instance_group" "task_spot" {
-  cluster_id     = aws_emr_cluster.emr.id
-  name           = "TASK SPOT"
-  instance_type  = var.emr_task_node_instance_type
-  instance_count = "1"
-  ebs_config {
-    size                 = "128"
-    type                 = "gp2"
-    volumes_per_instance = 1
-  }
-  bid_price          = var.emr_task_node_bid_price
-  lifecycle { 
-    ignore_changes = [
-      instance_count
-    ]  
-  }
-  autoscaling_policy = <<EOF
-{
-  "Constraints": {
-    "MinCapacity": 1,
-    "MaxCapacity": 200
-  },
-  "Rules": [
-    {
-      "Name": "ScaleOutOnContainersPendingRatio",
-      "Description": "Scale out if ContainerPendingRatio is more than 1",
-      "Action": {
-        "SimpleScalingPolicyConfiguration": {
-          "AdjustmentType": "CHANGE_IN_CAPACITY",
-          "ScalingAdjustment": 1,
-          "CoolDown": 300
-        }
-      },
-      "Trigger": {
-        "CloudWatchAlarmDefinition": {
-          "ComparisonOperator": "GREATER_THAN",
-          "EvaluationPeriods": 1,
-          "MetricName": "ContainerPendingRatio",
-          "Namespace": "AWS/ElasticMapReduce",
-          "Period": 300,
-          "Statistic": "AVERAGE",
-          "Threshold": 1.0,
-          "Unit": "COUNT"
-        }
-      }
-    },
-    {
-      "Name": "ScaleInOnContainersPendingRatio",
-      "Description": "Scale in if ContainerPendingRatio is less than 0.5",
-      "Action": {
-        "SimpleScalingPolicyConfiguration": {
-          "AdjustmentType": "CHANGE_IN_CAPACITY",
-          "ScalingAdjustment": -1,
-          "CoolDown": 300
-        }
-      },
-      "Trigger": {
-        "CloudWatchAlarmDefinition": {
-          "ComparisonOperator": "LESS_THAN",
-          "EvaluationPeriods": 1,
-          "MetricName": "ContainerPendingRatio",
-          "Namespace": "AWS/ElasticMapReduce",
-          "Period": 300,
-          "Statistic": "AVERAGE",
-          "Threshold": 0.5,
-          "Unit": "COUNT"
-        }
-      }
-    }
-  ]
-}
-EOF
+resource "aws_emr_instance_fleet" "task_spot" {
+  cluster_id           = aws_emr_cluster.emr.id
+  name                 = "TASK SPOT"
+  target_spot_capacity = 2
 
+  lifecycle {
+    ignore_changes = [
+      target_spot_capacity,
+      launch_specifications[0].spot_specification["allocation_strategy"] // Workaround for bug: https://github.com/hashicorp/terraform-provider-aws/issues/34151
+    ]
+  }
+
+  launch_specifications {
+    spot_specification {
+      allocation_strategy      = "price-capacity-optimized"
+      timeout_action           = "SWITCH_TO_ON_DEMAND"
+      timeout_duration_minutes = 30
+    }
+  }
+
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 96
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m6i.xlarge"
+    weighted_capacity = 3
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 224
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m6i.2xlarge"
+    weighted_capacity = 7
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 512
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m6i.4xlarge"
+    weighted_capacity = 16
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 1024
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m6i.8xlarge"
+    weighted_capacity = 32
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 1536
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m6i.12xlarge"
+    weighted_capacity = 48
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 128
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5.xlarge"
+    weighted_capacity = 4
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 256
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5.2xlarge"
+    weighted_capacity = 8
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 512
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5.4xlarge"
+    weighted_capacity = 16
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 128
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5a.xlarge"
+    weighted_capacity = 4
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 256
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5a.2xlarge"
+    weighted_capacity = 8
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 512
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5a.4xlarge"
+    weighted_capacity = 16
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 224
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6i.4xlarge"
+    weighted_capacity = 7
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 544
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6i.8xlarge"
+    weighted_capacity = 17
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 864
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6i.12xlarge"
+    weighted_capacity = 27
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 1216
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6i.16xlarge"
+    weighted_capacity = 38
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 1856
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6i.24xlarge"
+    weighted_capacity = 58
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 64
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5.xlarge"
+    weighted_capacity = 2
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 128
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5.2xlarge"
+    weighted_capacity = 4
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 256
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5.4xlarge"
+    weighted_capacity = 8
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 672
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5.9xlarge"
+    weighted_capacity = 21
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 928
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5.12xlarge"
+    weighted_capacity = 29
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 1440
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5.18xlarge"
+    weighted_capacity = 45
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 224
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5a.4xlarge"
+    weighted_capacity = 7
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 544
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5a.8xlarge"
+    weighted_capacity = 17
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 928
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5a.12xlarge"
+    weighted_capacity = 29
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 1216
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5a.16xlarge"
+    weighted_capacity = 38
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 1856
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5a.24xlarge"
+    weighted_capacity = 58
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 128
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "r6i.xlarge"
+    weighted_capacity = 4
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 128
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "r5.xlarge"
+    weighted_capacity = 4
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 128
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "r5a.xlarge"
+    weighted_capacity = 4
+  }
 }
 
 resource "aws_ssm_parameter" "emr_public_dns" {
@@ -302,6 +563,13 @@ resource "aws_ssm_parameter" "emr_public_dns" {
   tags = {
     Deployment = var.deployment_id
   }
+}
+
+resource "aws_ssm_parameter" "emr_cluster_id" {
+  name        = "EtleapEmrClusterId${local.resource_name_suffix}"
+  description = "The ID of the current active EMR cluster"
+  type        = "String"
+  value       = aws_emr_cluster.emr.id
 }
 
 data "aws_instance" "emr-master" {

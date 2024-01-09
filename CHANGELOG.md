@@ -1,3 +1,23 @@
+# Release 1.7.0
+
+
+## Summary
+Switches the EMR cluster from using instance groups to instance fleets. This provides greater resilience to Spot Instance shortages. 
+
+## Changes
+- The EMR cluster will be provisioned with Instance Fleets for Master, Core and Task nodes.
+- The `EtleapEMR_AutoScaling_DefaultRole` will be deleted. Scaling the cluster will done by the Etleap application.
+- The `EtleapApp` role now has the `elasticmapreduce:ListInstanceFleets` and `elasticmapreduce:ModifyInstanceFleet` permissions, so it can perform scaling operations.
+- The `EtleapEMRProfilePolicy` role now has the `elasticmapreduce:ListInstanceFleets` permission instead of `elasticmapreduce:ListInstanceGroups`.
+- The `EtleapEMRInstanceFleet` policy is now attached to the EMR default role (`EtleapEMR_DefaultRole`). It allow the role to be passed to EC2, as well as granting the `ec2:CreateLaunchTemplateVersion` permission. These are required for EMR so it can provision resources when starting up the instance fleets.
+- Adds a new `EtleapEmrClusterId` SSM parameter.
+- Updates the required Terraform AWS Provider to version 5.28 or higher. 
+
+## Upgrade Instructions
+Before applying, please run `terraform init -upgrade` to get the new version of the AWS provider. 
+
+This version will require both the App EC2 instances, and the EMR cluster to be replaced. Expect a 15 minute downtime for the Web UI, API and Pipeline operation when applying. 
+
 # Release 1.6.22
 
 Remove search for AWS's NAT image, as it has been removed from their catalog (although the image still exists), causing Terraform to fail when trying to apply. The NAT image ID is hardcoded for now, and we will provide a new image soon.

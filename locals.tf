@@ -36,6 +36,7 @@ locals {
     account_id                               = data.aws_caller_identity.current.account_id
     db_address                               = aws_db_instance.db.address
     emr_cluster_config_name                  = "${local.ssm_parameter_prefix}/emr_cluster_dns"
+    emr_cluster_id_parameter_name            = aws_ssm_parameter.emr_cluster_id.name
     app_hostname                             = var.app_hostname == null ? local.default_hostname : var.app_hostname
     github_username                          = var.github_username
     github_access_token_arn                  = var.github_access_token_arn

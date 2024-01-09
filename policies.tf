@@ -60,9 +60,9 @@ resource "aws_iam_role_policy_attachment" "emr_default_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole"
 }
 
-resource "aws_iam_role_policy_attachment" "emr_autoscaling_default_role" {
-  role       = aws_iam_role.emr_autoscaling_default_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforAutoScalingRole"
+resource "aws_iam_role_policy_attachment" "emr_default_instance_fleet" {
+  role       = aws_iam_role.emr_default_role.name
+  policy_arn = aws_iam_policy.emr_default_instance_fleet.arn
 }
 
 resource "aws_iam_role_policy_attachment" "allow_sns_put" {
@@ -173,7 +173,9 @@ resource "aws_iam_policy" "ec2_describe" {
             "Action": [
                 "ec2:DescribeInstances",
                 "ec2:DescribeVpcs",
-                "autoscaling:DescribeAutoScalingInstances"
+                "autoscaling:DescribeAutoScalingInstances",
+                "elasticmapreduce:ListInstanceFleets",
+                "elasticmapreduce:ModifyInstanceFleet"
             ],
             "Resource": [
                 "*"
@@ -221,7 +223,7 @@ resource "aws_iam_policy" "emr_profile_policy" {
             "elasticmapreduce:Describe*",
             "elasticmapreduce:ListBootstrapActions",
             "elasticmapreduce:ListClusters",
-            "elasticmapreduce:ListInstanceGroups",
+            "elasticmapreduce:ListInstanceFleets",
             "elasticmapreduce:ListInstances",
             "elasticmapreduce:ListSteps",
             "rds:Describe*",
@@ -338,26 +340,29 @@ resource "aws_iam_role" "emr_default_role" {
 EOF
 }
 
-resource "aws_iam_role" "emr_autoscaling_default_role" {
-  name               = "EtleapEMR_AutoScaling_DefaultRole${local.resource_name_suffix}"
-  assume_role_policy = <<EOF
+resource "aws_iam_policy" "emr_default_instance_fleet" {
+  name = "EtleapEMRInstanceFleet${local.resource_name_suffix}"
+  policy = <<EOF
 {
-  "Version": "2008-10-17",
+  "Version": "2012-10-17",
   "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": [
-          "elasticmapreduce.amazonaws.com",
-          "application-autoscaling.amazonaws.com"
-        ]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
+    {  
+      "Sid": "PassRoleForEC2",  
+      "Effect": "Allow",  
+      "Action": "iam:PassRole",  
+      "Resource": "${aws_iam_role.emr_default_role.arn}",  
+      "Condition": {  
+          "StringLike": {  
+              "iam:PassedToService": "ec2.amazonaws.com*"  
+          }  
+      }
+    },
+    {  
+      "Sid": "AllowCreateLaunchTemplate",  
+      "Effect": "Allow",  
+      "Action": "ec2:CreateLaunchTemplateVersion",  
+      "Resource": "*" 
+    }]
 }
 EOF
-
 }
-

@@ -39,7 +39,7 @@ resource "aws_route" "private" {
   count                  = local.created_vpc_count
   route_table_id         = aws_route_table.private[0].id
   destination_cidr_block = "0.0.0.0/0"
-  instance_id            = aws_instance.nat[0].id
+  network_interface_id   = aws_instance.nat[0].primary_network_interface_id
 }
 
 resource "aws_route" "prod_public" {
