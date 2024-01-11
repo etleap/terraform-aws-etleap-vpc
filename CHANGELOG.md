@@ -1,3 +1,6 @@
+# Release 1.7.2
+Fixes RDS CPU, disk and freeable memory alarms, which broke due to Terraform AWS provider upgrade (Release 1.7.0).
+
 # Release 1.7.1
 Upgrades DMS instance version to 3.5.1.
 

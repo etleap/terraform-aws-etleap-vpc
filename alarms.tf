@@ -101,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   metric_name         = "CPUUtilization"
   namespace           = "AWS/RDS"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.db.id
+    DBInstanceIdentifier = aws_db_instance.db.identifier
   }
   period                    = "300"
   statistic                 = "Average"
@@ -118,7 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_disk" {
   metric_name         = "FreeStorageSpace"
   namespace           = "AWS/RDS"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.db.id
+    DBInstanceIdentifier = aws_db_instance.db.identifier
   }
   period                    = "300"
   statistic                 = "Average"
@@ -135,7 +135,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
   metric_name         = "FreeableMemory"
   namespace           = "AWS/RDS"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.db.id
+    DBInstanceIdentifier = aws_db_instance.db.identifier
   }
   period                    = "300"
   statistic                 = "Average"
