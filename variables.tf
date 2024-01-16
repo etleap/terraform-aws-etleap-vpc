@@ -284,16 +284,6 @@ variable "allow_iam_devops_role" {
   description = "Enable access to the deployment for Etleap by creating an IAM role that Etleap's ops team can assume."
 }
 
-variable "emr_task_node_instance_type" {
-  default     = "c5.2xlarge"
-  description = "The instance type to use for EMR Task nodes. Defaults to `c5.2xlarge`."
-}
-
-variable "emr_task_node_bid_price" {
-  default     = "0.41"
-  description = "The max bid price for the EMR Task Instance. We recommend setting to the on-demand price for the region where Etleap is deployed."
-}
-
 variable "enable_streaming_ingestion" {
   default     = false
   description = "Enable support and required infrastructure for streaming ingestion sources."

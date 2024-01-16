@@ -1,3 +1,6 @@
+# Release 1.7.3
+Removes `emr_task_node_instance_type` and `emr_task_node_bid_price` variables as they are no longer used.
+
 # Release 1.7.2
 Fixes RDS CPU, disk and freeable memory alarms, which broke due to Terraform AWS provider upgrade (Release 1.7.0).
 
