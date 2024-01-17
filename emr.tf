@@ -285,26 +285,6 @@ resource "aws_emr_instance_fleet" "task_spot" {
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 1024
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "m6i.8xlarge"
-    weighted_capacity = 32
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 1536
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "m6i.12xlarge"
-    weighted_capacity = 48
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
       size                 = 128
       type                 = "gp2"
       volumes_per_instance = 1
@@ -375,46 +355,6 @@ resource "aws_emr_instance_fleet" "task_spot" {
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 544
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c6i.8xlarge"
-    weighted_capacity = 17
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 864
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c6i.12xlarge"
-    weighted_capacity = 27
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 1216
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c6i.16xlarge"
-    weighted_capacity = 38
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 1856
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c6i.24xlarge"
-    weighted_capacity = 58
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
       size                 = 64
       type                 = "gp2"
       volumes_per_instance = 1
@@ -445,82 +385,12 @@ resource "aws_emr_instance_fleet" "task_spot" {
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 672
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c5.9xlarge"
-    weighted_capacity = 21
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 928
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c5.12xlarge"
-    weighted_capacity = 29
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 1440
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c5.18xlarge"
-    weighted_capacity = 45
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
       size                 = 224
       type                 = "gp2"
       volumes_per_instance = 1
     }
     instance_type     = "c5a.4xlarge"
     weighted_capacity = 7
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 544
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c5a.8xlarge"
-    weighted_capacity = 17
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 928
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c5a.12xlarge"
-    weighted_capacity = 29
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 1216
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c5a.16xlarge"
-    weighted_capacity = 38
-  }
-  instance_type_configs {
-    bid_price_as_percentage_of_on_demand_price = 100
-    ebs_config {
-      size                 = 1856
-      type                 = "gp2"
-      volumes_per_instance = 1
-    }
-    instance_type     = "c5a.24xlarge"
-    weighted_capacity = 58
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100

@@ -1,3 +1,13 @@
+# # Release 1.7.4
+
+Limiting EMR Task Spot Instance sizes to `4xlarge`. This addresses increased rates of tranformation errors we saw with the larger instance types. 
+
+## Upgrade Instructions
+
+This update will require replacing the EMR cluster, and this will cause 15-20 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
+Run `terraform apply -replace=module.<name>.aws_emr_cluster.emr-normal` to replace the EMR cluster.
+
 # Release 1.7.3
 Removes `emr_task_node_instance_type` and `emr_task_node_bid_price` variables as they are no longer used.
 
