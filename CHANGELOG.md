@@ -1,4 +1,11 @@
-# # Release 1.7.4
+# Release 1.7.5
+
+Use the latest Etleap NAT image, automatically discovered from the AMI catalog. This fixes an issue where the NAT image ID was hardcoded.
+
+## Upgrade Instructions
+Before applying, please remove the variable `amis["nat"]` if you have defined it.
+
+# Release 1.7.4
 
 Limiting EMR Task Spot Instance sizes to `4xlarge`. This addresses increased rates of tranformation errors we saw with the larger instance types. 
 

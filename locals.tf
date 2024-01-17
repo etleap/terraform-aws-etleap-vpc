@@ -1,4 +1,6 @@
 locals {
+  account_id                          = data.aws_caller_identity.current.account_id
+  hosted_account_id                   = "223848809711"
   ssm_parameter_prefix                = "/etleap/${var.deployment_id}"
   vpc_cidr_block                      = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.0/22"
   vpc_cidr_block_config_name          = "${local.ssm_parameter_prefix}/vpc_cidr"
@@ -33,7 +35,7 @@ locals {
     has_downgraded_dms_instace               = !var.disable_cdc_support && var.downgrade_cdc
     dms_downgraded_replication_instance_name = (!var.disable_cdc_support && var.downgrade_cdc) ? aws_dms_replication_instance.dms_downgraded[0].replication_instance_id : null
     dms_downgraded_replication_instance_arn  = (!var.disable_cdc_support && var.downgrade_cdc) ? aws_dms_replication_instance.dms_downgraded[0].replication_instance_arn : null
-    account_id                               = data.aws_caller_identity.current.account_id
+    account_id                               = local.account_id
     db_address                               = aws_db_instance.db.address
     emr_cluster_config_name                  = "${local.ssm_parameter_prefix}/emr_cluster_dns"
     emr_cluster_id_parameter_name            = aws_ssm_parameter.emr_cluster_id.name
