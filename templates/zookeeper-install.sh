@@ -12,9 +12,12 @@ printf "[ZOOKEEPER_INIT] Installing Docker, docker-compose"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository -y -u "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
 sudo apt-get update
+printf "[ZOOKEEPER_INIT] Available docker-ce packages"
 apt-cache policy docker-ce
+printf "[ZOOKEEPER_INIT] Available docker-compose packages"
+apt-cache policy docker-compose
 cat /etc/apt/sources.list
-sudo apt-get install docker-ce docker-compose -q -y
+sudo apt-get install docker-ce=5:24.0.7-1~ubuntu.20.04~focal docker-compose=1.25.0-1 -q -y
 
 printf "[ZOOKEEPER_INIT] Installing pass gnupg2 awscli"
 sudo apt-get install pass gnupg2 awscli -q -y

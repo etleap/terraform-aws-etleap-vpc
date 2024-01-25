@@ -1,3 +1,7 @@
+# Release 1.7.6
+
+Pin Docker to v24.0.7 and docker-compose to v1.25.0. This fixes an issue where newer Docker engine version (25) was not compatible with docker-compose v1.
+
 # Release 1.7.5
 
 Use the latest Etleap NAT image, automatically discovered from the AMI catalog. This fixes an issue where the NAT image ID was hardcoded.
