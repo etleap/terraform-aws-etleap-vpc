@@ -17,7 +17,7 @@ apt-cache policy docker-ce
 printf "[ZOOKEEPER_INIT] Available docker-compose packages"
 apt-cache policy docker-compose
 cat /etc/apt/sources.list
-sudo apt-get install docker-ce=5:24.0.7-1~ubuntu.20.04~focal docker-compose=1.25.0-1 -q -y
+sudo apt-get install docker-ce=5:24.0.7-1~ubuntu.20.04~focal docker-compose=1.25.0-1 -q -y --allow-downgrades
 
 printf "[ZOOKEEPER_INIT] Installing pass gnupg2 awscli"
 sudo apt-get install pass gnupg2 awscli -q -y
