@@ -1,3 +1,7 @@
+# Release 1.7.8
+
+Tunes `DMS Disk Space 30GB Remaining` alarm to reduce flappiness.
+
 # Release 1.7.7
 
 Fix an issue with the Zookeeper installation that prevented the Zookeeper cluster from starting up propertly. The issue was introduced in version 1.7.6.
