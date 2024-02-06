@@ -284,6 +284,11 @@ variable "allow_iam_devops_role" {
   description = "Enable access to the deployment for Etleap by creating an IAM role that Etleap's ops team can assume."
 }
 
+variable "allow_iam_support_role" {
+  default     = true
+  description = "Enables access to the deployment for Etleap by creating an IAM role that Etleap's support team can assume along with limited IAM policies for providing support."
+}
+
 variable "enable_streaming_ingestion" {
   default     = false
   description = "Enable support and required infrastructure for streaming ingestion sources."
@@ -302,11 +307,6 @@ variable "streaming_endpoint_acm_certificate_arn" {
 variable "streaming_endpoint_access_cidr_blocks" {
   default     = ["0.0.0.0/0"]
   description = "CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses."
-}
-
-variable "disable_ssm_access" {
-  default     = false
-  description = "Disable SSM profile attachment to the main app role. To be used in case you want to opt-out of SSM based access to Etleap instances."
 }
 
 variable "dms_proxy_bucket" {

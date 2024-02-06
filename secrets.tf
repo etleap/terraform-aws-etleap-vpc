@@ -26,6 +26,13 @@ module "db_password" {
   length = 20
 }
 
+module "db_support_password" {
+  source  = "./modules/password"
+
+  name   = "Etleap-${var.deployment_id}-DBSupportPassword"
+  length = 20
+}
+
 module "db_salesforce_password" {
   source  = "./modules/password"
 

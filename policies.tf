@@ -23,19 +23,19 @@ resource "aws_iam_policy_attachment" "assume_roles" {
 }
 
 resource "aws_iam_role_policy_attachment" "app-ssm" {
-  count      = var.disable_ssm_access ? 0 : 1
+  count      = var.allow_iam_support_role ? 1 : 0
   role       = aws_iam_role.app.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "zookeeper-ssm" {
-  count      = var.disable_ssm_access ? 0 : 1
+  count      = var.allow_iam_support_role ? 1 : 0
   role       = aws_iam_role.zookeeper.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "emr-ssm" {
-  count      = var.disable_ssm_access ? 0 : 1
+  count      = var.allow_iam_support_role ? 1 : 0
   role       = aws_iam_role.emr.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
@@ -173,6 +173,7 @@ resource "aws_iam_policy" "ec2_describe" {
             "Action": [
                 "ec2:DescribeInstances",
                 "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
                 "autoscaling:DescribeAutoScalingInstances",
                 "elasticmapreduce:ListInstanceFleets",
                 "elasticmapreduce:ModifyInstanceFleet"

@@ -10,14 +10,24 @@ locals {
   app_private_ip_config_name          = "${local.ssm_parameter_prefix}/app_private_ip"
 
   rds_hostname_config_name            = "${local.ssm_parameter_prefix}/rds_hostname"
+  rds_username_config_name            = "${local.ssm_parameter_prefix}/rds_username"
   rds_password_arn_config_name        = "${local.ssm_parameter_prefix}/rds_password_arn"
+  rds_support_username_config_name    = "${local.ssm_parameter_prefix}/rds_support_username"
+  rds_support_password_arn_config_name = "${local.ssm_parameter_prefix}/rds_support_password_arn"
 
   default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : ""
 
   context = {
     deployment_id                            = var.deployment_id
     vpc_cidr_block                           = local.vpc_cidr_block
+    vpc_subnet_a_id                          = local.subnet_a_private_id
+    vpc_subnet_b_id                          = local.subnet_b_private_id
+    vpc_subnet_c_id                          = local.subnet_c_private_id
+    allow_support_role                       = var.allow_iam_support_role ? "true" : "false"
+    db_username                              = "etleap-prod"
     db_password_arn                          = module.db_password.arn
+    db_support_username                      = "etleap-support"
+    db_support_password_arn                  = module.db_support_password.arn
     db_salesforce_password_arn               = module.db_salesforce_password.arn
     admin_password_arn                       = module.admin_password.arn
     deployment_secret_arn                    = module.deployment_secret.arn

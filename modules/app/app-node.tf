@@ -119,6 +119,10 @@ output "instance_id" {
   value = aws_instance.app.id
 }
 
+output "instance_arn" {
+  value = aws_instance.app.arn
+}
+
 output "instance_private_dns" {
   value = aws_instance.app.private_dns
 }

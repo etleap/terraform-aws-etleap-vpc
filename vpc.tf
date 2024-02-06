@@ -167,8 +167,4 @@ resource "aws_ssm_parameter" "vpc_cidr" {
   description = "Etleap ${var.deployment_id} - VPC CIDR"
   type        = "String"
   value       = local.vpc_cidr_block
-
-  tags = {
-    Deployment = var.deployment_id
-  }
 }

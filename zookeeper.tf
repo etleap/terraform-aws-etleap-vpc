@@ -30,7 +30,6 @@ resource "aws_instance" "zookeeper" {
 
   tags = {
     Name = "Etleap ${each.value} ${var.deployment_id}"
-    Deployment = var.deployment_id
   }
 
   volume_tags = {

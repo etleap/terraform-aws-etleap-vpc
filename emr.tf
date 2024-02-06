@@ -23,7 +23,6 @@ resource "aws_emr_cluster" "emr" {
 
   tags = {
     Name = "Etleap EMR ${var.deployment_id}"
-    Deployment = var.deployment_id
   }
 
   lifecycle {
@@ -429,10 +428,6 @@ resource "aws_ssm_parameter" "emr_public_dns" {
   description = "Etleap ${var.deployment_id} - EMR public DNS"
   type        = "String"
   value       = aws_emr_cluster.emr.master_public_dns
-
-  tags = {
-    Deployment = var.deployment_id
-  }
 }
 
 resource "aws_ssm_parameter" "emr_cluster_id" {

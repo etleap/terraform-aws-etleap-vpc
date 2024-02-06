@@ -1,7 +1,6 @@
 export ETLEAP_DEPLOYMENT_ID=${var.deployment_id}
 export USE_PROD_SECRETS=0
 export JOB_ROLE=customer_job,monitor
-export ETLEAP_VPC_SUBNET_CIDR="${var.vpc_cidr_block}"
 export ETLEAP_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_password_arn} | jq -r .SecretString)"
 export SALESFORCE_DB_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.db_salesforce_password_arn} | jq -r .SecretString)"
 export FRONT_END_HOSTNAME="${var.app_hostname}"
@@ -24,6 +23,12 @@ export ETLEAP_SETUP_INTERMEDIATE_ROLE_ARN="${var.s3_role}"
 export ETLEAP_SETUP_STREAMING_INGESTION_ENABLED="${var.streaming_ingestion_enabled}"
 export ETLEAP_ELVA_BASE_HTTP_ENDPOINT="http://${var.streaming_endpoint_hostname}"
 export ETLEAP_ELVA_PUBLIC_ENDPOINT="$ETLEAP_ELVA_BASE_HTTP_ENDPOINT"
+export ETLEAP_ALLOW_SUPPORT_ROLE="${var.allow_support_role}"
+
+export ETLEAP_VPC_SUBNET_CIDR="${var.vpc_cidr_block}"
+export ETLEAP_VPC_SUBNET_A_CIDR="$(aws ec2 describe-subnets --subnet-ids ${var.vpc_subnet_a_id} | jq -r '.Subnets[].CidrBlock // empty')"
+export ETLEAP_VPC_SUBNET_B_CIDR="$(aws ec2 describe-subnets --subnet-ids ${var.vpc_subnet_b_id} | jq -r '.Subnets[].CidrBlock // empty')"
+export ETLEAP_VPC_SUBNET_C_CIDR="$(aws ec2 describe-subnets --subnet-ids ${var.vpc_subnet_c_id} | jq -r '.Subnets[].CidrBlock // empty')"
 
 %{ if var.has_dms_instance }
 export ETLEAP_DMS_ROLE_ARN="${var.dms_role}"

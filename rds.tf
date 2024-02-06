@@ -144,10 +144,13 @@ resource "aws_ssm_parameter" "rds_hostname" {
   description = "Etleap ${var.deployment_id} - RDS Hostname"
   type        = "String"
   value       = local.context.db_address
+}
 
-  tags = {
-    Deployment = var.deployment_id
-  }
+resource "aws_ssm_parameter" "rds_username" {
+  name        = local.rds_username_config_name
+  description = "Etleap ${var.deployment_id} - RDS Username"
+  type        = "String"
+  value       = local.context.db_username
 }
 
 resource "aws_ssm_parameter" "rds_password_arn" {
@@ -155,9 +158,18 @@ resource "aws_ssm_parameter" "rds_password_arn" {
   description = "Etleap ${var.deployment_id} - RDS Password ARN"
   type        = "String"
   value       = local.context.db_password_arn
-
-  tags = {
-    Deployment = var.deployment_id
-  }
 }
 
+resource "aws_ssm_parameter" "rds_support_username" {
+  name        = local.rds_support_username_config_name
+  description = "Etleap ${var.deployment_id} - RDS Support Username"
+  type        = "String"
+  value       = local.context.db_support_username
+}
+
+resource "aws_ssm_parameter" "rds_support_password_arn" {
+  name        = local.rds_support_password_arn_config_name
+  description = "Etleap ${var.deployment_id} - RDS Support Password ARN"
+  type        = "String"
+  value       = local.context.db_support_password_arn
+}

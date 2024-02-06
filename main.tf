@@ -5,7 +5,6 @@ locals {
   resource_name_suffix = var.unique_resource_names ? "-${var.deployment_id}-${random_id.deployment_random.hex}" : ""
 }
 
-
 module "elva" {
   count = var.enable_streaming_ingestion ? 1 : 0
   source = "./modules/elva"

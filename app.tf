@@ -27,10 +27,11 @@ module "main_app" {
     main_app_ip              = "127.0.0.1",
     zookeeper_hosts_dns      = local.zookeeper_hosts_dns
   })
-  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
+
+  # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, SALESFORCE_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
+  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
 
   tags = {
-    Deployment = var.deployment_id
     AppRole = "main"
   }
 }
@@ -64,10 +65,11 @@ module "secondary_app" {
     main_app_ip              = local.app_main_private_ip
     zookeeper_hosts_dns      = local.zookeeper_hosts_dns
   })
-  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${var.deployment_id} ${aws_db_instance.db.address}"
+
+  # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, SALESFORCE_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
+  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_salesforce_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
 
   tags = {
-    Deployment = var.deployment_id
     AppRole = "secondary"
   }
 }
@@ -189,10 +191,6 @@ resource "aws_ssm_parameter" "app_hostname" {
   description = "Etleap ${var.deployment_id} - App Hostname"
   type        = "String"
   value       = local.context.app_hostname
-
-  tags = {
-    Deployment = var.deployment_id
-  }
 }
 
 resource "aws_ssm_parameter" "app_private_ip" {
@@ -200,8 +198,4 @@ resource "aws_ssm_parameter" "app_private_ip" {
   description = "Etleap ${var.deployment_id} - App Main Private IP"
   type        = "String"
   value       = local.app_main_private_ip
-
-  tags = {
-    Deployment = var.deployment_id
-  }
 }

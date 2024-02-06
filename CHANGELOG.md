@@ -1,3 +1,31 @@
+# Release 1.8.0
+
+## Summary
+
+New Support Role for Etleap access to the deployment that Etleap's support team can assume along with limited IAM policies for providing support.
+
+## Changes
+
+New variable `allow_iam_support_role` that controls whether this role is created or not. If set to `false`, this role will not be created.
+
+Support Role limited IAM policies include:
+- Start, stop, and resume Port Forwarding to the DB (RDS) instance and SOCKS proxy (using SSM sessions) specifically using the `Etleap App main` instance
+- Describing EC2 instances, network interfaces, images, addresses, subnets, tags, and volumes
+- Listing resources related to Auto Scaling, EMR, CloudWatch, RDS, SNS, and Support
+- Listing SNS topics and queues related to the Etleap deployment
+- Listing and reading metric data from CloudWatch
+- Allows reading a specific AWS Secrets Manager secret: the DB support user password
+- Allows reading AWS Parameter Store parameters specific to this deployment
+
+These policies are also included if CDC is enabled: (in case `disable_cdc_support` is not false)
+- Accessing and filtering logs to the specific DMS CloudWatch log group
+- Listing resources related to DMS
+- Allows specific write actions to DMS resources, including creating and deleting endpoints, replication tasks, and assessments
+
+## Upgrade Instructions
+
+If you currently have explicitly set `disable_ssm_access` to `true`, please remove this variable as it no longer exists. In this case, if you wish to disable Etleap support access, please set `allow_iam_support_role` to `false`.
+
 # Release 1.7.8
 
 Tunes `DMS Disk Space 30GB Remaining` alarm to reduce flappiness.
