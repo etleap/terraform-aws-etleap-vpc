@@ -31,6 +31,12 @@ write_files:
 - path: /home/ubuntu/zookeeper-monitor.sh.gz
   encoding: b64
   content: ${base64gzip(file_zookeeper_monitor)}
+- path: /home/ubuntu/zookeeper-stat.sh.gz
+  encoding: b64
+  content: ${base64gzip(file_zookeeper_stat)}
+- path: /home/ubuntu/zookeeper-zxid-check.sh.gz
+  encoding: b64
+  content: ${base64gzip(file_zookeeper_zxid_check)}
 - path: /home/ubuntu/docker-compose.yml
   encoding: b64
   content: ${base64encode(file_docker_compose)}

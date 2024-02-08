@@ -1,3 +1,21 @@
+# Release 1.8.1
+
+Resolved [an issue related to Zookeeper Transaction ID (zxid) exhaustion](https://issues.apache.org/jira/browse/ZOOKEEPER-2789) that could cause Zookeeper cluster downtime.
+
+More details: zxid is a unique, sequential identifier assigned to each transaction in a Zookeeper cluster, ensuring the orderly execution and consistency of distributed operations. It has a maximum value of 2^32, and the Zookeeper cluster gets into a bad state when the zxid reaches this value. The solution is to periodically trigger leader re-election in the Zookeeper cluster before the zxid counter values reach its maximum limit. Restarting the leader resets the zxid counter to 0, and the cluster continues to operate normally without any downtime.
+
+## Upgrade Instructions
+This version requires replacement of the Zookeeper EC2 instances. Sequential replacement of each instance ensures zero downtime.
+
+```bash
+terraform taint 'module.<name>.aws_instance.zookeeper["1"]'
+terraform apply
+terraform taint 'module.<name>.aws_instance.zookeeper["2"]'
+terraform apply
+terraform taint 'module.<name>.aws_instance.zookeeper["3"]'
+terraform apply
+```
+
 # Release 1.8.0
 
 ## Summary

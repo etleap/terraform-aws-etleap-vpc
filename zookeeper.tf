@@ -56,7 +56,9 @@ resource "aws_instance" "zookeeper" {
     file_kinesis_install = file("${path.module}/templates/kinesis-install.sh"),
     file_zookeeper_install = file("${path.module}/templates/zookeeper-install.sh"),
     file_zookeeper_cron = file("${path.module}/templates/zookeeper-cron.sh"),
+    file_zookeeper_stat = file("${path.module}/templates/zookeeper-stat.sh"),
     file_zookeeper_monitor = file("${path.module}/templates/zookeeper-monitor.sh"),
+    file_zookeeper_zxid_check = file("${path.module}/templates/zookeeper-zxid-check.sh"),
     file_docker_compose = templatefile("${path.module}/templates/zookeeper-docker-compose.yml.tpl", {
       zookeeper_id = each.key
       zookeeper_nodes = local.zookeeper_hosts_dns
