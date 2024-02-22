@@ -3,7 +3,7 @@
 export AWS_DEFAULT_REGION=us-east-1
 
 # Zookeeper might catch more than 1 security group, so let's fetch the first one
-SECURITY_GROUP=$(curl -s http://169.254.169.254/latest/meta-data/security-groups | grep 'app\|monitor\|job\|sfc\|customervpc\|zookeeper' | head -n1)
+SECURITY_GROUP=$(curl -s http://169.254.169.254/latest/meta-data/security-groups | grep 'app\|monitor\|job\|customervpc\|zookeeper' | head -n1)
 ZK_HOST="localhost"
 RETRIES=5
 

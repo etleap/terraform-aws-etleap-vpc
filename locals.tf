@@ -28,7 +28,6 @@ locals {
     db_password_arn                          = module.db_password.arn
     db_support_username                      = "etleap-support"
     db_support_password_arn                  = module.db_support_password.arn
-    db_salesforce_password_arn               = module.db_salesforce_password.arn
     admin_password_arn                       = module.admin_password.arn
     deployment_secret_arn                    = module.deployment_secret.arn
     kms_key                                  = aws_kms_key.etleap_encryption_key.key_id
