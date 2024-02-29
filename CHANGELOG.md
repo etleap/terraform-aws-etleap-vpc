@@ -1,3 +1,13 @@
+# Release 1.8.3
+
+Grants the `dms:ModifyEndpoint` to the `EtleapApp` role so that it can update the connection details on DMS endpoints when source connections for CDC pipelines are changed in Etleap.
+
+# Release 1.8.2
+
+Remove the database creation script and other related resources related to the deprecated Salesforce V1 connector, as the migration to new Salesforce V2 connector has been completed for all environments.
+
+This release will require replacing the application EC2 instances. Expect 15 minutes of downtime for pipelines, API and WebApp. 
+
 # Release 1.8.1
 
 Resolved [an issue related to Zookeeper Transaction ID (zxid) exhaustion](https://issues.apache.org/jira/browse/ZOOKEEPER-2789) that could cause Zookeeper cluster downtime.
