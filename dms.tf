@@ -148,6 +148,7 @@ resource "aws_iam_policy" "job_manage_dms" {
         "dms:StopReplicationTask",
         "dms:DescribeEndpoints",
         "dms:CreateEndpoint",
+        "dms:ModifyEndpoint",
         "dms:DeleteEndpoint",
         "dms:DescribeTableStatistics",
         "dms:TestConnection",
