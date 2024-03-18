@@ -19,6 +19,7 @@ resource "aws_db_instance" "db" {
   deletion_protection          = true
   performance_insights_enabled = true
   multi_az                     = var.ha_mode
+  ca_cert_identifier           = "rds-ca-2019"
 
   allow_major_version_upgrade = var.rds_allow_major_version_upgrade
   apply_immediately           = var.rds_apply_immediately
