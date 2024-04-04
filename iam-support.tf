@@ -26,7 +26,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "support_ssm_limited" {
-    count       = var.allow_iam_support_role ? 1 : 0
+    count       = var.allow_iam_support_role && var.app_available ? 1 : 0
     role        = aws_iam_role.support[0].name
     policy_arn  = aws_iam_policy.support_ssm_limited[0].arn
 }
@@ -80,7 +80,7 @@ resource "aws_iam_role_policy_attachment" "support_ssm_read_limited" {
 }
 
 resource "aws_iam_policy" "support_ssm_limited" {
-    count  = var.allow_iam_support_role ? 1 : 0
+    count  = var.allow_iam_support_role && var.app_available ? 1 : 0
     name   = "Etleap-${var.deployment_id}-Support-SSM-Limited-Policy"
     description = "Start, stop, and resume Port Forwarding to the DB (RDS) instance and SOCKS proxy (using SSM sessions) specifically using the deployment's app instance."
     policy = <<EOF

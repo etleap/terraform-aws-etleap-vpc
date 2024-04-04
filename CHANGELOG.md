@@ -1,3 +1,7 @@
+# Release 1.8.6
+
+Fixes an issue introduced in version 1.8.0. When `app_available` is set to `false`, the resource `aws_iam_policy.support_ssm_limited` can't be created because it uses the `instance_id` field of the app node, which doesn't exist. This fixes that issue by making the resource `aws_iam_policy.support_ssm_limited` conditional on `app_available`.
+
 # Release 1.8.5
 
 Removes the `github_access_token` variable as it was not used, `github_access_token_arn` is used instead.
