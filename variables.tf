@@ -72,10 +72,6 @@ locals {
   ssl_pem = var.ssl_pem == null ? file("${path.module}/ssl/cert.pem") : var.ssl_pem
 }
 
-variable "github_access_token" {
-  default = ""
-}
-
 variable "app_hostname" {
   default     = null
   description = "The hostname where Etleap will be accessible from."

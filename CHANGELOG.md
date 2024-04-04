@@ -1,3 +1,7 @@
+# Release 1.8.5
+
+Removes the `github_access_token` variable as it was not used, `github_access_token_arn` is used instead.
+
 # Release 1.8.4
 
 Locks database CA certificate to `rds-ca-2019`, as the application is not yet adapted for newer certificates and will fail to start due to new AWS defaults.

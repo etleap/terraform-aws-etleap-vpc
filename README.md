@@ -10,7 +10,7 @@ This will create a new VPC, and deploy Etleap and its associated resources insid
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.8.4"
+  version = "1.8.5"
 
   region           = "us-east-1"
   deployment_id    = "deployment" # This will be provided by Etleap
@@ -82,7 +82,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `s3_input_buckets` | The names of the S3 buckets which will be used with "S3 Input" connections. The module will create an IAM role to be specified with the "S3 Input" connections, together with a bucket policy that needs to be applied to the bucket. | `list(string)` | `[]` | no
 | `s3_data_lake_account_ids` | The 12-digit IDs of the AWS accounts containing the roles specified with "S3 Data Lake" connections. IAM roles in these accounts are given read access to the intermediate data S3 bucket. | `list(string)` | `[]` | no |
 | `github_username` | Github username to use when accessing custom transforms | `string` | `null` | no | 
-| `github_access_token` | ARN of the secret containing the GitHub access token | `string` | `null` | no |
+| `github_access_token_arn` | ARN of the secret containing the GitHub access token | `string` | `null` | no |
 | `connection_secrets` | A map between environment variables and Secrets Manager Secret ARN for secrets to be injected into the application. This is only used for enabling certain integration. | `map(string, string)` | `{}` | no |
 | `resource_tags` | Resource tags to be applied to all resources create by this template. | `map(string, string)` | `{}` | no |
 | `app_access_cidr_blocks` | CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
