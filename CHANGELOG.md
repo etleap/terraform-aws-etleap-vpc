@@ -1,3 +1,7 @@
+# Release 1.8.7
+
+Adds a workaround for [an AWS Terraform provider bug](https://github.com/hashicorp/terraform-provider-aws/issues/34661) that arises when re-creating the `High Job GC Activity` CloudWatch alarm, by calculating the app node's private hostname instead of retrieving it from AWS.
+
 # Release 1.8.6
 
 Fixes an issue introduced in version 1.8.0. When `app_available` is set to `false`, the resource `aws_iam_policy.support_ssm_limited` can't be created because it uses the `instance_id` field of the app node, which doesn't exist. This fixes that issue by making the resource `aws_iam_policy.support_ssm_limited` conditional on `app_available`.

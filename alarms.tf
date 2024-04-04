@@ -425,6 +425,11 @@ resource "aws_cloudwatch_metric_alarm" "kinesis_running_secondary_app" {
   treat_missing_data = "notBreaching"
 }
 
+locals {
+  # See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-naming.html#instance-naming-types
+  app_private_dns = var.region == "us-east-1" ? "ip-${replace(element(tolist(aws_network_interface.main_app.private_ips[*]), 0), ".", "-")}.ec2.internal" : "ip-${replace(element(tolist(aws_network_interface.main_app.private_ips[*]), 0), ".", "-")}.${var.region}.compute.internal"
+}
+
 resource "aws_cloudwatch_metric_alarm" "job_gc" {
   count = var.app_available ? 1 : 0
 
@@ -455,7 +460,7 @@ resource "aws_cloudwatch_metric_alarm" "job_gc" {
       period      = "60"
       namespace   = "Etleap/Java"
       dimensions  = {
-        local-hostname = module.main_app[0].instance_private_dns
+        local-hostname = local.app_private_dns
         level          = "INFO"
         type           = "GAUGE"
         Env            = var.deployment_id
