@@ -140,6 +140,7 @@ resource "aws_lb" "app" {
   subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
   security_groups    = [aws_security_group.app.id]
   idle_timeout       = 300
+  drop_invalid_header_fields = true
 
   tags = {
     Name = "Etleap LB ${var.deployment_id}"
