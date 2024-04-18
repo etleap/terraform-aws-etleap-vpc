@@ -10,7 +10,7 @@ This will create a new VPC, and deploy Etleap and its associated resources insid
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.8.7"
+  version = "1.8.8"
 
   region           = "us-east-1"
   deployment_id    = "deployment" # This will be provided by Etleap

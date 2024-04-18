@@ -368,5 +368,33 @@ resource "aws_iam_policy" "support_ssm_read" {
 EOF
 }
 
+resource "aws_iam_role_policy_attachment" "support_emr_read" {
+  count      = var.allow_iam_support_role ? 1 : 0
+  role       = aws_iam_role.support[0].name
+  policy_arn = aws_iam_policy.support_s3_read[0].arn
+}
 
-
+resource "aws_iam_policy" "support_s3_read" {
+  count  = var.allow_iam_support_role ? 1 : 0
+  name   = "Etleap-${var.deployment_id}-Support-S3-EMR-Read-Policy"
+  policy = <<EOF
+{
+    "Version":"2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowListingOfEMRLogs",
+            "Action": "s3:ListBucket",
+            "Effect": "Allow",
+            "Resource": "${aws_s3_bucket.intermediate.arn}",
+            "Condition": {"StringLike": {"s3:prefix": ["emr-logs/*"]}}
+        },
+        {
+            "Sid": "AllowReadEMRLogs",
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "${aws_s3_bucket.intermediate.arn}/emr-logs/*"
+        }
+  ]
+}
+EOF
+}

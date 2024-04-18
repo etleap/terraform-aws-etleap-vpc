@@ -1,3 +1,7 @@
+# Release 1.8.8
+
+Adds permissions for Etleap's Support Role to read logs to troubleshoot EMR issues. When `allow_iam_support_role` is `true`, an IAM permission is set to allow Etleap's Support Role read access to the `emr-logs` folder in the S3 bucket that stores EMR logs.
+
 # Release 1.8.7
 
 Adds a workaround for [an AWS Terraform provider bug](https://github.com/hashicorp/terraform-provider-aws/issues/34661) that arises when re-creating the `High Job GC Activity` CloudWatch alarm, by calculating the app node's private hostname instead of retrieving it from AWS.
