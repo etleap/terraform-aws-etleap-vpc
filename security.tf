@@ -157,6 +157,10 @@ resource "aws_security_group" "zookeeper" {
   lifecycle {
     ignore_changes = [name, description, tags, tags_all] 
   }
+  
+  tags = {
+    Name = "Etleap Zookeeper"
+  }
 }
 
 resource "aws_security_group_rule" "zookeeper-allow-ssh" {

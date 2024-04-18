@@ -1,3 +1,12 @@
+# Release 1.8.9
+
+1. Updates the EMR Cluster ID parameter name, so it follows the naming convention for the exiting parameters.
+2. Adds a `Name` tag to the `zookeeper` Security Group for new deployments only. 
+
+## Upgrade instructions
+
+This update requires reprovisioning the application EC2 instances. Expect 15 minutes of downtime of the UI, API and pipelines. 
+
 # Release 1.8.8
 
 Adds permissions for Etleap's Support Role to read logs to troubleshoot EMR issues. When `allow_iam_support_role` is `true`, an IAM permission is set to allow Etleap's Support Role read access to the `emr-logs` folder in the S3 bucket that stores EMR logs.

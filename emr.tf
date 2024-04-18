@@ -431,7 +431,7 @@ resource "aws_ssm_parameter" "emr_public_dns" {
 }
 
 resource "aws_ssm_parameter" "emr_cluster_id" {
-  name        = "EtleapEmrClusterId${local.resource_name_suffix}"
+  name        = "${local.ssm_parameter_prefix}/emr_cluster_id"
   description = "The ID of the current active EMR cluster"
   type        = "String"
   value       = aws_emr_cluster.emr.id
