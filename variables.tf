@@ -310,6 +310,11 @@ variable "dms_proxy_bucket" {
   description = "(Internal) A bucket to be used as a proxy for DMS. Should only be set in multitenant environments."
 }
 
+variable "enable_emr_preemption" {
+  default     = true
+  description = "(Internal) True if preemption should be enabled for the deployment's EMR cluster. Only change from the default value if requested by Etleap's support team, as it may negatively affect data processing times."
+}
+
 # here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.
 locals {
   validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 3) && (var.private_subnets == null ? false : length(var.private_subnets) == 3)

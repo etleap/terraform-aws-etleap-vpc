@@ -1,3 +1,7 @@
+# Release 1.8.10
+
+Adds an internal variable to control a setting for preemption of tasks in EMR's job scheduler. The default value for the setting remains unchanged, and this setting should only be changed if requested by Etleap's support team.
+
 # Release 1.8.9
 
 1. Updates the EMR Cluster ID parameter name, so it follows the naming convention for the exiting parameters.
