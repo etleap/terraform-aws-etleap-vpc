@@ -84,7 +84,7 @@ resource "aws_security_group_rule" "nat-ingress" {
 
 resource "aws_eip" "nat" {
   count    = local.created_vpc_count
-  vpc      = true
+  domain   = "vpc"
 }
 
 resource "aws_eip_association" "nat" {
