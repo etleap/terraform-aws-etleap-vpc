@@ -1,5 +1,6 @@
 resource "aws_iam_role" "support" {
     count       = var.allow_iam_support_role ? 1 : 0
+    tags        = local.default_tags
     name        = "Etleap-${var.deployment_id}-Support-Role"
     description = "Role for Etleap's support team."
     max_session_duration = 28800
@@ -23,6 +24,7 @@ resource "aws_iam_role" "support" {
     ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "support_ssm_limited" {
@@ -81,6 +83,7 @@ resource "aws_iam_role_policy_attachment" "support_ssm_read_limited" {
 
 resource "aws_iam_policy" "support_ssm_limited" {
     count  = var.allow_iam_support_role && var.app_available ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-SSM-Limited-Policy"
     description = "Start, stop, and resume Port Forwarding to the DB (RDS) instance and SOCKS proxy (using SSM sessions) specifically using the deployment's app instance."
     policy = <<EOF
@@ -112,6 +115,7 @@ EOF
 
 resource "aws_iam_policy" "support_logs_dms_limited" {
     count  = var.allow_iam_support_role && ! var.disable_cdc_support ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-Logs_DMS-Limited-Policy"
     description = "DMS-related resource access, only if CDC support is enabled for the deployment. Includes read of the deployment's DMS replication instance's CloudWatch log group, list resources related to DMS, and full CRUD of the deployment's DMS resources, including endpoints, replication tasks, and assessments."
     policy = <<EOF
@@ -133,7 +137,7 @@ resource "aws_iam_policy" "support_logs_dms_limited" {
                 "logs:ListTagsForResource"
             ],
             "Resource": [
-                "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:dms-tasks-${aws_dms_replication_instance.dms[0].replication_instance_id}:*"
+                "arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:dms-tasks-${aws_dms_replication_instance.dms[0].replication_instance_id}:*"
             ]
         },
         {
@@ -182,8 +186,8 @@ resource "aws_iam_policy" "support_logs_dms_limited" {
                 "dms:TestConnection"
             ],
             "Resource": [
-                "arn:aws:dms:${var.region}:${data.aws_caller_identity.current.account_id}:task:*",
-                "arn:aws:dms:${var.region}:${data.aws_caller_identity.current.account_id}:endpoint:*"
+                "arn:aws:dms:${local.region}:${data.aws_caller_identity.current.account_id}:task:*",
+                "arn:aws:dms:${local.region}:${data.aws_caller_identity.current.account_id}:endpoint:*"
             ]
         },
         {
@@ -192,7 +196,7 @@ resource "aws_iam_policy" "support_logs_dms_limited" {
                 "dms:TestConnection"
             ],
             "Resource": [
-                "arn:aws:dms:${var.region}:${data.aws_caller_identity.current.account_id}:rep:*"
+                "arn:aws:dms:${local.region}:${data.aws_caller_identity.current.account_id}:rep:*"
             ]
         }
     ]
@@ -202,6 +206,7 @@ EOF
 
 resource "aws_iam_policy" "support_ec2_read" {
     count  = var.allow_iam_support_role ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-EC2-Read-Policy"
     description = "Describe EC2 instances, network interfaces, images, addresses, subnets, tags, and volumes."
     policy = <<EOF
@@ -228,6 +233,7 @@ EOF
 
 resource "aws_iam_policy" "support_autoscaling_emr_rds_sns_read" {
     count  = var.allow_iam_support_role ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-Autoscaling_EMR_RDS_SNS-Read-Policy"
     description = "List resources related to Auto Scaling, EMR, RDS, and SNS."
     policy = <<EOF
@@ -252,6 +258,7 @@ EOF
 
 resource "aws_iam_policy" "support_support_full" {
     count  = var.allow_iam_support_role ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-Support-Full-Policy"
     description = "Full access to AWS Support."
     policy = <<EOF
@@ -272,6 +279,7 @@ EOF
 
 resource "aws_iam_policy" "support_sns_read" {
     count  = var.allow_iam_support_role ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-SNS-Read-Policy"
     description = "List SNS topics and queues related to the deployment."
     policy = <<EOF
@@ -298,6 +306,7 @@ EOF
 
 resource "aws_iam_policy" "support_cloudwatch_read" {
     count  = var.allow_iam_support_role ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-Cloudwatch-Read-Policy"
     description = "List and read metric data from CloudWatch."
     policy = <<EOF
@@ -320,6 +329,7 @@ EOF
 
 resource "aws_iam_policy" "support_secretsmanager_limited" {
     count  = var.allow_iam_support_role ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-Secretsmanager-Limited-Policy"
     description = "Read the deployment's database's support user's password from Secrets Manager."
     policy = <<EOF
@@ -343,6 +353,7 @@ EOF
 
 resource "aws_iam_policy" "support_ssm_read" {
     count  = var.allow_iam_support_role ? 1 : 0
+    tags   = local.default_tags
     name   = "Etleap-${var.deployment_id}-Support-SSM-Read-Policy"
     description = "Read the deployment's Parameter Store parameters."
     policy = <<EOF
@@ -356,7 +367,7 @@ resource "aws_iam_policy" "support_ssm_read" {
                 "ssm:GetParameters",
                 "ssm:GetParameter"
             ],
-            "Resource": "arn:aws:ssm:${var.region}:${local.account_id}:parameter/etleap/${var.deployment_id}/*"
+            "Resource": "arn:aws:ssm:${local.region}:${local.account_id}:parameter/etleap/${var.deployment_id}/*"
         },
         {
             "Effect": "Allow",
@@ -376,6 +387,7 @@ resource "aws_iam_role_policy_attachment" "support_emr_read" {
 
 resource "aws_iam_policy" "support_s3_read" {
   count  = var.allow_iam_support_role ? 1 : 0
+  tags   = local.default_tags
   name   = "Etleap-${var.deployment_id}-Support-S3-EMR-Read-Policy"
   policy = <<EOF
 {

@@ -1,3 +1,16 @@
+# Release 1.8.11
+
+Removes the `region` variable and the AWS provider block from the module, as per [HashiCorp's best practices](https://developer.hashicorp.com/terraform/language/modules/develop/providers). This enables the module to inherit provider properties from the root module's AWS provider, including the `region` property, which specifies which AWS region resources should be created in.
+
+## Upgrade Instructions
+
+Please remove the `region` variable as it no longer exists. If you are using this module in a region other than the default `us-east-1` region, please ensure you have an `aws` provider block in your root module that includes the `region` property: 
+
+```terraform
+provider "aws" {
+  region = "xx-xxxx-x"
+}
+
 # Release 1.8.10
 
 Adds an internal variable to control a setting for preemption of tasks in EMR's job scheduler. The default value for the setting remains unchanged, and this setting should only be changed if requested by Etleap's support team.

@@ -1,10 +1,6 @@
 // Configurable variables begin here
 // ---------------------------------
 
-variable "region" {
-  description = "The region Etleap is deployed in."
-}
-
 variable "deployment_id" {
   description = "The Deployment ID for this deployment. If you don't have one, please contact Etleap Support."
 }

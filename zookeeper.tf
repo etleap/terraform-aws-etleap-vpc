@@ -12,6 +12,7 @@ locals {
 
 resource "aws_network_interface" "zookeeper" {
   for_each = local.zookeeper_map
+  tags     = local.default_tags
 
   private_ips_count = 0
   subnet_id         = element(local.subnet_ids, each.key)
@@ -19,7 +20,9 @@ resource "aws_network_interface" "zookeeper" {
 }
 
 resource "aws_instance" "zookeeper" {
-  for_each = local.zookeeper_map
+  for_each    = local.zookeeper_map
+  tags        = merge({Name = "Etleap ${each.value} ${var.deployment_id}"}, local.default_tags)
+  volume_tags = merge({Name = "Etleap ${each.value} ${var.deployment_id}"}, local.default_tags)
 
   instance_type = "t3.small"
   ami           = var.amis["app"]
@@ -27,14 +30,6 @@ resource "aws_instance" "zookeeper" {
   iam_instance_profile = aws_iam_instance_profile.zookeeper.name
 
   user_data_replace_on_change = true
-
-  tags = {
-    Name = "Etleap ${each.value} ${var.deployment_id}"
-  }
-
-  volume_tags = {
-    Name = "Etleap ${each.value} ${var.deployment_id}"
-  }
 
   network_interface {
     network_interface_id = aws_network_interface.zookeeper[each.key].id
@@ -49,7 +44,7 @@ resource "aws_instance" "zookeeper" {
 
   user_data = templatefile("${path.module}/templates/zookeeper-userdata.yml.tpl", {
     env = "vpc",
-    region = var.region,
+    region = local.region,
     hostname = each.value,
     datadog_active = 0,
     zookeeper_id = each.key,

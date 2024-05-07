@@ -1,4 +1,5 @@
 resource "aws_dynamodb_table" "activity-log" {
+  tags          = local.default_tags
   name          = "EtleapActivityLog-${var.deployment_id}"
   billing_mode  = "PAY_PER_REQUEST"
   hash_key      = "ProjectActivityTypeIsError"

@@ -1,5 +1,6 @@
 // Default object required for successful Elva initialisation
 resource "aws_s3_bucket_object" "default_config" {
+    tags    = var.tags
     bucket  = var.config_bucket.bucket
     key     = "streaming-configuration/00000.yaml"
     content = <<EOF

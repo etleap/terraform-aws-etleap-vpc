@@ -48,3 +48,8 @@ variable "streaming_endpoint_access_cidr_blocks" {
 
 variable "app_security_group_id" {
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}

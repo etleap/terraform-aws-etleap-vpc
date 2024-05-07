@@ -1,21 +1,25 @@
 locals {
-  account_id                          = data.aws_caller_identity.current.account_id
-  hosted_account_id                   = "223848809711"
-  ssm_parameter_prefix                = "/etleap/${var.deployment_id}"
-  vpc_cidr_block                      = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.0/22"
-  vpc_cidr_block_config_name          = "${local.ssm_parameter_prefix}/vpc_cidr"
-  default_hostname                    = aws_lb.app.dns_name
-  app_hostname_config_name            = "${local.ssm_parameter_prefix}/app_hostname"
-  app_main_private_ip                 = element(tolist(aws_network_interface.main_app.private_ips[*]), 0)
-  app_private_ip_config_name          = "${local.ssm_parameter_prefix}/app_private_ip"
+  account_id                 = data.aws_caller_identity.current.account_id
+  hosted_account_id          = "223848809711"
+  ssm_parameter_prefix       = "/etleap/${var.deployment_id}"
+  vpc_cidr_block             = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3}.0/22"
+  vpc_cidr_block_config_name = "${local.ssm_parameter_prefix}/vpc_cidr"
+  default_hostname           = aws_lb.app.dns_name
+  app_hostname_config_name   = "${local.ssm_parameter_prefix}/app_hostname"
+  app_main_private_ip        = element(tolist(aws_network_interface.main_app.private_ips[*]), 0)
+  app_private_ip_config_name = "${local.ssm_parameter_prefix}/app_private_ip"
 
-  rds_hostname_config_name            = "${local.ssm_parameter_prefix}/rds_hostname"
-  rds_username_config_name            = "${local.ssm_parameter_prefix}/rds_username"
-  rds_password_arn_config_name        = "${local.ssm_parameter_prefix}/rds_password_arn"
-  rds_support_username_config_name    = "${local.ssm_parameter_prefix}/rds_support_username"
+  rds_hostname_config_name             = "${local.ssm_parameter_prefix}/rds_hostname"
+  rds_username_config_name             = "${local.ssm_parameter_prefix}/rds_username"
+  rds_password_arn_config_name         = "${local.ssm_parameter_prefix}/rds_password_arn"
+  rds_support_username_config_name     = "${local.ssm_parameter_prefix}/rds_support_username"
   rds_support_password_arn_config_name = "${local.ssm_parameter_prefix}/rds_support_password_arn"
 
   default_streaming_endpoint_hostname = var.enable_streaming_ingestion ? module.elva[0].elva_lb_public_address : ""
+
+  default_tags = merge({
+    Deployment = var.deployment_id
+  }, var.resource_tags)
 
   context = {
     deployment_id                            = var.deployment_id

@@ -1,5 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name          = "Etleap - ${var.deployment_id} - EMR Cluster Running"
   comparison_operator = "LessThanThreshold"
@@ -20,6 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_cluster_running" {
 
 resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name          = "Etleap - ${var.deployment_id} - 60% Disk EMR HDFS"
   comparison_operator = "GreaterThanThreshold"
@@ -39,6 +41,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_hdfs_utilization" {
 
 resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name          = "Etleap - ${var.deployment_id} - EMR Unhealthy Nodes"
   comparison_operator = "GreaterThanThreshold"
@@ -58,6 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "emr_unhealthy_nodes" {
 
 resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name          = "Etleap - ${var.deployment_id} - EMR Missing Blocks"
   comparison_operator = "GreaterThanThreshold"
@@ -77,6 +81,8 @@ resource "aws_cloudwatch_metric_alarm" "emr_missing_blocks" {
 
 
 resource aws_cloudwatch_metric_alarm "emr_namenode_disk" {
+  tags = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - 80% Disk EMR NameNode"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -95,6 +101,8 @@ resource aws_cloudwatch_metric_alarm "emr_namenode_disk" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
+  tags = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - RDS CPU 90%"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -112,6 +120,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_disk" {
+  tags = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - RDS Disk Space"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
@@ -129,6 +139,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_disk" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
+  tags = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - RDS Freeable Memory"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "1"
@@ -147,6 +159,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_freeable_memory" {
 
 resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name          = "Etleap - ${var.deployment_id} - Main Node 80% CPU"
   comparison_operator = "GreaterThanThreshold"
@@ -165,7 +178,9 @@ resource "aws_cloudwatch_metric_alarm" "main_node_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "secondary_node_cpu" {
-  count               = var.app_available && var.ha_mode ? 1 : 0
+  count = var.app_available && var.ha_mode ? 1 : 0
+  tags  = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - Secondary Node 80% CPU"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
@@ -184,6 +199,7 @@ resource "aws_cloudwatch_metric_alarm" "secondary_node_cpu" {
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name          = "Etleap - ${var.deployment_id} - Main Node 90% Disk Root"
   comparison_operator = "GreaterThanThreshold"
@@ -204,6 +220,7 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_root" {
 
 resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name          = "Etleap - ${var.deployment_id} - Main Node 90% Disk Docker"
   comparison_operator = "GreaterThanThreshold"
@@ -223,7 +240,9 @@ resource "aws_cloudwatch_metric_alarm" "main_app_disk_docker" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_root" {
-  count               = var.app_available && var.ha_mode ? 1 : 0
+  count = var.app_available && var.ha_mode ? 1 : 0
+  tags  = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - Secondary Node 90% Disk Root"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -242,7 +261,9 @@ resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_root" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_docker" {
-  count               = var.app_available && var.ha_mode ? 1 : 0
+  count = var.app_available && var.ha_mode ? 1 : 0
+  tags  = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - HA Node 90% Disk Docker"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "1"
@@ -261,6 +282,8 @@ resource "aws_cloudwatch_metric_alarm" "secondary_app_disk_docker" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "app_running" {
+  tags = local.default_tags
+
   alarm_name = "Etleap - ${var.deployment_id} - App is running"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "5"
@@ -278,6 +301,8 @@ resource "aws_cloudwatch_metric_alarm" "app_running" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "job_running" {
+  tags = local.default_tags
+
   alarm_name = "Etleap - ${var.deployment_id} - Job is running"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "10"
@@ -295,6 +320,8 @@ resource "aws_cloudwatch_metric_alarm" "job_running" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dms_cpu" {
+  tags = local.default_tags
+
   alarm_name                = "Etleap - ${var.deployment_id} - DMS 80% CPU"
   comparison_operator       = "GreaterThanThreshold"
   evaluation_periods        = "5"
@@ -309,7 +336,9 @@ resource "aws_cloudwatch_metric_alarm" "dms_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dms_disk" {
-  count               = var.disable_cdc_support ? 0 : 1
+  count = var.disable_cdc_support ? 0 : 1
+  tags  = local.default_tags
+
   alarm_name          = "Etleap - ${var.deployment_id} - DMS Disk Space 30GB Remaining"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "3"
@@ -328,7 +357,9 @@ resource "aws_cloudwatch_metric_alarm" "dms_disk" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dms_available_memory" {
-  count                     = var.disable_cdc_support ? 0 : 1
+  count = var.disable_cdc_support ? 0 : 1
+  tags  = local.default_tags
+
   alarm_name                = "Etleap - ${var.deployment_id} - DMS Available Memory <= 10%"
   comparison_operator       = "LessThanOrEqualToThreshold"
   evaluation_periods        = "3"
@@ -347,7 +378,9 @@ resource "aws_cloudwatch_metric_alarm" "dms_available_memory" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dms_freeable_memory" {
-  count                     = var.disable_cdc_support ? 0 : 1
+  count = var.disable_cdc_support ? 0 : 1
+  tags  = local.default_tags
+
   alarm_name                = "Etleap - ${var.deployment_id} - DMS Freeable Memory <= 2GB"
   comparison_operator       = "LessThanOrEqualToThreshold"
   evaluation_periods        = "3"
@@ -363,6 +396,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_freeable_memory" {
 
 resource "aws_cloudwatch_metric_alarm" "zookeeper_unhealthy_nodes" {
   for_each = local.zookeeper_map
+  tags     = local.default_tags
 
   alarm_name                = "Etleap - ${var.deployment_id} - ${each.value} is down"
   comparison_operator       = "LessThanThreshold"
@@ -383,6 +417,7 @@ resource "aws_cloudwatch_metric_alarm" "zookeeper_unhealthy_nodes" {
 
 resource "aws_cloudwatch_metric_alarm" "kinesis_running_main_app" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name                = "Etleap - ${var.deployment_id} - main_app - Kinesis Agent not running"
   comparison_operator       = "LessThanThreshold"
@@ -405,6 +440,7 @@ resource "aws_cloudwatch_metric_alarm" "kinesis_running_main_app" {
 
 resource "aws_cloudwatch_metric_alarm" "kinesis_running_secondary_app" {
   count = var.app_available && var.ha_mode ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name                = "Etleap - ${var.deployment_id} - secondary_app - Kinesis not running"
   comparison_operator       = "LessThanThreshold"
@@ -427,11 +463,12 @@ resource "aws_cloudwatch_metric_alarm" "kinesis_running_secondary_app" {
 
 locals {
   # See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-naming.html#instance-naming-types
-  app_private_dns = var.region == "us-east-1" ? "ip-${replace(element(tolist(aws_network_interface.main_app.private_ips[*]), 0), ".", "-")}.ec2.internal" : "ip-${replace(element(tolist(aws_network_interface.main_app.private_ips[*]), 0), ".", "-")}.${var.region}.compute.internal"
+  app_private_dns = local.region == "us-east-1" ? "ip-${replace(element(tolist(aws_network_interface.main_app.private_ips[*]), 0), ".", "-")}.ec2.internal" : "ip-${replace(element(tolist(aws_network_interface.main_app.private_ips[*]), 0), ".", "-")}.${local.region}.compute.internal"
 }
 
 resource "aws_cloudwatch_metric_alarm" "job_gc" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   alarm_name                = "Etleap - ${var.deployment_id} - High Job GC Activity"
   comparison_operator       = "GreaterThanThreshold"

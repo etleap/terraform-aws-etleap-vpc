@@ -15,12 +15,3 @@ terraform {
     }
   }
 }
-
-provider "aws" {
-  region = var.region
-  default_tags {
-    tags = merge({
-      Deployment = var.deployment_id
-    }, var.resource_tags)
-  }
-}

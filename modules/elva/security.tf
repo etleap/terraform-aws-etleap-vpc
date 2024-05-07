@@ -1,4 +1,5 @@
 resource "aws_security_group" "elva-elb" {
+  tags        = var.tags
   name        = "Etleap Elva ELB ${var.deployment_id}"
   description = "Rules for the Elva ELB"
   vpc_id      = var.vpc_id
@@ -53,6 +54,7 @@ resource "aws_security_group_rule" "elva-elb-allow-logs" {
 }
 
 resource "aws_security_group" "elva-node" {
+  tags        = var.tags
   name        = "Etleap ${var.deployment_id} Elva Node"
   description = "Rules for the Elva nodes"
   vpc_id      = var.vpc_id

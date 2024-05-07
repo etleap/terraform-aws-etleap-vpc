@@ -1,6 +1,9 @@
 # TODO See if it makes sense to use NAT gateway instead, avoids having to manage AMIs
 resource "aws_instance" "nat" {
-  count                       = local.created_vpc_count
+  count       = local.created_vpc_count
+  tags        = merge({Name = "Etleap NAT ${var.deployment_id}"}, local.default_tags)
+  volume_tags = merge({Name = "Etleap NAT", }, local.default_tags)
+
   ami                         = data.aws_ami.nat.id
   instance_type               = var.nat_instance_type
   key_name                    = var.key_name
@@ -9,14 +12,6 @@ resource "aws_instance" "nat" {
   associate_public_ip_address = true
   source_dest_check           = false
   private_ip                  = var.nat_private_ip
-
-  tags = {
-    Name = "Etleap NAT ${var.deployment_id}"
-  }
-
-  volume_tags = {
-    Name = "Etleap NAT"
-  }
 
   lifecycle {
     create_before_destroy = true
@@ -53,13 +48,10 @@ data "aws_ami" "nat" {
 
 resource "aws_security_group" "nat" {
   count       = local.created_vpc_count
+  tags        = merge({Name = "Etleap NAT"}, local.default_tags)
   name        = "Etleap NAT"
   description = "Etleap NAT"
   vpc_id      = aws_vpc.etleap[0].id
-
-  tags = {
-    Name = "Etleap NAT"
-  }
 }
 
 resource "aws_security_group_rule" "nat-egress" {
@@ -84,6 +76,7 @@ resource "aws_security_group_rule" "nat-ingress" {
 
 resource "aws_eip" "nat" {
   count    = local.created_vpc_count
+  tags     = local.default_tags
   vpc      = true
 }
 

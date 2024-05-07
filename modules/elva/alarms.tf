@@ -1,4 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "elva_healthyhosts" {
+  tags                = var.tags
   alarm_name          = "Etleap - ${var.deployment_id} - Elva Healthy Host Count"
   comparison_operator = "LessThanThreshold"
   metric_name         = "HealthyHostCount"

@@ -37,11 +37,16 @@ variable "instance_type" {
 variable "enable_public_access" {
 }
 
+variable "app_role" {
+}
+
 variable "tags" {
   default = {}
 }
 
 resource "aws_instance" "app" {
+  tags                 = merge({Name = "Etleap App ${var.deployment_id} ${var.name}", AppRole = var.app_role, }, var.tags)
+  volume_tags          = merge({Name = "Etleap App", }, var.tags)
   instance_type        = var.instance_type
   ami                  = var.ami
   key_name             = var.key_name
@@ -105,14 +110,6 @@ power_state:
   condition: True
   timeout: 30
 EOF
-
-  tags = merge({
-    Name = "Etleap App ${var.deployment_id} ${var.name}"
-  }, var.tags)
-
-  volume_tags = {
-    Name = "Etleap App"
-  }
 }
 
 output "instance_id" {

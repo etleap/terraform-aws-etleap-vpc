@@ -1,38 +1,26 @@
 resource "aws_vpc" "etleap" {
   count                = local.created_vpc_count
+  tags                 = merge({Name = "Etleap VPC ${var.deployment_id}"}, local.default_tags)
   cidr_block           = local.vpc_cidr_block
   enable_dns_hostnames = true
-
-  tags = {
-    Name = "Etleap VPC ${var.deployment_id}"
-  }
 }
 
 resource "aws_internet_gateway" "etleap" {
   count  = local.created_vpc_count
+  tags   = merge({Name = "Etleap IG"}, local.default_tags)
   vpc_id = aws_vpc.etleap[0].id
-
-  tags = {
-    Name = "Etleap IG"
-  }
 }
 
 resource "aws_route_table" "private" {
   count  = local.created_vpc_count
+  tags   = merge({Name = "Etleap Private ${var.deployment_id}"}, local.default_tags)
   vpc_id = aws_vpc.etleap[0].id
-
-  tags = {
-    Name = "Etleap Private ${var.deployment_id}"
-  }
 }
 
 resource "aws_route_table" "public" {
   count  = local.created_vpc_count
+  tags   = merge({Name = "Etleap Public ${var.deployment_id}"}, local.default_tags)
   vpc_id = aws_vpc.etleap[0].id
-
-  tags = {
-    Name = "Etleap Public ${var.deployment_id}"
-  }
 }
 
 resource "aws_route" "private" {
@@ -51,68 +39,50 @@ resource "aws_route" "prod_public" {
 
 resource "aws_subnet" "a_private" {
   count             = local.created_vpc_count
+  tags              = merge({Name = "Etleap A Private ${var.deployment_id}"}, local.default_tags)
   vpc_id            = aws_vpc.etleap[0].id
   cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 0}.0/24"
-  availability_zone = "${var.region}a"
-
-  tags = {
-    Name = "Etleap A Private ${var.deployment_id}"
-  }
+  availability_zone = "${local.region}a"
 }
 
 resource "aws_subnet" "b_private" {
   count             = local.created_vpc_count
+  tags              = merge({Name = "Etleap B Private ${var.deployment_id}"}, local.default_tags)
   vpc_id            = aws_vpc.etleap[0].id
   cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 1}.0/24"
-  availability_zone = "${var.region}b"
-
-  tags = {
-    Name = "Etleap B Private ${var.deployment_id}"
-  }
+  availability_zone = "${local.region}b"
 }
 
 resource "aws_subnet" "c_private" {
   count             = local.created_vpc_count
+  tags              = merge({Name = "Etleap C Private ${var.deployment_id}"}, local.default_tags)
   vpc_id            = aws_vpc.etleap[0].id
   cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 2}.0/24"
-  availability_zone = "${var.region}c"
-
-  tags = {
-    Name = "Etleap C Private ${var.deployment_id}"
-  }
+  availability_zone = "${local.region}c"
 }
 
 resource "aws_subnet" "a_public" {
   count             = local.created_vpc_count
+  tags              = merge({Name = "Etleap A Public ${var.deployment_id}"}, local.default_tags)
   vpc_id            = aws_vpc.etleap[0].id
   cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.0/26"
-  availability_zone = "${var.region}a"
-
-  tags = {
-    Name = "Etleap A Public ${var.deployment_id}"
-  }
+  availability_zone = "${local.region}a"
 }
 
 resource "aws_subnet" "b_public" {
   count             = local.created_vpc_count
+  tags              = merge({Name = "Etleap B Public ${var.deployment_id}"}, local.default_tags)
   vpc_id            = aws_vpc.etleap[0].id
   cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.64/26"
-  availability_zone = "${var.region}b"
-
-  tags = {
-    Name = "Etleap B Public ${var.deployment_id}"
-  }
+  availability_zone = "${local.region}b"
 }
 
 resource "aws_subnet" "c_public" {
   count             = local.created_vpc_count
+  tags              = merge({Name = "Etleap C Public ${var.deployment_id}"}, local.default_tags)
   vpc_id            = aws_vpc.etleap[0].id
   cidr_block        = "${var.vpc_cidr_block_1}.${var.vpc_cidr_block_2}.${var.vpc_cidr_block_3 + 3}.128/26"
-  availability_zone = "${var.region}c"
-
-  tags = {
-    Name = "Etleap C Public ${var.deployment_id}"
-  }
+  availability_zone = "${local.region}c"
 }
 
 resource "aws_route_table_association" "a_private" {
@@ -164,6 +134,7 @@ locals {
 
 resource "aws_ssm_parameter" "vpc_cidr" {
   name        = local.vpc_cidr_block_config_name
+  tags        = local.default_tags
   description = "Etleap ${var.deployment_id} - VPC CIDR"
   type        = "String"
   value       = local.vpc_cidr_block

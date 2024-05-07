@@ -1,5 +1,6 @@
 module "main_app" {
   count = var.app_available ? 1 : 0
+  tags  = local.default_tags
 
   depends_on = [
     aws_route.prod_public,
@@ -7,6 +8,7 @@ module "main_app" {
   ]
 
   name              = "main"
+  app_role          = "main" 
   source            = "./modules/app/"
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.main_app.id
@@ -15,7 +17,7 @@ module "main_app" {
   key_name             = var.key_name
   ssl_pem              = local.ssl_pem
   ssl_key              = local.ssl_key
-  region               = var.region
+  region               = local.region
   instance_type        = var.app_instance_type
   enable_public_access = var.enable_public_access
 
@@ -30,14 +32,11 @@ module "main_app" {
 
   # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
-
-  tags = {
-    AppRole = "main"
-  }
 }
 
 module "secondary_app" {
   count = var.app_available && var.ha_mode ? 1 : 0
+  tags  = local.default_tags
 
   depends_on = [
     aws_route.prod_public,
@@ -45,6 +44,7 @@ module "secondary_app" {
   ]
 
   name              = "secondary"
+  app_role          = "secondary"
   source            = "./modules/app/"
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.secondary_app[0].id
@@ -53,7 +53,7 @@ module "secondary_app" {
   key_name             = var.key_name
   ssl_pem              = local.ssl_pem
   ssl_key              = local.ssl_key
-  region               = var.region
+  region               = local.region
   instance_type        = var.app_instance_type
   enable_public_access = var.enable_public_access
 
@@ -68,13 +68,10 @@ module "secondary_app" {
 
   # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
-
-  tags = {
-    AppRole = "secondary"
-  }
 }
 
 resource "aws_network_interface" "main_app" {
+  tags              = local.default_tags
   private_ips       = var.app_private_ip != null ? [var.app_private_ip] : null
   private_ips_count = 0
   subnet_id         = local.subnet_b_private_id
@@ -83,6 +80,7 @@ resource "aws_network_interface" "main_app" {
 
 resource "aws_network_interface" "secondary_app" {
   count             = var.ha_mode ? 1 : 0
+  tags              = local.default_tags
   private_ips       = var.secondary_app_private_ip != null ? [var.secondary_app_private_ip] : null
   private_ips_count = 0
   subnet_id         = local.subnet_a_private_id
@@ -91,12 +89,9 @@ resource "aws_network_interface" "secondary_app" {
 
 resource "aws_acm_certificate" "etleap" {
   count            = var.acm_certificate_arn == null || var.streaming_endpoint_acm_certificate_arn == null ? 1 : 0
+  tags             = merge({Name = "Etleap Default"}, local.default_tags)
   private_key      = local.ssl_key
   certificate_body = local.ssl_pem
-
-  tags = {
-    Name = "Etleap Default"
-  }
 
   lifecycle {
     create_before_destroy = true
@@ -104,6 +99,7 @@ resource "aws_acm_certificate" "etleap" {
 }
 
 resource "aws_iam_instance_profile" "app" {
+  tags = local.default_tags
   name = "EtleapApp${local.resource_name_suffix}"
   role = aws_iam_role.app.name
 }
@@ -114,6 +110,7 @@ resource "aws_iam_role_policy_attachment" "ecr_readonly_access" {
 }
 
 resource "aws_iam_role" "app" {
+  tags               = local.default_tags
   name               = "EtleapApp${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
@@ -130,23 +127,20 @@ resource "aws_iam_role" "app" {
   ]
 }
 EOF
-
 }
 
 resource "aws_lb" "app" {
+  tags               = merge({Name = "Etleap LB ${var.deployment_id}"}, local.default_tags)
   name_prefix        = "etleap"
   internal           = !var.enable_public_access
   load_balancer_type = "application"
   subnets            = var.enable_public_access ? [local.subnet_a_public_id, local.subnet_b_public_id] : [local.subnet_a_private_id, local.subnet_b_private_id]
   security_groups    = [aws_security_group.app.id]
   idle_timeout       = 300
-
-  tags = {
-    Name = "Etleap LB ${var.deployment_id}"
-  }
 }
 
 resource "aws_lb_listener" "app" {
+  tags              = local.default_tags
   load_balancer_arn = aws_lb.app.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -160,6 +154,7 @@ resource "aws_lb_listener" "app" {
 }
 
 resource "aws_lb_target_group" "app" {
+  tags        = local.default_tags
   name_prefix = "Etleap"
   port        = 443
   protocol    = "HTTPS"
@@ -187,6 +182,7 @@ resource "aws_lb_target_group_attachment" "secondary_app" {
 }
 
 resource "aws_ssm_parameter" "app_hostname" {
+  tags        = local.default_tags
   name        = local.app_hostname_config_name
   description = "Etleap ${var.deployment_id} - App Hostname"
   type        = "String"
@@ -194,6 +190,7 @@ resource "aws_ssm_parameter" "app_hostname" {
 }
 
 resource "aws_ssm_parameter" "app_private_ip" {
+  tags        = local.default_tags
   name        = local.app_private_ip_config_name
   description = "Etleap ${var.deployment_id} - App Main Private IP"
   type        = "String"

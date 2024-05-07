@@ -47,11 +47,13 @@ resource "aws_iam_role_policy_attachment" "emr_profile_policy" {
 
 resource "aws_iam_instance_profile" "emr_profile" {
   name = "EtleapEMRProfile${local.resource_name_suffix}"
+  tags = local.default_tags
   role = aws_iam_role.emr.name
 }
 
 resource "aws_iam_instance_profile" "zookeeper" {
   name = "Etleap-Zookeeper_iam_profile${local.resource_name_suffix}"
+  tags = local.default_tags
   role = aws_iam_role.zookeeper.name
 }
 
@@ -76,6 +78,7 @@ resource "aws_iam_role_policy_attachment" "dynamodb_crud" {
 }
 
 resource "aws_iam_role" "zookeeper" {
+  tags               = local.default_tags
   name               = "Etleapzookeeper${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
@@ -96,10 +99,10 @@ EOF
 lifecycle {
   ignore_changes = [name, description, tags]
 }
-
 }
 
 resource "aws_iam_role" "emr" {
+  tags               = local.default_tags
   name               = "EtleapEMR${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
@@ -116,10 +119,10 @@ resource "aws_iam_role" "emr" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_policy" "get_secrets_and_params" {
+  tags   = local.default_tags
   name   = "EtleapEC2SecretsAndParams${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -131,8 +134,8 @@ resource "aws_iam_policy" "get_secrets_and_params" {
                 "secretsmanager:GetSecretValue"
             ],
             "Resource": [
-                "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:Etleap*",
-                "arn:aws:secretsmanager:${var.region}:841591717599:secret:${var.deployment_id}/*"
+                "arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.account_id}:secret:Etleap*",
+                "arn:aws:secretsmanager:${local.region}:841591717599:secret:${var.deployment_id}/*"
             ]
         },
          {
@@ -141,7 +144,7 @@ resource "aws_iam_policy" "get_secrets_and_params" {
                 "ssm:GetParameter"
             ],
             "Resource": [
-                "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/etleap*"
+                "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/etleap*"
             ]
         },
         {
@@ -152,17 +155,17 @@ resource "aws_iam_policy" "get_secrets_and_params" {
             "Resource": "*",
             "Condition": {
                 "StringEquals": {
-                    "kms:ViaService": "secretsmanager.${var.region}.amazonaws.com"
+                    "kms:ViaService": "secretsmanager.${local.region}.amazonaws.com"
                 }
             }
         }
     ]
 }
 EOF
-
 }
 
 resource "aws_iam_policy" "ec2_describe" {
+  tags   = local.default_tags
   name   = "EtleapEC2Describe${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -185,10 +188,10 @@ resource "aws_iam_policy" "ec2_describe" {
     ]
 }
 EOF
-
 }
 
 resource "aws_iam_policy" "cloudwatch_metric_data" {
+  tags   = local.default_tags
   name   = "EtleapMetricData${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -207,10 +210,10 @@ resource "aws_iam_policy" "cloudwatch_metric_data" {
     ]
 }
 EOF
-
 }
 
 resource "aws_iam_policy" "emr_profile_policy" {
+  tags   = local.default_tags
   name   = "EtleapEMRProfilePolicy${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -241,10 +244,10 @@ resource "aws_iam_policy" "emr_profile_policy" {
     }]
 }
 EOF
-
 }
 
 resource "aws_iam_policy" "assume_roles" {
+  tags   = local.default_tags
   name   = "Etleap_assume_roles${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -272,11 +275,11 @@ resource "aws_iam_policy" "assume_roles" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_policy" "allow_sns_put" {
-  name = "Etleap_sns_put${local.resource_name_suffix}"
+  tags   = local.default_tags
+  name   = "Etleap_sns_put${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -292,7 +295,8 @@ EOF
 }
 
 resource aws_iam_policy "dynamodb_crud" {
-  name = "Etleap-dynamodb-crud${local.resource_name_suffix}"
+  tags   = local.default_tags
+  name   = "Etleap-dynamodb-crud${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -323,6 +327,7 @@ EOF
 }
 
 resource "aws_iam_role" "emr_default_role" {
+  tags               = local.default_tags
   name               = "EtleapEMR_DefaultRole${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
@@ -339,10 +344,12 @@ resource "aws_iam_role" "emr_default_role" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_policy" "emr_default_instance_fleet" {
-  name = "EtleapEMRInstanceFleet${local.resource_name_suffix}"
+  tags   = local.default_tags
+  name   = "EtleapEMRInstanceFleet${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",

@@ -1,4 +1,5 @@
 resource "aws_db_instance" "db" {
+  tags                         = local.default_tags
   identifier_prefix            = "etleap"
   allocated_storage            = 500
   storage_type                 = "gp2"
@@ -33,6 +34,7 @@ resource "aws_db_instance" "db" {
 }
 
 resource "aws_db_subnet_group" "db" {
+  tags       = local.default_tags
   name       = "etleap_db_${local.deployment_random}"
   subnet_ids = [local.subnet_a_private_id, local.subnet_b_private_id]
   
@@ -45,6 +47,7 @@ resource "aws_db_subnet_group" "db" {
 }
 
 resource "aws_db_parameter_group" "mysql8-0-etleap" {
+  tags        = local.default_tags
   name        = "etleap-mysql8-0-${local.deployment_random}"
   description = "MySQL 8.0 with Etleap modifications"
   family      = "mysql8.0"
@@ -141,6 +144,7 @@ resource "aws_db_parameter_group" "mysql8-0-etleap" {
 }
 
 resource "aws_ssm_parameter" "rds_hostname" {
+  tags        = local.default_tags
   name        = local.rds_hostname_config_name
   description = "Etleap ${var.deployment_id} - RDS Hostname"
   type        = "String"
@@ -148,6 +152,7 @@ resource "aws_ssm_parameter" "rds_hostname" {
 }
 
 resource "aws_ssm_parameter" "rds_username" {
+  tags        = local.default_tags
   name        = local.rds_username_config_name
   description = "Etleap ${var.deployment_id} - RDS Username"
   type        = "String"
@@ -155,6 +160,7 @@ resource "aws_ssm_parameter" "rds_username" {
 }
 
 resource "aws_ssm_parameter" "rds_password_arn" {
+  tags        = local.default_tags
   name        = local.rds_password_arn_config_name
   description = "Etleap ${var.deployment_id} - RDS Password ARN"
   type        = "String"
@@ -162,6 +168,7 @@ resource "aws_ssm_parameter" "rds_password_arn" {
 }
 
 resource "aws_ssm_parameter" "rds_support_username" {
+  tags        = local.default_tags
   name        = local.rds_support_username_config_name
   description = "Etleap ${var.deployment_id} - RDS Support Username"
   type        = "String"
@@ -169,6 +176,7 @@ resource "aws_ssm_parameter" "rds_support_username" {
 }
 
 resource "aws_ssm_parameter" "rds_support_password_arn" {
+  tags        = local.default_tags
   name        = local.rds_support_password_arn_config_name
   description = "Etleap ${var.deployment_id} - RDS Support Password ARN"
   type        = "String"

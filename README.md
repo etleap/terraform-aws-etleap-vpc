@@ -10,9 +10,8 @@ This will create a new VPC, and deploy Etleap and its associated resources insid
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.8.10"
+  version = "1.8.11"
 
-  region           = "us-east-1"
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
   vpc_cidr_block_2 = 22
@@ -51,7 +50,6 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
-| `region` | The region Etleap is deployed in. | `string` | n/a | yes |
 | `deployment_id` | The Deployment ID for this deployment. If you don't have one, please contact Etleap Support. | `string` | n/a | yes |
 | `vpc_cidr_block_1` | The first octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
 | `vpc_cidr_block_2` | The second octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |

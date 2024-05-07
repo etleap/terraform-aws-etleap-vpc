@@ -1,6 +1,7 @@
 // Role Devops allows to be assumed by users from the account 841591717599 (vpcdeployments) logged with active MFA
 resource "aws_iam_role" "etleap-role-devops" {
   count       = var.allow_iam_devops_role ? 1 : 0
+  tags        = local.default_tags
   name        = "Etleap-${var.deployment_id}-Devops-Role"
   description = "Role for Etleap Devops users"
   assume_role_policy = <<EOF

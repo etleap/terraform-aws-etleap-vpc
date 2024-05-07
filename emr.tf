@@ -2,6 +2,7 @@ resource "aws_emr_cluster" "emr" {
   depends_on = [
     aws_instance.nat
   ]
+  tags                              = merge({Name = "Etleap EMR ${var.deployment_id}"}, local.default_tags)
   name                              = "Etleap EMR"
   release_label                     = "emr-5.35.0"
   applications                      = ["Hadoop", "Spark"]
@@ -19,10 +20,6 @@ resource "aws_emr_cluster" "emr" {
     additional_master_security_groups = join(",", concat([aws_security_group.emr.id], var.extra_security_groups))
     additional_slave_security_groups  = join(",", concat([aws_security_group.emr.id], var.extra_security_groups))
     instance_profile                  = aws_iam_instance_profile.emr_profile.name
-  }
-
-  tags = {
-    Name = "Etleap EMR ${var.deployment_id}"
   }
 
   lifecycle {
@@ -75,49 +72,49 @@ resource "aws_emr_cluster" "emr" {
 
   bootstrap_action {
     name = "Configure Fair Scheduler"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/download-fair-scheduler-config.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/download-fair-scheduler-config.sh"
   }
 
   bootstrap_action {
     name = "Add Etleap-provided JARs"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/add-app-provided-libs.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/add-app-provided-libs.sh"
   }
 
   bootstrap_action {
     name = "Replace the Java keystore with Etleap's"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-etleap-keystore.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-etleap-keystore.sh"
   }
 
   bootstrap_action {
     name = "Install Kinesis Agent"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-kinesis-agent.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-kinesis-agent.sh"
     args = [var.deployment_id, local.app_main_private_ip, "false"]
   }
 
   bootstrap_action {
     name = "Set TCP keepalive"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/set-tcp-keepalive.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/set-tcp-keepalive.sh"
   }
 
   bootstrap_action {
     name = "Copy HDFS init script"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/copy-hdfs-init.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/copy-hdfs-init.sh"
   }
 
   bootstrap_action {
     name = "Apply EMR hotfix for autoscaling bug"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/replace_hadoop_rpms.sh"
-    args = ["etleap-emr-${var.region}"]
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/replace_hadoop_rpms.sh"
+    args = ["etleap-emr-${local.region}"]
   }
 
   bootstrap_action {
     name = "Install HDFS crontab"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-hdfs-crontab.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-hdfs-crontab.sh"
   }
 
   bootstrap_action {
     name = "Install DBT"
-    path = "s3://etleap-emr-${var.region}/conf-hadoop2/install-dbt.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-dbt.sh"
   }
 
   step {
@@ -424,6 +421,7 @@ resource "aws_emr_instance_fleet" "task_spot" {
 }
 
 resource "aws_ssm_parameter" "emr_public_dns" {
+  tags        = local.default_tags
   name        = local.context.emr_cluster_config_name
   description = "Etleap ${var.deployment_id} - EMR public DNS"
   type        = "String"
@@ -431,6 +429,7 @@ resource "aws_ssm_parameter" "emr_public_dns" {
 }
 
 resource "aws_ssm_parameter" "emr_cluster_id" {
+  tags        = local.default_tags
   name        = "${local.ssm_parameter_prefix}/emr_cluster_id"
   description = "The ID of the current active EMR cluster"
   type        = "String"

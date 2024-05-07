@@ -1,9 +1,11 @@
 module "inbound_queue" {
   source       = "./modules/event-queue"
+  tags         = local.default_tags
   organization = var.deployment_id
 }
 
 resource "aws_iam_policy" "inbound-sns-sqs-manage" {
+  tags   = local.default_tags
   name   = "Etleap-inbound-sns-sqs-manage${local.resource_name_suffix}"
   policy = <<EOF
 {

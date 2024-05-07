@@ -1,4 +1,5 @@
 resource "aws_s3_bucket" "intermediate" {
+  tags          = local.default_tags
   bucket        = "etleap-intermediate-${var.deployment_id}-${local.deployment_random}"
   force_destroy = true
 
@@ -41,7 +42,8 @@ locals {
 }
 
 resource "aws_iam_role" "intermediate" {
-  name               = "EtleapIntermediate${local.resource_name_suffix}"
+  tags                 = local.default_tags
+  name                 = "EtleapIntermediate${local.resource_name_suffix}"
   max_session_duration = 14400
   lifecycle {
     ignore_changes = [max_session_duration]
@@ -66,6 +68,7 @@ EOF
 }
 
 resource "aws_iam_policy" "intermediate" {
+  tags = local.default_tags
   name = "EtleapIntermediate${local.resource_name_suffix}"
 
   policy = <<EOF
@@ -100,6 +103,7 @@ resource "random_id" "deployment_random" {
 
 resource "aws_iam_role" "s3_input_role" {
   count              = length(var.s3_input_buckets) > 0 ? 1 : 0
+  tags               = local.default_tags
   name               = "EtleapInput${local.resource_name_suffix}"
   assume_role_policy = <<EOF
 {
@@ -122,6 +126,7 @@ EOF
 
 resource aws_iam_policy "s3_input_policy" {
   count  = length(var.s3_input_buckets) > 0 ? 1 : 0
+  tags   = local.default_tags
   name   = "EtleapInput${local.resource_name_suffix}"
   policy = <<EOF
 {

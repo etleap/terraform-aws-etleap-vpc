@@ -1,5 +1,6 @@
 # User required for reading streaming configurations in streaming-configuration
 resource "aws_iam_user" "elva" {
+  tags = var.tags
   name = "etleap_streaming_ingress_${var.deployment_id}"
 }
 
@@ -47,6 +48,7 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "elva" {
+  tags = var.tags
   name = "EtleapElva${var.deployment_id}"
   role = var.app_role_name
 }
@@ -58,6 +60,7 @@ resource "aws_iam_policy_attachment" "elva" {
 }
 
 resource "aws_iam_policy" "elva_intermediate_access" {
+  tags = var.tags
   name = "Etleap${var.deployment_id}ElvaIntermediateAccess${var.resource_name_suffix}"
 
   policy = <<EOF

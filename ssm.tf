@@ -1,6 +1,7 @@
 
 resource "aws_ssm_document" "portforward_socks" {
   count         = var.allow_iam_devops_role || var.allow_iam_support_role ? 1 : 0
+  tags          = local.default_tags
   name          = "PortForwardingSocks-${var.deployment_id}"
   document_type = "Session"
 
@@ -34,6 +35,7 @@ DOC
 
 resource "aws_ssm_document" "portforward_db" {
   count         = var.allow_iam_devops_role || var.allow_iam_support_role ? 1 : 0
+  tags          = local.default_tags
   name          = "PortForwardingDB-${var.deployment_id}"
   document_type = "Session"
 

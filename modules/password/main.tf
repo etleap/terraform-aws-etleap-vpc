@@ -5,7 +5,13 @@ variable "length" {
   type = number
 }
 
+variable "tags" {
+  type = map(string)
+  default = {}
+}
+
 resource "aws_secretsmanager_secret" "secret" {
+  tags                    = var.tags
   name                    = var.name
   recovery_window_in_days = 30
 

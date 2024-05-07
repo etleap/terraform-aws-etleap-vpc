@@ -1,64 +1,46 @@
 resource "aws_security_group" "app" {
+  tags        = merge({Name = "Etleap App"}, local.default_tags)
   name        = "Etleap App"
   description = "Etleap App"
   vpc_id      = local.vpc_id
-
-  tags = {
-    Name = "Etleap App"
-  }
 }
 
 resource "aws_security_group" "db" {
+  tags        = merge({Name = "Etleap DB"}, local.default_tags)
   name        = "Etleap DB"
   description = "Etleap DB"
   vpc_id      = local.vpc_id
-
-  tags = {
-    Name = "Etleap DB"
-  }
 }
 
 resource "aws_security_group" "emr" {
+  tags        = merge({Name = "Etleap EMR"}, local.default_tags)
   name        = "Etleap EMR"
   description = "Etleap EMR Security Group"
   vpc_id      = local.vpc_id
-
-  tags = {
-    Name = "Etleap EMR"
-  }
 }
 
 resource "aws_security_group" "emr-master-managed" {
+  tags                   = merge({Name = "Etleap EMR Master (managed by EMR)"}, local.default_tags)
   name                   = "EMR Master Managed"
   description            = "Rules managed by EMR for EMR master"
   vpc_id                 = local.vpc_id
   revoke_rules_on_delete = true
-
-  tags = {
-    Name = "Etleap EMR Master (managed by EMR)"
-  }
 }
 
 resource "aws_security_group" "emr-slave-managed" {
+  tags                   = merge({Name = "Etleap EMR Slave (managed by EMR)"}, local.default_tags)
   name                   = "EMR Slave Managed"
   description            = "Rules managed by EMR for EMR slave"
   vpc_id                 = local.vpc_id
   revoke_rules_on_delete = true
-
-  tags = {
-    Name = "Etleap EMR Slave (managed by EMR)"
-  }
 }
 
 resource "aws_security_group" "emr-service-access-managed" {
+  tags                   = merge({Name = "Etleap EMR Service Access (managed by EMR)"}, local.default_tags)
   name                   = "EMR Service Access Managed"
   description            = "Rules managed by EMR for EMR service access"
   vpc_id                 = local.vpc_id
   revoke_rules_on_delete = true
-
-  tags = {
-    Name = "Etleap EMR Service Access (managed by EMR)"
-  }
 }
 
 resource "aws_security_group_rule" "emr_master_service_access" {
@@ -152,14 +134,11 @@ resource "aws_security_group_rule" "app-allow-web-ssl" {
 }
 
 resource "aws_security_group" "zookeeper" {
+  tags   = merge({Name = "Etleap Zookeeper"}, local.default_tags)
   name   = "Etleap zookeeper"
   vpc_id = local.vpc_id
   lifecycle {
     ignore_changes = [name, description, tags, tags_all] 
-  }
-  
-  tags = {
-    Name = "Etleap Zookeeper"
   }
 }
 

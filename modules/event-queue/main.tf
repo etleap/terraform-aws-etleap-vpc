@@ -1,7 +1,13 @@
 variable "organization" {
 }
 
+variable "tags" {
+  type = map(string)
+  default = {}
+}
+
 resource "aws_sns_topic" "etleap-inbound" {
+  tags = var.tags
   name = "etleap-inbound-${var.organization}"
 }
 
@@ -13,10 +19,13 @@ resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
 }
 
 resource "aws_sqs_queue" "etleap-inbound-dlq" {
+  tags = var.tags
   name = "etleap-inbound-dlq-${var.organization}"
 }
+
 resource "aws_sqs_queue" "etleap-inbound" {
-  name = "etleap-inbound-${var.organization}"
+  tags           = var.tags
+  name           = "etleap-inbound-${var.organization}"
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.etleap-inbound-dlq.arn
     maxReceiveCount     = 3
