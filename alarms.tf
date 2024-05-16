@@ -381,14 +381,15 @@ resource "aws_cloudwatch_metric_alarm" "dms_freeable_memory" {
   count = var.disable_cdc_support ? 0 : 1
   tags  = local.default_tags
 
-  alarm_name                = "Etleap - ${var.deployment_id} - DMS Freeable Memory <= 2GB"
+  alarm_name                = "Etleap - ${var.deployment_id} - DMS Freeable Memory <= 10%"
   comparison_operator       = "LessThanOrEqualToThreshold"
   evaluation_periods        = "3"
   metric_name               = "FreeableMemory"
   namespace                 = "AWS/DMS"
   period                    = "300"
   statistic                 = "Average"
-  threshold                 = "2147483648"
+  // Memory size is in MiB, so we need to convert to bytes(1024*1024) and then take 10%(0.1) of that
+  threshold                 = data.aws_ec2_instance_type.dms_instance_type.memory_size * 1024 * 1024 * 0.1
   alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics

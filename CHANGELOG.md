@@ -1,3 +1,7 @@
+# Release 1.8.12
+
+Fixes an issue with the `DMS Freeable Memory <= 10%` alarm by correcting its threshold value to 10% regardless of the instance size. Before this change the alarm would always be in an ALARM state with the default instance size, because the threshold had a fixed value of 2GB.
+
 # Release 1.8.11
 
 Removes the `region` variable and the AWS provider block from the module, as per [HashiCorp's best practices](https://developer.hashicorp.com/terraform/language/modules/develop/providers). This enables the module to inherit provider properties from the root module's AWS provider, including the `region` property, which specifies which AWS region resources should be created in.
