@@ -7,10 +7,6 @@
 - [ ] New feature (adds functionality)
 - [ ] Infrastructure change
 
-## Related story in Pivotal
-
-[Story name](https://www.pivotaltracker.com/story/show/<ID>)
-
 ## Checklists
 
 ### Development
@@ -25,4 +21,4 @@
 - [ ] Reviews have been requested.
 - [ ] Changes have been reviewed and accepted by at least one other engineer.
 - [ ] `CHANGELOG.md` as well as variables, alarms, and readmes have been [reviewed by the PM](https://www.notion.so/etleap/Dev-Workflow-Checklist-1693ed0f162040e8b4659e90ba85252b?pvs=4#8bc0f53b03f34194a46a3df51f551e14).
-- [ ] The Pivotal story has a link to this pull request.
+- [ ] The Linear story has a link to this pull request.

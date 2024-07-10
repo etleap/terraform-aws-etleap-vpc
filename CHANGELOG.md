@@ -1,3 +1,13 @@
+# Release 1.8.13
+
+Upgrades RDS CA certificate to `rds-ca-rsa4096-g1`, as the `rds-ca-2019` CA certificate is approaching its expiry date. This change does not require a database reboot.
+
+## Upgrade instructions
+1. Set the `rds_apply_immediately` variable to `true`
+2. Apply terraform
+3. Unset the `rds_apply_immediately` variable or set it to `false`
+4. Apply terraform again
+
 # Release 1.8.12
 
 Fixes an issue with the `DMS Freeable Memory <= 10%` alarm by correcting its threshold value to 10% regardless of the instance size. Before this change the alarm would always be in an ALARM state with the default instance size, because the threshold had a fixed value of 2GB.
