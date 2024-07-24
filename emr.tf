@@ -1,3 +1,14 @@
+// Used for triggering the replacement of an EMR cluster when configuration changes require it, but we can't do it via TF alone
+// e.g. changes that require replacing Instance Fleets, should replace the entire cluster, as Instance Fleets can't be deleted (1), and 
+// we don't support multiple Spot Instance Fleets per cluster.
+// 
+// (1) https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/emr_instance_fleet
+resource "null_resource" "emr_configuration_change" {
+  triggers = {
+    emr_instance_fleet_smallest_instance_size = var.emr_instance_fleet_smallest_instance_size
+  }
+}
+
 resource "aws_emr_cluster" "emr" {
   depends_on = [
     aws_instance.nat
@@ -24,6 +35,7 @@ resource "aws_emr_cluster" "emr" {
 
   lifecycle {
     create_before_destroy = true
+    replace_triggered_by  = [ null_resource.emr_configuration_change ]
   }
 
   master_instance_fleet {
@@ -228,7 +240,8 @@ EOF
 
 }
 
-resource "aws_emr_instance_fleet" "task_spot" {
+resource "aws_emr_instance_fleet" "task_spot_xlarge" {
+  count = var.emr_instance_fleet_smallest_instance_size == "xlarge" ? 1 : 0
   cluster_id           = aws_emr_cluster.emr.id
   name                 = "TASK SPOT"
   target_spot_capacity = 2
@@ -417,6 +430,94 @@ resource "aws_emr_instance_fleet" "task_spot" {
     }
     instance_type     = "r5a.xlarge"
     weighted_capacity = 4
+  }
+}
+
+moved {
+  from = aws_emr_instance_fleet.task_spot
+  to   = aws_emr_instance_fleet.task_spot_xlarge[0]
+}
+
+resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
+  count = var.emr_instance_fleet_smallest_instance_size == "4xlarge" ? 1 : 0
+  cluster_id           = aws_emr_cluster.emr.id
+  name                 = "TASK SPOT"
+  target_spot_capacity = 2
+
+  lifecycle {
+    ignore_changes = [
+      target_spot_capacity,
+      launch_specifications[0].spot_specification["allocation_strategy"] // Workaround for bug: https://github.com/hashicorp/terraform-provider-aws/issues/34151
+    ]
+  }
+
+  launch_specifications {
+    spot_specification {
+      allocation_strategy      = "price-capacity-optimized"
+      timeout_action           = "SWITCH_TO_ON_DEMAND"
+      timeout_duration_minutes = 30
+    }
+  }
+
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 512
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m6i.4xlarge"
+    weighted_capacity = 16
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 512
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5.4xlarge"
+    weighted_capacity = 16
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 512
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m5a.4xlarge"
+    weighted_capacity = 16
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 224
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6i.4xlarge"
+    weighted_capacity = 7
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 256
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5.4xlarge"
+    weighted_capacity = 8
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 224
+      type                 = "gp2"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c5a.4xlarge"
+    weighted_capacity = 7
   }
 }
 

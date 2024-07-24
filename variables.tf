@@ -301,6 +301,17 @@ variable "streaming_endpoint_access_cidr_blocks" {
   description = "CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses."
 }
 
+variable "emr_instance_fleet_smallest_instance_size" {
+  type        = string
+  default     = "xlarge"
+  description = "The smallest instance size used for EMR instance fleet. The instance fleet uses sizes from the specified size up to `4xlarge` of various instance types to maximize spot instance availability. Valid values are `xlarge` and `4xlarge`, and the default is `xlarge`. Setting to `4xlarge` reduces the number of instances, which is helpful when the number of IP addresses is limited, but may also increase AWS costs for small deployments due to the lower cluster scaling granularity."
+
+  validation {
+    condition     = contains(["xlarge", "4xlarge"], var.emr_instance_fleet_smallest_instance_size)
+    error_message = "Valid values are 'xlarge' or '4xlarge'."
+  }
+}
+
 variable "dms_proxy_bucket" {
   default     = null
   description = "(Internal) A bucket to be used as a proxy for DMS. Should only be set in multitenant environments."

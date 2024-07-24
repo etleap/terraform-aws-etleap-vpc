@@ -1,3 +1,11 @@
+# Release 1.8.14
+
+Adds the option to select a configuration that uses larger EMR task spot nodes, for environments that have a restricted range of IP addresses available.
+
+## Upgrade instructions
+
+The following only applies if you want to make use of the new variable: Apply the terraform module version upgrade first, before changing the newly introduced parameter. This will avoid the EMR cluster from entering an invalid state.
+
 # Release 1.8.13
 
 Upgrades RDS CA certificate to `rds-ca-rsa4096-g1`, as the `rds-ca-2019` CA certificate is approaching its expiry date. This change does not require a database reboot.
