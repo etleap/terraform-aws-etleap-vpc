@@ -322,6 +322,40 @@ variable "enable_emr_preemption" {
   description = "(Internal) True if preemption should be enabled for the deployment's EMR cluster. Only change from the default value if requested by Etleap's support team, as it may negatively affect data processing times."
 }
 
+variable "is_influx_db_in_secondary_region" {
+  default     = false
+  description = "Set to true if the AWS region where you're deploying Etleap does not support Amazon Timestream for InfluxDB, and InfluxDB has therefore been created in a secondary AWS region. See the README for instructions for how to configure this."
+}
+
+variable "influx_db_hostname" {
+  default     = null
+  description = "The hostname of the InfluxDB instance if it is deployed in a secondary region. See `is_influx_db_in_secondary_region`."
+}
+
+variable "influx_db_password_arn" {
+  default     = null
+  description = "The password ARN of the InfluxDB instance if it is deployed in a secondary region. See `is_influx_db_in_secondary_region`."
+}
+
+locals {
+  validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1", 
+                                                                    "us-east-2", 
+                                                                    "us-west-2",
+                                                                    "ap-south-1", 
+                                                                    "ap-southeast-1",
+                                                                    "ap-southeast-2", 
+                                                                    "ap-northeast-1", 
+                                                                    "eu-central-1", 
+                                                                    "eu-west-1",
+                                                                    "eu-north-1"
+                                                                  ], data.aws_region.current.name))
+  validate_influx_db_hostname_and_password_err_msg = "If you are deploying Etleap in a region that doesn't yet support Amazon Timestream for InfluxDB, then follow the instructions in the README for deploying InfluxDB in a secondary region, set `is_influx_db_in_secondary_region` to `true`, and specify `influx_db_hostname` and `influx_db_password_arn`. If `is_influx_db_in_secondary_region` is set to `false` (default), then neither `influx_db_hostname` or `influx_db_password_arn` should be set."
+}
+
+resource "null_resource" "are_influx_db_hostname_and_password_valid" {
+  count = local.validate_influx_db_hostname_and_password ? 0 : local.validate_influx_db_hostname_and_password_err_msg
+}
+
 # here we are validating the VPC config is valid, and that we have 6 subnets if the user is specifying a VPC ID.
 locals {
   validate_vpc_cnd = var.vpc_id == null ? true : (var.public_subnets == null ? false : length(var.public_subnets) == 3) && (var.private_subnets == null ? false : length(var.private_subnets) == 3)

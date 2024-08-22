@@ -21,6 +21,10 @@ locals {
     Deployment = var.deployment_id
   }, var.resource_tags)
 
+  is_influx_db_in_secondary_region         = var.influx_db_hostname != null && var.influx_db_password_arn != null 
+  influx_db_username                       = "root"
+  influx_db_password                       = data.aws_secretsmanager_secret_version.influx_db_password.secret_string
+
   context = {
     deployment_id                            = var.deployment_id
     vpc_cidr_block                           = local.vpc_cidr_block
@@ -63,5 +67,12 @@ locals {
     streaming_endpoint_hostname              = var.streaming_endpoint_hostname == null ? local.default_streaming_endpoint_hostname : var.streaming_endpoint_hostname
     activity_log_table_name                  = aws_dynamodb_table.activity-log.id
     dms_proxy_bucket                         = var.dms_proxy_bucket
+    influx_db_hostname                       = var.is_influx_db_in_secondary_region ? var.influx_db_hostname : aws_timestreaminfluxdb_db_instance.influx_db[0].endpoint
+    influx_db_api_token_arn                  = aws_secretsmanager_secret.influx_db_api_token.arn
   }
 }
+
+data "aws_secretsmanager_secret_version" "influx_db_password" {
+  secret_id = var.is_influx_db_in_secondary_region ? var.influx_db_password_arn : module.influx_db_password[0].arn
+}
+

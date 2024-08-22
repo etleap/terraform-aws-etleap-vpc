@@ -32,6 +32,9 @@ module "main_app" {
 
   # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
+  
+  # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
+  influx_db_init = "/tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
 }
 
 module "secondary_app" {
@@ -68,6 +71,10 @@ module "secondary_app" {
 
   # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
+
+  # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
+  influx_db_init = "/tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
+
 }
 
 resource "aws_network_interface" "main_app" {
@@ -195,4 +202,22 @@ resource "aws_ssm_parameter" "app_private_ip" {
   description = "Etleap ${var.deployment_id} - App Main Private IP"
   type        = "String"
   value       = local.app_main_private_ip
+}
+
+resource "aws_iam_role_policy" "secretsmanager_write_access" {
+  name   = "SecretsManagerWriteAccess${local.resource_name_suffix}"
+  role   = aws_iam_role.app.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "secretsmanager:PutSecretValue",
+      "Resource": "${local.context.influx_db_api_token_arn}"
+    }
+  ]
+}
+EOF
 }

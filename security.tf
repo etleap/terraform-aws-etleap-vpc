@@ -19,6 +19,14 @@ resource "aws_security_group" "emr" {
   vpc_id      = local.vpc_id
 }
 
+resource "aws_security_group" "influxdb" {
+  count                  = var.is_influx_db_in_secondary_region ? 0 : 1
+  tags                   = merge({Name = "Etleap InfluxDB"}, local.default_tags)
+  name                   = "Etleap InfluxDB"
+  description            = "Etleap InfluxDB"
+  vpc_id                 = local.vpc_id
+}
+
 resource "aws_security_group" "emr-master-managed" {
   tags                   = merge({Name = "Etleap EMR Master (managed by EMR)"}, local.default_tags)
   name                   = "EMR Master Managed"
@@ -197,3 +205,24 @@ resource "aws_security_group_rule" "zookeeper-out-all" {
   security_group_id        = aws_security_group.zookeeper.id
   cidr_blocks              = ["0.0.0.0/0"]
 }
+
+resource "aws_security_group_rule" "app-to-influxdb" {
+  count                    = var.is_influx_db_in_secondary_region ? 0 : 1
+  type                     = "ingress"
+  from_port                = 8086
+  to_port                  = 8086
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.influxdb[0].id
+  source_security_group_id = aws_security_group.app.id
+}
+
+resource "aws_security_group_rule" "emr-to-influxdb" {
+  count                    = var.is_influx_db_in_secondary_region ? 0 : 1
+  type                     = "ingress"
+  from_port                = 8086
+  to_port                  = 8086
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.influxdb[0].id
+  source_security_group_id = aws_security_group.emr.id
+}
+

@@ -10,7 +10,7 @@ This will create a new VPC, and deploy Etleap and its associated resources insid
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.8.14"
+  version = "1.9.0"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -254,4 +254,4 @@ Downtime:
     c. Under the "Targets" tab, check that all instances are "Health". 
 
 5. Once the main instance is online, apply the remaining changes with `terraform apply`. If HA Mode is enabled, this will also replace the secondary application instace. 
-6. Manually terminate the old cluster from the AWS Console or the CLI. 
+6. Manually terminate the old cluster from the AWS Console or the CLI.

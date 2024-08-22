@@ -116,6 +116,17 @@ resource "aws_iam_policy" "dms_s3" {
         "arn:aws:s3:::${aws_s3_bucket.intermediate.id}",
         "arn:aws:s3:::${aws_s3_bucket.intermediate.id}/*"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kinesis:DescribeStream", 
+        "kinesis:PutRecords",
+        "kinesis:PutRecord"
+      ],
+      "Resource": [
+        "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-dms-*"
+      ]
     }
   ]
 }

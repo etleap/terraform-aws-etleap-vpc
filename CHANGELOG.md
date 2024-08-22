@@ -1,3 +1,15 @@
+# Release 1.9.0
+
+Enables pipelines to [Apache Iceberg](https://iceberg.apache.org/) destinations. This version includes:
+- An [Amazon Timestream for InfluxDB](https://docs.aws.amazon.com/timestream/latest/developerguide/timestream-for-influxdb.html) instance for storing metrics, along with a security group for Etleap's application node and EMR cluster to communicate with it.
+- Permissions for Etleap to dynamically create Kinesis streams to store AWS DMS output.
+- Permissions for Etleap's EMR cluster to read data from Etleap's Kinesis streams, and to use Etleap's KMS key to encrypt data.
+
+## Upgrade instructions
+
+This update will require replacing the EMR cluster, and this will cause 15-20 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+By default, this update requires Amazon Timestream for InfluxDB to be available in the region Etleap is deployed to, which is currently the following regions: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`, and `eu-north-1`. If you are deploying Etleap in a region that's not in this list, you will need to create a secondary VPC in one of these regions and peer the primary VPC to it. To do this, please follow the instructions in the README.
+
 # Release 1.8.14
 
 Adds the option to select a configuration that uses larger EMR task spot nodes, for environments that have a restricted range of IP addresses available.

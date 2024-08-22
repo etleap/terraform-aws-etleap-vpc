@@ -374,3 +374,90 @@ resource "aws_iam_policy" "emr_default_instance_fleet" {
 }
 EOF
 }
+
+# Provides access to KMS hosted keys to encrypt data
+resource "aws_iam_policy" "emr_kms_encryption_policy" {
+  name   = "EtleapEMRKmsEncryptionPolicy${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Encrypt"
+      ],
+      "Resource": [
+        "${aws_kms_key.etleap_encryption_key.arn}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "emr_kms_encryption_policy" {
+  role       = aws_iam_role.emr.name
+  policy_arn = aws_iam_policy.emr_kms_encryption_policy.arn
+}
+
+resource "aws_iam_policy" "kinesis_emr_permissions_policy" {
+  name = "EtleapEMRKinesisPermissionPolicy${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kinesis:ListShards",
+        "kinesis:GetShardIterator",
+        "kinesis:GetRecords",
+        "kinesis:DescribeStream"
+      ],
+      "Resource": [
+          "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-dms-*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "kinesis_emr_permissions_policy" {
+  name       = "EtleapEMRKinesisPermissionPolicy${local.resource_name_suffix}"
+  roles      = [aws_iam_role.emr.name]
+  policy_arn = aws_iam_policy.kinesis_emr_permissions_policy.arn
+}
+
+resource "aws_iam_policy" "kinesis_app_permissions_policy" {
+  name = "EtleapAppKinesisPermissionPolicy${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kinesis:ListShards",
+        "kinesis:GetShardIterator",
+        "kinesis:GetRecords",
+        "kinesis:DescribeStream",
+        "kinesis:PutRecord*",
+        "kinesis:CreateStream",
+        "kinesis:IncreaseStreamRetentionPeriod"
+      ],
+      "Resource": [
+          "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-dms-*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "kinesis_app_permissions_policy" {
+  name       = "EtleapAppKinesisPermissionPolicy${local.resource_name_suffix}"
+  roles      = [aws_iam_role.app.name]
+  policy_arn = aws_iam_policy.kinesis_app_permissions_policy.arn
+}

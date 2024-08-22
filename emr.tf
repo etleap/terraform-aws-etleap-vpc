@@ -138,6 +138,15 @@ resource "aws_emr_cluster" "emr" {
     }
   }
 
+  step {
+    action_on_failure = "CANCEL_AND_WAIT"
+    name = "Install Flink History Server"
+    hadoop_jar_step {
+      jar = "s3://${local.region}.elasticmapreduce/libs/script-runner/script-runner.jar"
+      args = ["s3://etleap-emr-${local.region}/conf-hadoop2/install-flink-historyserver.sh"]
+    }
+  }
+
   configurations_json = <<EOF
   [
     {

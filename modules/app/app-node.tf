@@ -16,6 +16,9 @@ variable "deployment_id" {
 variable "db_init" {
 }
 
+variable "influx_db_init" {
+}
+
 variable "ami" {
 }
 
@@ -80,6 +83,11 @@ write_files:
     ${indent(4, file("${path.module}/db-init.sh"))}
   owner: ubuntu:ubuntu
   permissions: "0755"
+- path: /tmp/influx-db-init.sh
+  content: |
+    ${indent(4, file("${path.module}/influx-db-init.sh"))}
+  owner: ubuntu:ubuntu
+  permissions: "0755"
 - path: /home/ubuntu/.etleap
   content: |
     ${indent(4, var.config)}
@@ -97,6 +105,9 @@ runcmd:
 - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 - "service docker restart"
 - ${var.db_init}
+%{ if var.app_role == "main" ~}
+- ${var.influx_db_init}
+%{ endif ~}
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
 - "apt-get update && apt-get -y upgrade"
