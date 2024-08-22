@@ -7,7 +7,7 @@ Enables pipelines to [Apache Iceberg](https://iceberg.apache.org/) destinations.
 
 ## Upgrade instructions
 
-This update will require replacing the EMR cluster, and this will cause 15-20 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+This upgrade will replace the application node(s) and the EMR cluster, and this will cause about 30 minutes of downtime.
 By default, this update requires Amazon Timestream for InfluxDB to be available in the region Etleap is deployed to, which is currently the following regions: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`, and `eu-north-1`. If you are deploying Etleap in a region that's not in this list, you will need to create a secondary VPC in one of these regions and peer the primary VPC to it. To do this, please follow the instructions in the README.
 
 # Release 1.8.14
