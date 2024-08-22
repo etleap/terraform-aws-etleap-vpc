@@ -461,3 +461,9 @@ resource "aws_iam_policy_attachment" "kinesis_app_permissions_policy" {
   roles      = [aws_iam_role.app.name]
   policy_arn = aws_iam_policy.kinesis_app_permissions_policy.arn
 }
+
+resource "aws_iam_policy_attachment" "app_intermediate_get_scripts_policy" {
+  name       = "Intermediate Bucket Script Access"
+  roles      = [aws_iam_role.app.name]
+  policy_arn = aws_iam_policy.intermediate_get_scripts_policy.arn
+}

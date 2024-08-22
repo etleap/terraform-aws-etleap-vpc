@@ -83,11 +83,6 @@ write_files:
     ${indent(4, file("${path.module}/db-init.sh"))}
   owner: ubuntu:ubuntu
   permissions: "0755"
-- path: /tmp/influx-db-init.sh
-  content: |
-    ${indent(4, file("${path.module}/influx-db-init.sh"))}
-  owner: ubuntu:ubuntu
-  permissions: "0755"
 - path: /home/ubuntu/.etleap
   content: |
     ${indent(4, var.config)}

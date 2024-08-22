@@ -34,7 +34,7 @@ module "main_app" {
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
   
   # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
-  influx_db_init = "/tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
+  influx_db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.influx_db_init_script.key} /tmp/influx-db-init.sh && chmod 0755 /tmp/influx-db-init.sh && /tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
 }
 
 module "secondary_app" {
@@ -73,8 +73,7 @@ module "secondary_app" {
   db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
 
   # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
-  influx_db_init = "/tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
-
+  influx_db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.influx_db_init_script.key} /tmp/influx-db-init.sh && chmod 0755 /tmp/influx-db-init.sh && /tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
 }
 
 resource "aws_network_interface" "main_app" {

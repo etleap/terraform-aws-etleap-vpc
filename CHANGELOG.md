@@ -1,3 +1,6 @@
+# Release 1.9.1
+Changes the way that the InfluxDB initialization script is obtained by the EC2 instances. This is to avoid some deployments hitting the 16k character limit for the `user_data` property. Instead of using the `user_data` property, the script is stored in S3 and fetched on EC2 instance startup.
+
 # Release 1.9.0
 
 Enables pipelines to [Apache Iceberg](https://iceberg.apache.org/) destinations. This version includes:

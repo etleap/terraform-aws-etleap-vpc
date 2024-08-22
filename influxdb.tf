@@ -27,3 +27,9 @@ module "influx_db_password" {
 resource "aws_secretsmanager_secret" "influx_db_api_token" {
   name = "EtleapInfluxDbApiToken${local.resource_name_suffix}"
 }
+
+resource "aws_s3_object" "influx_db_init_script" {
+  bucket  = aws_s3_bucket.intermediate.id
+  key     = "init-scripts/influx_db_init.sh"
+  source  = "${path.module}/templates/influx-db-init.sh"
+}
