@@ -3,7 +3,9 @@ Contains templates for Etleap VPC deployments.
 # Creating a new deployment
 
 Below is the minimal module instantiation to run Etleap inside your own VPC.
-This will create a new VPC, and deploy Etleap and its associated resources inside.
+This will create a new VPC, and deploy Etleap and its associated resources inside. 
+
+Note: This deployment requires Amazon Timestream for InfluxDB to be available in the region Etleap is deployed to, which are currently the following regions: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`, and `eu-north-1`. If you are deploying Etleap in a region that's not in this list, you will need to create a secondary VPC in one of these regions and peer the primary VPC to it. To do this, please follow the instructions for [Deploying Etleap in a region where Amazon Timestream for InfluxDB is not available](#deploying-etleap-in-a-region-where-amazon-timestream-for-influxdb-is-not-available).
 
 ## New VPC deployment
 
@@ -255,3 +257,242 @@ Downtime:
 
 5. Once the main instance is online, apply the remaining changes with `terraform apply`. If HA Mode is enabled, this will also replace the secondary application instace. 
 6. Manually terminate the old cluster from the AWS Console or the CLI.
+
+## Deploying Etleap in a region where Amazon Timestream for InfluxDB is not available 
+
+In order to run Etleap in a region that doesn't support Amazon Timestream you will need to provide an InfluxDB endpoint and password (variables `influx_db_hostname` and `influx_db_password_arn`). Follow the steps below to instantiate the Amazon Timestream for InfluxDB instance in one of the supported regions, and creating a VPC peering connection from the Etleap module's VPC to it.
+
+1. Create a new Terraform (.tf) file in the same directory as the file instantiating the `etleap/etleap-vpc/aws` module, with the following code.
+
+```
+provider "aws" {
+  alias   = "secondary"
+  region  = <region>
+  version = "~> 5.61"
+}
+
+data "aws_region" "main" {
+  provider = aws
+}
+
+data "aws_region" "secondary" {
+  provider = aws.secondary
+}
+
+data "aws_vpc" "main" {
+  id = module.<module-name>.vpc_id
+}
+
+locals {
+  deployment_id                             = <deployment_id>
+  main_vpc_private_route_table_id           = module.vpc.private_route_table_id
+
+  # The CIDR blocks can be adjusted to fit the requirements
+  secondary_vpc_cidr_block                  = "172.0.0.0/27"
+  secondary_vpc_private_subnet_a_cidr_block = "172.0.0.0/28"
+  secondary_vpc_private_subnet_b_cidr_block = "172.0.0.16/28"
+  secondary_region                          = data.aws_region.secondary.name
+
+  main_vpc_id                               = data.aws_vpc.main.id
+  main_vpc_region                           = data.aws_region.main.name
+  main_vpc_cidr_block                       = data.aws_vpc.main.cidr_block
+
+  default_tags = merge({
+    Deployment = local.deployment_id
+  })
+}
+
+# Password for InfluxDB
+resource "random_password" "secret_value" {
+  length  = 20
+  special = false
+  lifecycle {
+    ignore_changes = [length, lower, min_lower, min_numeric, min_special, min_upper, numeric, special, upper, keepers]
+  }
+}
+
+resource "aws_secretsmanager_secret" "influxdb_password" {
+  name          = "EtleapInfluxDbPassword${local.deployment_id}"
+  tags          = local.default_tags
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "influxdb_password" {
+  secret_id     = aws_secretsmanager_secret.influxdb_password.id
+  secret_string = random_password.secret_value.result
+}
+
+# InfluxDB
+resource "aws_timestreaminfluxdb_db_instance" "influx_db" {
+  name                   = "etleap-ingest-metrics-${local.deployment_id}"
+  username               = "root"
+  password               = aws_secretsmanager_secret_version.influxdb_password.secret_string
+  db_instance_type       = "db.influx.medium"
+  vpc_subnet_ids         = [aws_subnet.subnet_a_private_influx.id, aws_subnet.subnet_b_private_influx.id]
+  vpc_security_group_ids = [aws_security_group.influxdb.id]
+  allocated_storage      = 100
+  organization           = "etleap"
+  bucket                 = "raw_bucket"
+  publicly_accessible    = false
+  deployment_type        = var.ha_mode ? "WITH_MULTIAZ_STANDBY" : "SINGLE_AZ"
+  tags                   = local.default_tags
+  provider               = aws.secondary
+}
+
+# All VPC resources
+resource "aws_vpc" "etleap_influx" {
+  tags                 = merge({Name = "Etleap Influx VPC ${local.deployment_id}"}, local.default_tags)
+  cidr_block           = local.secondary_vpc_cidr_block
+  enable_dns_hostnames = true
+  provider             = aws.secondary
+}
+
+resource "aws_subnet" "subnet_a_private_influx" {
+  vpc_id            = aws_vpc.etleap_influx.id
+  cidr_block        = local.secondary_vpc_private_subnet_a_cidr_block
+
+  availability_zone = "${local.secondary_region}a"
+  tags              = merge({Name = "Etleap Secondary VPC Subnet A"}, local.default_tags)
+  provider          = aws.secondary
+}
+
+resource "aws_subnet" "subnet_b_private_influx" {
+  vpc_id            = aws_vpc.etleap_influx.id
+  cidr_block        = local.secondary_vpc_private_subnet_b_cidr_block
+
+  availability_zone = "${local.secondary_region}b"
+  tags              = merge({Name = "Etleap Secondary VPC Subnet B"}, local.default_tags)
+  provider          = aws.secondary
+}
+
+resource "aws_security_group" "influxdb" {
+  tags        = merge({Name = "Etleap Influx Security Group"}, local.default_tags)
+  name        = "Etleap InfluxDB Supplemental"
+  description = "Etleap InfluxDB Supplemental"
+  vpc_id      = aws_vpc.etleap_influx.id
+  provider    = aws.secondary
+}
+
+resource "aws_security_group_rule" "app-to-influxdb" {
+  type               = "ingress"
+  from_port          = 8086
+  to_port            = 8086
+  protocol           = "tcp"
+  security_group_id  = aws_security_group.influxdb.id
+  provider           = aws.secondary
+  cidr_blocks        = [local.main_vpc_cidr_block]
+}
+
+# VPC peering resources
+resource "aws_vpc_peering_connection" "secondary_to_main" {
+  peer_vpc_id   = local.main_vpc_id
+  vpc_id        = aws_vpc.etleap_influx.id
+  peer_region   = local.main_vpc_region
+  provider      = aws.secondary
+  tags          = merge({Name = "Etleap Influx Peering Connection"}, local.default_tags)
+}
+
+# Accepter's side of the connection.
+resource "aws_vpc_peering_connection_accepter" "peer" {
+  tags                      = merge({Name = "Etleap Influx Peer Connection Accceptor ${local.deployment_id}"}, local.default_tags)
+  vpc_peering_connection_id = aws_vpc_peering_connection.secondary_to_main.id
+  auto_accept               = true
+  accepter {
+    allow_remote_vpc_dns_resolution = true
+  }
+}
+
+resource "aws_route_table" "private_influx" {
+  tags     = merge({Name = "Etleap Private Influx Supplemental ${local.deployment_id}"}, local.default_tags)
+  vpc_id   = aws_vpc.etleap_influx.id
+  provider = aws.secondary
+}
+
+resource "aws_route" "private_route_to_main" {
+  route_table_id            = aws_route_table.private_influx.id
+  destination_cidr_block    = local.main_vpc_cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.secondary_to_main.id
+  provider                  = aws.secondary
+}
+
+resource "aws_route_table_association" "a_private_influx" {
+  subnet_id      = aws_subnet.subnet_a_private_influx.id
+  route_table_id = aws_route_table.private_influx.id
+  provider       = aws.secondary
+}
+
+resource "aws_route_table_association" "b_private_influx" {
+  subnet_id      = aws_subnet.subnet_b_private_influx.id
+  route_table_id = aws_route_table.private_influx.id
+  provider       = aws.secondary
+}
+
+# Main VPC route
+resource "aws_route" "main_to_influx_route" {
+  route_table_id            = local.main_vpc_private_route_table_id
+  destination_cidr_block    = local.secondary_vpc_cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.secondary_to_main.id
+}
+
+```
+
+2. Make the following changes in your new file: 
+
+  - Replace `<region>` in the secondary AWS provider with one of the regions that support Amazon Timestream for InfluxDB: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`, or `eu-north-1`.
+  ```
+  provider "aws" {
+    alias   = "secondary"
+    region  = <region>
+    version = "~> 5.61"
+  }
+  ```
+
+  - Replace `<module-name>` with the module name you chose for your [Etleap VPC deployment](#new-vpc-deployment).
+  ```
+  data "aws_vpc" "main" {
+    id = module.<module-name>.vpc_id
+  }
+  ```
+
+  - In the `locals` block, replace `<deployment-id>` with the value that you used in your [Etleap VPC module](#new-vpc-deployment), and `<module-name>` with the same one used above.ed in [New VPC deployment](#new-vpc-deployment). Additionally, replace the module name to the same one used above.
+  ```
+  locals {
+    deployment_id                   = <deployment-id>
+    main_vpc_private_route_table_id = module.<module-name>.private_route_table_id
+
+    # ...
+  }
+  ```
+
+  - [Optional] In the case you have a CIDR range conflict in your secondary region, adjust the `secondary_vpc_cidr_block`, `secondary_vpc_private_subnet_a_cidr_block`, and `secondary_vpc_private_subnet_b_cidr_block` to a range that does not conflict with other CIDR ranges in use. Please ensure that the range selected for `secondary_vpc_cidr_block` uses subnet mask "/27" and the ranges selected for `secondary_vpc_private_subnet_a_cidr_block` and `secondary_vpc_private_subnet_b_cidr_block` use subnet mask "/28".
+  ```
+  locals {
+    # ...
+
+    secondary_vpc_cidr_block                  = "172.0.0.0/27"
+    secondary_vpc_private_subnet_a_cidr_block = "172.0.0.0/28"
+    secondary_vpc_private_subnet_b_cidr_block = "172.0.0.16/28"
+    
+    # ...
+  }
+  ```
+
+3. Additionally, pass these parameters to the module.
+
+In the module definition created in [New VPC deployment](#new-vpc-deployment), add the following lines.
+```
+  influx_db_hostname                = aws_timestreaminfluxdb_db_instance.influx_db.endpoint
+  influx_db_password_arn            = aws_secretsmanager_secret.influxdb_password.arn
+  is_influx_db_in_secondary_region  = true
+```
+
+4. To initialize Etleap deployment, run the following commands to recreate terraform resources:
+
+```
+terraform init
+terraform apply -target aws_timestreaminfluxdb_db_instance.influx_db
+terraform apply
+```
