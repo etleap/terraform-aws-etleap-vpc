@@ -23,7 +23,7 @@ locals {
 
   is_influx_db_in_secondary_region         = var.influx_db_hostname != null && var.influx_db_password_arn != null 
   influx_db_username                       = "root"
-  influx_db_password                       = data.aws_secretsmanager_secret_version.influx_db_password.secret_string
+  influx_db_password                       = var.is_influx_db_in_secondary_region ? data.aws_secretsmanager_secret_version.influx_db_password[0].secret_string : module.influx_db_password[0].secret_string
 
   context = {
     deployment_id                            = var.deployment_id
@@ -73,6 +73,7 @@ locals {
 }
 
 data "aws_secretsmanager_secret_version" "influx_db_password" {
-  secret_id = var.is_influx_db_in_secondary_region ? var.influx_db_password_arn : module.influx_db_password[0].arn
+  count     = var.is_influx_db_in_secondary_region ? 1 : 0
+  secret_id = var.influx_db_password_arn
 }
 

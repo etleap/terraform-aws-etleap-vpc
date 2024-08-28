@@ -1,3 +1,7 @@
+# Release 1.9.3
+
+Fixed an issue introduced in Release 1.9.0 with the creation and read order for the InfluxDB password. The issue occurred when running InfluxDB in a separate region, and required `terraform apply` to be run twice when creating a new VPC deployment.
+
 # Release 1.9.2
 
 Fixed an issue that would prevent the application from starting in VPCs whose CIDR range overlaps with `172.17.0.0/16`.
