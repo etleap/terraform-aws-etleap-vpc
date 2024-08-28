@@ -4,7 +4,7 @@ Fixed an issue that would prevent the application from starting in VPCs whose CI
 
 ## Upgrade instructions
 
-This upgrade will replace the application node(s), and this will cause about 15 minutes of downtime for the UI, API and Pipelines.
+The upgrade will replace the 3 Zookeeper nodes, and application node(s). This will cause about 15 minutes of downtime for the UI, API and Pipelines.
 
 # Release 1.9.1
 Changes the way that the InfluxDB initialization script is obtained by the EC2 instances. This is to avoid some deployments hitting the 16k character limit for the `user_data` property. Instead of using the `user_data` property, the script is stored in S3 and fetched on EC2 instance startup.
