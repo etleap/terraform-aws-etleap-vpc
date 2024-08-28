@@ -96,7 +96,6 @@ write_files:
     region = ${var.region}
 
 runcmd:
-- "sed -i 's/\"dns\": \\[\".*\"\\]/\"dns\": [\"169.254.169.253\"]/g' /etc/docker/daemon.json"
 - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 - "service docker restart"
 - ${var.db_init}

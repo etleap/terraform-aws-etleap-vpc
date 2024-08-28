@@ -22,7 +22,6 @@ sudo apt-get install docker-ce=5:24.0.7-1~ubuntu.20.04~focal docker-compose=1.25
 printf "[ZOOKEEPER_INIT] Installing pass gnupg2 awscli"
 sudo apt-get install pass gnupg2 awscli -q -y
 
-printf "{ \"userland-proxy\": false, \"dns\": [\"10.0.0.2\"] }" | sudo tee /etc/docker/daemon.json
 sudo gpasswd -a ubuntu docker
 
 printf "[ZOOKEEPER_INIT] Reinstall docker-py"

@@ -383,7 +383,7 @@ resource "null_resource" "are_cidr_ranges_valid" {
 
 variable "amis" {
   default = {
-    app = "ami-0a45bb0027bebfe43" # Ubuntu 20.04 LTS
+    app = "ami-03036c2d4d91bb77c" # Ubuntu 20.04 LTS
   }
 }
 

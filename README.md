@@ -60,7 +60,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `first_name` | The first name to use when creating the first Etleap user account. | `string` | n/a | yes |
 | `last_name` | The last name to use when creating the first Etleap user account. | `string` | n/a | yes |
 | `email` | The email to use when creating the first Etleap user account. | `string` | n/a | yes |
-| `vcp_id` | Existing VPC to deploy Etleap in. | `string` | n/a | no |
+| `vcp_id` | Existing VPC to deploy Etleap in. VPC's that have a CIDR range that overlaps `192.168.0.1/24` are not currently supported. | `string` | n/a | no |
 | `public_subnets` | Existing public subnets to deploy Etleap in. | `list(string)` | n/a | no |
 | `private_subnets` | Existing private subnets to deploy Etleap in. | `list(string)` | n/a | no |
 | `extra_security_groups` | Grant access to the DB, EC2 instance, and EMR cluster to the specified Security Groups | `list(string)` | `[]` | no |
