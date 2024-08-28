@@ -4,10 +4,10 @@ resource "aws_iam_policy_attachment" "secrets" {
   policy_arn = aws_iam_policy.get_secrets_and_params.arn
 }
 
-resource "aws_iam_policy_attachment" "ec2_describe" {
-  name       = "Etleap EC2 Describe"
+resource "aws_iam_policy_attachment" "app_various_limited" {
+  name       = "Etleap App Specific Permissions"
   roles      = [aws_iam_role.app.name]
-  policy_arn = aws_iam_policy.ec2_describe.arn
+  policy_arn = aws_iam_policy.app_various_limited.arn
 }
 
 resource "aws_iam_policy_attachment" "cloudwatch_metric_data" {
@@ -65,16 +65,6 @@ resource "aws_iam_role_policy_attachment" "emr_default_role" {
 resource "aws_iam_role_policy_attachment" "emr_default_instance_fleet" {
   role       = aws_iam_role.emr_default_role.name
   policy_arn = aws_iam_policy.emr_default_instance_fleet.arn
-}
-
-resource "aws_iam_role_policy_attachment" "allow_sns_put" {
-  role       = aws_iam_role.app.name
-  policy_arn = aws_iam_policy.allow_sns_put.arn
-}
-
-resource "aws_iam_role_policy_attachment" "dynamodb_crud" {
-  role       = aws_iam_role.app.name
-  policy_arn = aws_iam_policy.dynamodb_crud.arn
 }
 
 resource "aws_iam_role" "zookeeper" {
@@ -164,27 +154,88 @@ resource "aws_iam_policy" "get_secrets_and_params" {
 EOF
 }
 
-resource "aws_iam_policy" "ec2_describe" {
+# All app instance specific permissions that are not used by other instances
+# Organized in a single policy to avoid breaching the 10 policy per role limit
+resource "aws_iam_policy" "app_various_limited" {
   tags   = local.default_tags
-  name   = "EtleapEC2Describe${local.resource_name_suffix}"
+  name   = "Etleap-${var.deployment_id}-App-Various-Limited-Policy"
   policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeInstances",
-                "ec2:DescribeVpcs",
-                "ec2:DescribeSubnets",
-                "autoscaling:DescribeAutoScalingInstances",
-                "elasticmapreduce:ListInstanceFleets",
-                "elasticmapreduce:ModifyInstanceFleet"
-            ],
-            "Resource": [
-                "*"
-            ]
-        }
+      {
+        "Sid": "EC2Describe",
+        "Effect": "Allow",
+        "Action": [
+          "ec2:DescribeInstances",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSubnets",
+          "autoscaling:DescribeAutoScalingInstances",
+          "elasticmapreduce:ListInstanceFleets",
+          "elasticmapreduce:ModifyInstanceFleet"
+        ],
+        "Resource": [
+          "*"
+        ]
+      },
+      {
+        "Sid": "InfluxDbApiTokenSecretPut",
+        "Effect": "Allow",
+        "Action": "secretsmanager:PutSecretValue",
+        "Resource": "${local.context.influx_db_api_token_arn}"
+      },
+      {
+        "Sid": "DmsKinesisAccess",
+        "Effect": "Allow",
+        "Action": [
+          "kinesis:ListShards",
+          "kinesis:GetShardIterator",
+          "kinesis:GetRecords",
+          "kinesis:DescribeStream",
+          "kinesis:PutRecord*",
+          "kinesis:CreateStream",
+          "kinesis:IncreaseStreamRetentionPeriod"
+        ],
+        "Resource": [
+            "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-dms-*"
+        ]
+      },
+      {
+        "Sid": "InitScriptsGet",
+        "Effect":"Allow",
+        "Action":[
+          "s3:GetObject"
+        ],
+        "Resource":[
+          "arn:aws:s3:::${aws_s3_bucket.intermediate.id}/init-scripts/*"
+        ]
+      },
+      {
+        "Sid": "DynamoDBTableAccess",
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:ConditionCheckItem",
+          "dynamodb:PutItem",
+          "dynamodb:DescribeTable",
+          "dynamodb:DeleteItem",
+          "dynamodb:GetItem",
+          "dynamodb:Scan",
+          "dynamodb:Query",
+          "dynamodb:UpdateItem"
+        ],
+        "Resource": [
+          "${aws_dynamodb_table.activity-log.arn}",
+          "${aws_dynamodb_table.activity-log.arn}/index/*"
+        ]
+      },
+      {
+        "Sid": "SnsAllowPublishToAny",
+        "Effect": "Allow",
+        "Action": "sns:Publish",
+        "Resource": "*"
+      }
     ]
 }
 EOF
@@ -271,55 +322,6 @@ resource "aws_iam_policy" "assume_roles" {
         "sts:AssumeRole"
       ],
       "Resource": ${jsonencode(var.roles_allowed_to_be_assumed)}
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "allow_sns_put" {
-  tags   = local.default_tags
-  name   = "Etleap_sns_put${local.resource_name_suffix}"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Id": "SnsAllowOutboundMessages",
-  "Statement": [{
-    "Sid": "SnsAllowPublishToAny",
-    "Effect": "Allow",
-    "Action": "sns:Publish",
-    "Resource": "*"
-  }]
-}
-EOF
-}
-
-resource aws_iam_policy "dynamodb_crud" {
-  tags   = local.default_tags
-  name   = "Etleap-dynamodb-crud${local.resource_name_suffix}"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "DynamoDBTableAccess",
-      "Effect": "Allow",
-      "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:PutItem",
-        "dynamodb:DescribeTable",
-        "dynamodb:DeleteItem",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:Query",
-        "dynamodb:UpdateItem"
-      ],
-      "Resource": [
-        "${aws_dynamodb_table.activity-log.arn}",
-        "${aws_dynamodb_table.activity-log.arn}/index/*"
-      ]
     }
   ]
 }
@@ -428,42 +430,4 @@ resource "aws_iam_policy_attachment" "kinesis_emr_permissions_policy" {
   name       = "EtleapEMRKinesisPermissionPolicy${local.resource_name_suffix}"
   roles      = [aws_iam_role.emr.name]
   policy_arn = aws_iam_policy.kinesis_emr_permissions_policy.arn
-}
-
-resource "aws_iam_policy" "kinesis_app_permissions_policy" {
-  name = "EtleapAppKinesisPermissionPolicy${local.resource_name_suffix}"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "kinesis:ListShards",
-        "kinesis:GetShardIterator",
-        "kinesis:GetRecords",
-        "kinesis:DescribeStream",
-        "kinesis:PutRecord*",
-        "kinesis:CreateStream",
-        "kinesis:IncreaseStreamRetentionPeriod"
-      ],
-      "Resource": [
-          "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-dms-*"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy_attachment" "kinesis_app_permissions_policy" {
-  name       = "EtleapAppKinesisPermissionPolicy${local.resource_name_suffix}"
-  roles      = [aws_iam_role.app.name]
-  policy_arn = aws_iam_policy.kinesis_app_permissions_policy.arn
-}
-
-resource "aws_iam_policy_attachment" "app_intermediate_get_scripts_policy" {
-  name       = "Intermediate Bucket Script Access"
-  roles      = [aws_iam_role.app.name]
-  policy_arn = aws_iam_policy.intermediate_get_scripts_policy.arn
 }

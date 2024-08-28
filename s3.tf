@@ -91,26 +91,6 @@ resource "aws_iam_policy" "intermediate" {
 EOF
 }
 
-resource "aws_iam_policy" "intermediate_get_scripts_policy" {
-  tags = local.default_tags
-  name = "EtleapIntermediateGetScripts${local.resource_name_suffix}"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement":[{
-    "Effect":"Allow",
-    "Action":[
-      "s3:GetObject"
-    ],
-    "Resource":[
-      "arn:aws:s3:::${aws_s3_bucket.intermediate.id}/init-scripts/*"
-    ]
-  }]
-}
-EOF
-}
-
 resource "aws_iam_policy_attachment" "intermediate" {
   name       = "Intermediate Bucket Access"
   roles      = [aws_iam_role.intermediate.name]

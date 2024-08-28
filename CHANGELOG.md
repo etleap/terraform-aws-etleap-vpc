@@ -1,3 +1,7 @@
+# Release 1.9.4
+
+Fixes an issue introduced in version 1.9.0 that broke upgrades in AWS accounts with the default limit of 10 IAM policies per IAM role. We avoid hitting the limit by combining multiple policies into one.
+
 # Release 1.9.3
 
 Fixed an issue introduced in Release 1.9.0 with the creation and read order for the InfluxDB password. The issue occurred when running InfluxDB in a separate region, and required `terraform apply` to be run twice when creating a new VPC deployment.

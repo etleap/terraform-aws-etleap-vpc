@@ -202,21 +202,3 @@ resource "aws_ssm_parameter" "app_private_ip" {
   type        = "String"
   value       = local.app_main_private_ip
 }
-
-resource "aws_iam_role_policy" "secretsmanager_write_access" {
-  name   = "SecretsManagerWriteAccess${local.resource_name_suffix}"
-  role   = aws_iam_role.app.name
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "secretsmanager:PutSecretValue",
-      "Resource": "${local.context.influx_db_api_token_arn}"
-    }
-  ]
-}
-EOF
-}
