@@ -12,6 +12,7 @@
 ### Development
 
 - [ ] Validated working in a test VPC.
+- [ ] Validated that any new resources follow the [naming conventions](https://www.notion.so/etleap/Evolving-the-Terraform-VPC-Module-52f081d09ded4d9291af8c9f8b32a7b2?pvs=4#89d4637048264ddf89803d0815cc4207).
 - [ ] `CHANGELOG.md` has been updated.
 - [ ] `README.md` has been updated with the new version; variables and outputs has been added/updated if needed.
 

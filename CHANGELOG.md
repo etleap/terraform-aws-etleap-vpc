@@ -1,3 +1,6 @@
+# Release 1.9.5
+Fixes an issue introduced in version 1.9.0 that broke deployments whose `deployment_id` input variable was longer than 11 characters. The issue was caused by Amazon Timestream for InfluxDB having a maximum instance name length of 40 characters. Reduces the Amazon Timestream for InfluxDB instance to maximum 40 characters and introduces validation to ensure `deployment_id` variable of 25 characters. The changes are backward compatible with all deployments, and upgrading to this from version 1.9.X is a no-op.
+
 # Release 1.9.4
 
 Fixes an issue introduced in version 1.9.0 that broke upgrades in AWS accounts with the default limit of 10 IAM policies per IAM role. We avoid hitting the limit by combining multiple policies into one.

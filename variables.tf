@@ -3,6 +3,11 @@
 
 variable "deployment_id" {
   description = "The Deployment ID for this deployment. If you don't have one, please contact Etleap Support."
+
+  validation {
+    condition = length(var.deployment_id) <= 25
+    error_message = "The variable deployment ID must be 25 characters or fewer."
+  }
 }
 
 variable "vpc_cidr_block_1" {

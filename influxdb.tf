@@ -1,6 +1,6 @@
 resource "aws_timestreaminfluxdb_db_instance" "influx_db" {
   count                  = var.is_influx_db_in_secondary_region ? 0 : 1
-  name                   = "etleap-ingest-metrics${local.resource_name_suffix}"
+  name                   = "Etleap-${var.deployment_id}-influx"
   username               = local.influx_db_username
   password               = local.influx_db_password
   db_instance_type       = "db.influx.medium"
@@ -13,6 +13,14 @@ resource "aws_timestreaminfluxdb_db_instance" "influx_db" {
   deployment_type        = var.ha_mode ? "WITH_MULTIAZ_STANDBY" : "SINGLE_AZ"
   tags                   = local.default_tags
   depends_on             = [ null_resource.are_influx_db_hostname_and_password_valid ]
+
+  // Ignoring the name change as we had to change it due to the AWS-imposed limit is 40 characters, 
+  // but some instances were already created with the old pattern and renaming would cause instances to be replaced.
+  lifecycle {
+    ignore_changes = [
+      "name"
+    ]
+  }
 }
 
 module "influx_db_password" {
