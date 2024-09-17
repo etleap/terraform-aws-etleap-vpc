@@ -40,13 +40,31 @@ resource "aws_security_group" "dms" {
   name        = "Etleap-DMS"
   description = "DMS group"
   vpc_id      = local.vpc_id
+}
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+# Required to access AWS APIs
+resource "aws_security_group_rule" "dms-egress-443" {
+  count             = var.disable_cdc_support ? 0 : 1
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.dms[0].id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "dms-egress-external" {
+  // the "for_each" argument must be a map, or set of strings; converting the list of maps
+  // to a single map with unique keys.
+  // We can have multiple ports for the same cidr_block; to get around this, we use the list 
+  // index as the key
+  for_each          = var.disable_cdc_support ? {} : { for idx, c in var.outbound_access_destinations: idx => c }
+  type              = "egress"
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.dms[0].id
+  cidr_blocks       = [each.value.cidr_block]
 }
 
 data "aws_iam_policy_document" "dms_assume_role" {

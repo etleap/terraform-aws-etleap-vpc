@@ -41,3 +41,41 @@ resource "aws_s3_object" "influx_db_init_script" {
   key     = "init-scripts/influx_db_init.sh"
   source  = "${path.module}/templates/influx-db-init.sh"
 }
+
+resource "aws_security_group" "influxdb" {
+  count       = var.is_influx_db_in_secondary_region ? 0 : 1
+  tags        = merge({ Name = "Etleap InfluxDB" }, local.default_tags)
+  name        = "Etleap InfluxDB"
+  description = "Etleap InfluxDB"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_security_group_rule" "influxdb-ingress-8086-app" {
+  count                    = var.is_influx_db_in_secondary_region ? 0 : 1
+  type                     = "ingress"
+  from_port                = 8086
+  to_port                  = 8086
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.influxdb[0].id
+  source_security_group_id = aws_security_group.app.id
+}
+
+moved {
+  from = aws_security_group_rule.app-to-influxdb
+  to   = aws_security_group_rule.influxdb-ingress-8086-app
+}
+
+resource "aws_security_group_rule" "influxdb-ingress-8086-emr" {
+  count                    = var.is_influx_db_in_secondary_region ? 0 : 1
+  type                     = "ingress"
+  from_port                = 8086
+  to_port                  = 8086
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.influxdb[0].id
+  source_security_group_id = aws_security_group.emr.id
+}
+
+moved {
+  from = aws_security_group_rule.emr-to-influxdb
+  to   = aws_security_group_rule.influxdb-ingress-8086-emr
+}

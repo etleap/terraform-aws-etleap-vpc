@@ -530,6 +530,160 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
   }
 }
 
+resource "aws_security_group" "emr" {
+  tags        = merge({ Name = "Etleap EMR" }, local.default_tags)
+  name        = "Etleap EMR"
+  description = "Etleap EMR Security Group"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_security_group_rule" "emr-ingress-app" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr.id
+  source_security_group_id = aws_security_group.app.id
+}
+
+moved {
+  from = aws_security_group_rule.app-to-emr
+  to   = aws_security_group_rule.emr-ingress-app
+}
+
+resource "aws_security_group_rule" "emr-egress-app" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr.id
+  source_security_group_id = aws_security_group.app.id
+}
+
+resource "aws_security_group_rule" "emr-ingress-emr" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr.id
+  source_security_group_id = aws_security_group.emr.id
+}
+
+moved {
+  from = aws_security_group_rule.emr-to-emr
+  to   = aws_security_group_rule.emr-ingress-emr
+}
+
+resource "aws_security_group_rule" "emr-egress-emr" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr.id
+  source_security_group_id = aws_security_group.emr.id
+}
+
+resource "aws_security_group_rule" "emr-egress-8086-influxdb" {
+  count                    = var.is_influx_db_in_secondary_region ? 0 : 1
+  type                     = "egress"
+  from_port                = 8086
+  to_port                  = 8086
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr.id
+  source_security_group_id = aws_security_group.influxdb[0].id
+}
+
+resource "aws_security_group_rule" "emr-egress-2181-zookeeper" {
+  type                     = "egress"
+  from_port                = 2181
+  to_port                  = 2181
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr.id
+  source_security_group_id = aws_security_group.zookeeper.id
+}
+
+# Required to access apt and other install resources
+resource "aws_security_group_rule" "emr-egress-80" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  security_group_id = aws_security_group.emr.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+# Required to access apt and other install resources and AWS APIs
+resource "aws_security_group_rule" "emr-egress-443" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.emr.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "emr-egress-external" {
+  // the "for_each" argument must be a map, or set of strings; converting the list of maps 
+  // to a single map with unique keys.
+  // We can have multiple ports for the same cidr_block; to get around this, we use the list 
+  // index as the key
+  for_each          = { for idx, c in var.outbound_access_destinations: idx => c}
+  type              = "egress"
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.emr.id
+  cidr_blocks       = [each.value.cidr_block]
+}
+
+# Managed by EMR
+resource "aws_security_group" "emr-master-managed" {
+  tags                   = merge({ Name = "Etleap EMR Master (managed by EMR)" }, local.default_tags)
+  name                   = "EMR Master Managed"
+  description            = "Rules managed by EMR for EMR master"
+  vpc_id                 = local.vpc_id
+  revoke_rules_on_delete = true
+}
+
+resource "aws_security_group" "emr-slave-managed" {
+  tags                   = merge({ Name = "Etleap EMR Slave (managed by EMR)" }, local.default_tags)
+  name                   = "EMR Slave Managed"
+  description            = "Rules managed by EMR for EMR slave"
+  vpc_id                 = local.vpc_id
+  revoke_rules_on_delete = true
+}
+
+resource "aws_security_group" "emr-service-access-managed" {
+  tags                   = merge({ Name = "Etleap EMR Service Access (managed by EMR)" }, local.default_tags)
+  name                   = "EMR Service Access Managed"
+  description            = "Rules managed by EMR for EMR service access"
+  vpc_id                 = local.vpc_id
+  revoke_rules_on_delete = true
+}
+
+resource "aws_security_group_rule" "emr-service-access-managed-ingress-9443-emr-master-managed" {
+  type                     = "ingress"
+  from_port                = 9443
+  to_port                  = 9443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr-service-access-managed.id
+  source_security_group_id = aws_security_group.emr-master-managed.id
+}
+
+moved {
+  from = aws_security_group_rule.emr_master_service_access
+  to   = aws_security_group_rule.emr-service-access-managed-ingress-9443-emr-master-managed
+}
+
+resource "aws_security_group_rule" "emr-service-master-managed-egress-9443-emr-access-managed" {
+  type                     = "egress"
+  from_port                = 9443
+  to_port                  = 9443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr-master-managed.id
+  source_security_group_id = aws_security_group.emr-service-access-managed.id
+}
+
 resource "aws_ssm_parameter" "emr_public_dns" {
   tags        = local.default_tags
   name        = local.context.emr_cluster_config_name

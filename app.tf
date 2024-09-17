@@ -104,6 +104,164 @@ resource "aws_acm_certificate" "etleap" {
   }
 }
 
+resource "aws_security_group" "app" {
+  tags        = merge({ Name = "Etleap App" }, local.default_tags)
+  name        = "Etleap App"
+  description = "Etleap App"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_security_group_rule" "app-ingress-app" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.app.id
+}
+
+moved {
+  from = aws_security_group_rule.app-to-app
+  to   = aws_security_group_rule.app-ingress-app
+}
+
+resource "aws_security_group_rule" "app-egress-app" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.app.id
+}
+
+
+resource "aws_security_group_rule" "app-egress-3306-db" {
+  type                     = "egress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.db.id
+}
+
+resource "aws_security_group_rule" "app-egress-emr" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.emr.id
+}
+
+resource "aws_security_group_rule" "app-ingress-22" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  security_group_id = aws_security_group.app.id
+  cidr_blocks       = var.ssh_access_cidr_blocks
+}
+
+moved {
+  from = aws_security_group_rule.app-allow-ssh
+  to   = aws_security_group_rule.app-ingress-22
+}
+
+resource "aws_security_group_rule" "app-ingress-443" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.app.id
+  cidr_blocks       = var.app_access_cidr_blocks
+}
+
+moved {
+  from = aws_security_group_rule.app-allow-web-ssl
+  to   = aws_security_group_rule.app-ingress-443
+}
+
+resource "aws_security_group_rule" "app-ingress-emr" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.emr.id
+}
+
+moved {
+  from = aws_security_group_rule.emr-to-app
+  to   = aws_security_group_rule.app-ingress-emr
+}
+
+resource "aws_security_group_rule" "app-ingress-dms" {
+  count                    = var.disable_cdc_support ? 0 : 1
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.dms[0].id
+  source_security_group_id = aws_security_group.app.id
+}
+
+moved {
+  from = aws_security_group_rule.dms-to-app[0]
+  to   = aws_security_group_rule.app-ingress-dms[0] 
+}
+
+resource "aws_security_group_rule" "app-egress-2181-zookeeper" {
+  type                     = "egress"
+  from_port                = 2181
+  to_port                  = 2181
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.zookeeper.id
+}
+
+resource "aws_security_group_rule" "app-egress-8086-influxdb" {
+  type                     = "egress"
+  from_port                = 8086
+  to_port                  = 8086
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.influxdb[0].id
+}
+
+# Required to access apt and other install resources, AWS APIs and deployment.etleap.com
+resource "aws_security_group_rule" "app-egress-443" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.app.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+# Required to access apt and other install resources
+resource "aws_security_group_rule" "app-egress-80" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  security_group_id = aws_security_group.app.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "app-egress-external" {
+  // the "for_each" argument must be a map, or set of strings; converting the list of maps 
+  // to a single map with unique keys.
+  // We can have multiple ports for the same cidr_block; to get around this, we use the list 
+  // index as the key.
+  for_each          = { for idx, c in var.outbound_access_destinations: idx => c}
+  type              = "egress"
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.app.id
+  cidr_blocks       = [each.value.cidr_block]
+}
+
 resource "aws_iam_instance_profile" "app" {
   tags = local.default_tags
   name = "EtleapApp${local.resource_name_suffix}"

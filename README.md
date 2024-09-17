@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.9.5"
+  version = "1.10.0"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -87,6 +87,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `resource_tags` | Resource tags to be applied to all resources create by this template. | `map(string, string)` | `{}` | no |
 | `app_access_cidr_blocks` | CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
 | `ssh_access_cidr_blocks` | CIDR ranges that have SSH access to the application instance(s) (port 22).  Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
+| `outbound_access_destinations` | CIDR ranges, ports and protocols to allow outbound access to for pipeline sources and destinations. Defaults to allowing all outbound traffic. Note that regardless of this value, outbound traffic to ports 80 and 443 is always allowed. | `list(map(string, any))` | all outbound traffic | no |
 | `roles_allowed_to_be_assumed` |A list of external roles that can be assumed by the app. When not specified, it defaults to all roles (*) | `list(string)` | `[]` | no |
 | `enable_public_access` |Enable public access to the Etleap deployment. This will create an _Internet facing_ ALB. Defaults to `true`. | `boolean` | `true` | no |
 | `acm_certificate_arn` | "ARN Certificate to use for SSL connections to the Etleap UI. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |

@@ -66,3 +66,132 @@ resource "aws_instance" "zookeeper" {
   })
 
 }
+
+resource "aws_security_group" "zookeeper" {
+  tags   = merge({ Name = "Etleap Zookeeper" }, local.default_tags)
+  name   = "Etleap zookeeper"
+  vpc_id = local.vpc_id
+  lifecycle {
+    ignore_changes = [name, description, tags, tags_all]
+  }
+}
+
+resource "aws_security_group_rule" "zookeeper-ingress-22" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  security_group_id = aws_security_group.zookeeper.id
+  cidr_blocks       = var.ssh_access_cidr_blocks
+}
+
+moved {
+  from = aws_security_group_rule.zookeeper-allow-ssh
+  to   = aws_security_group_rule.zookeeper-ingress-22
+}
+
+# Connections to client port 2181 should be allowed from every running application that needs access to ZK cluster (app, monitor, job, emr, etc.)
+resource "aws_security_group_rule" "zookeeper-ingress-2181-emr" {
+  type                     = "ingress"
+  from_port                = 2181
+  to_port                  = 2181
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.emr.id
+}
+
+moved {
+  from = aws_security_group_rule.emr-to-zookeeper
+  to   = aws_security_group_rule.zookeeper-ingress-2181-emr
+}
+
+resource "aws_security_group_rule" "zookeeper-ingress-2181-app" {
+  type                     = "ingress"
+  from_port                = 2181
+  to_port                  = 2181
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.app.id
+}
+
+moved {
+  from = aws_security_group_rule.app-to-zookeeper
+  to   = aws_security_group_rule.zookeeper-ingress-2181-app
+}
+
+# Connections to admin ports ZK 2888 & 3888 should be only allowed from other ZK nodes
+resource "aws_security_group_rule" "zookeeper-ingress-2888-zookeeper" {
+  type                     = "ingress"
+  from_port                = 2888
+  to_port                  = 2888
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.zookeeper.id
+}
+
+moved {
+  from = aws_security_group_rule.zookeeper-in-2888
+  to   = aws_security_group_rule.zookeeper-ingress-2888-zookeeper
+}
+
+resource "aws_security_group_rule" "zookeeper-ingress-3888-zookeeper" {
+  type                     = "ingress"
+  from_port                = 3888
+  to_port                  = 3888
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.zookeeper.id
+}
+
+moved {
+  from = aws_security_group_rule.zookeeper-in-3888
+  to   = aws_security_group_rule.zookeeper-ingress-3888-zookeeper
+}
+
+resource "aws_security_group_rule" "zookeeper-egress-2888-zookeeper" {
+  type                     = "egress"
+  from_port                = 2888
+  to_port                  = 2888
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.zookeeper.id
+}
+
+moved {
+  from = aws_security_group_rule.zookeeper-out-2888
+  to   = aws_security_group_rule.zookeeper-egress-2888-zookeeper
+}
+
+resource "aws_security_group_rule" "zookeeper-egress-3888-zookeeper" {
+  type                     = "egress"
+  from_port                = 3888
+  to_port                  = 3888
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.zookeeper.id
+  source_security_group_id = aws_security_group.zookeeper.id
+}
+
+moved {
+  from = aws_security_group_rule.zookeeper-out-3888
+  to   = aws_security_group_rule.zookeeper-egress-3888-zookeeper
+}
+
+# Required to access apt and other install resources, AWS APIs and deployment.etleap.com
+resource "aws_security_group_rule" "zookeeper-egress-443" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.zookeeper.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+# Required to access apt and other install resources
+resource "aws_security_group_rule" "zookeeper-egress-80" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  security_group_id = aws_security_group.zookeeper.id
+  cidr_blocks       = ["0.0.0.0/0"]
+}

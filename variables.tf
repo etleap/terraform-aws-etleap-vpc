@@ -342,6 +342,34 @@ variable "influx_db_password_arn" {
   description = "The password ARN of the InfluxDB instance if it is deployed in a secondary region. See `is_influx_db_in_secondary_region`."
 }
 
+variable "outbound_access_destinations" {
+  default = [{
+      cidr_block = "0.0.0.0/0"
+      from_port  = 0
+      to_port    = 65535
+      protocol   = "-1"
+    }]
+  type = list(map(string))
+  description = <<EOF
+(Optional) Restrict outbound access for the deployment to the specified list of CIDR blocks, ports and protocol. If unspecified, this will 
+default to the `0.0.0.0/0' CIDR block, and all ports and protocols.
+
+For example, to restrict outbound access to just Postgres DBs running in the 172.18.0.0/16 subnet, use the following definition:
+
+```
+outbound_access_destinations = [{
+  cidr_block = "172.18.0.0/16",
+  from_port  = 5432,
+  to_port    = 5432,
+  protocol   = "tcp"
+}]
+```
+
+The deployment will always have outbound access to ports 80 and 443, for license checking, instance lifecycle purposes (e.g. applying 
+security upgrades), and access to the AWS APIs.
+EOF
+}
+
 locals {
   validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1", 
                                                                     "us-east-2", 

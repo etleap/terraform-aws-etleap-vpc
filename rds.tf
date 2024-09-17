@@ -143,6 +143,27 @@ resource "aws_db_parameter_group" "mysql8-0-etleap" {
   }
 }
 
+resource "aws_security_group" "db" {
+  tags        = merge({ Name = "Etleap DB" }, local.default_tags)
+  name        = "Etleap DB"
+  description = "Etleap DB"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_security_group_rule" "db-ingress-3306-app" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.app.id
+}
+
+moved {
+  from = aws_security_group_rule.app-to-db
+  to   = aws_security_group_rule.db-ingress-3306-app
+}
+
 resource "aws_ssm_parameter" "rds_hostname" {
   tags        = local.default_tags
   name        = local.rds_hostname_config_name

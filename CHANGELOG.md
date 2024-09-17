@@ -1,4 +1,25 @@
+# Release 1.10.0
+
+Allows restricting outbound access to a set of specified CIDR blocks, ports and protocols; See documentation for the `outbound_access_destinations` variable for more details.
+
+## Upgrade instructions
+
+If you encounter the following error, you'll need to a perform a manual rememdiation step:
+
+```
+│ Error: [WARN] A duplicate Security Group rule was found on (sg-098c7b89330fa0745). This may be
+│ a side effect of a now-fixed Terraform issue causing two security groups with
+│ identical attributes but different source_security_group_ids to overwrite each
+│ other in the state. See https://github.com/hashicorp/terraform/pull/2376 for more
+│ information and instructions for recovery. Error: operation error EC2: AuthorizeSecurityGroupEgress, https response error StatusCode: 400, RequestID: 8bf090ad-aafc-4651-a765-961f535d25c4, api error InvalidPermission.Duplicate: the specified rule "peer: 0.0.0.0/0, ALL, ALLOW" already exists
+```
+
+Remediation: identify the `EtleapApp`, `EtleapDms` and `EtleapEMR` security groups. For each of them, remove the Security Group rule that allow traffic to the `0.0.0.0/0` CIDR block, on all ports. There might be more than one. Then run `terraform apply` again to complete the update.
+
+For more details, please see the original Terraform issue: https://github.com/hashicorp/terraform/pull/2376
+
 # Release 1.9.5
+
 Fixes an issue introduced in version 1.9.0 that broke deployments whose `deployment_id` input variable was longer than 11 characters. The issue was caused by Amazon Timestream for InfluxDB having a maximum instance name length of 40 characters. Reduces the Amazon Timestream for InfluxDB instance to maximum 40 characters and introduces validation to ensure `deployment_id` variable of 25 characters. The changes are backward compatible with all deployments, and upgrading to this from version 1.9.X is a no-op.
 
 # Release 1.9.4
