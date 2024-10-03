@@ -220,6 +220,7 @@ resource "aws_security_group_rule" "app-egress-2181-zookeeper" {
 }
 
 resource "aws_security_group_rule" "app-egress-8086-influxdb" {
+  count                    = var.is_influx_db_in_secondary_region ? 0 : 1
   type                     = "egress"
   from_port                = 8086
   to_port                  = 8086

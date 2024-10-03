@@ -1,6 +1,14 @@
+# Release 1.10.1
+
+Fixes a couple of bugs introduced in version 1.10.0:
+1. An issue that prevents `terraform apply` from succeeding when the Influx DB database in a different region than the main deployment.
+2. Duplicate security group rules errors when applying for a VPC that has `enable_streaming_ingestion` set to `true`.
+
 # Release 1.10.0
 
 Allows restricting outbound access to a set of specified CIDR blocks, ports and protocols; See documentation for the `outbound_access_destinations` variable for more details.
+
+If your deployment has `enable_streaming_ingestion` set to `true`, please upgrade to 1.10.1 directly. The upgrade instructions below still apply.
 
 ## Upgrade instructions
 
