@@ -1,3 +1,7 @@
+# Release 1.10.2
+
+Allows specifying a Security Group ID instead of a CIDR block as part of the the `outbound_access_destinations` configuration. 
+
 # Release 1.10.1
 
 Fixes a couple of bugs introduced in version 1.10.0:

@@ -627,13 +627,14 @@ resource "aws_security_group_rule" "emr-egress-external" {
   // to a single map with unique keys.
   // We can have multiple ports for the same cidr_block; to get around this, we use the list 
   // index as the key
-  for_each          = { for idx, c in var.outbound_access_destinations: idx => c}
-  type              = "egress"
-  from_port         = each.value.from_port
-  to_port           = each.value.to_port
-  protocol          = each.value.protocol
-  security_group_id = aws_security_group.emr.id
-  cidr_blocks       = [each.value.cidr_block]
+  for_each                 = { for idx, c in var.outbound_access_destinations : idx => c }
+  type                     = "egress"
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.emr.id
+  cidr_blocks              = contains(keys(each.value), "cidr_block") ? [each.value.cidr_block] : null
+  source_security_group_id = lookup(each.value, "target_security_group_id", null)
 }
 
 # Managed by EMR

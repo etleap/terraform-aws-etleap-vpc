@@ -497,3 +497,32 @@ terraform init
 terraform apply -target aws_timestreaminfluxdb_db_instance.influx_db
 terraform apply
 ```
+
+## Restrict outbound access
+
+By default, we allow all outbound access, on all ports to all IP addresses. 
+The module allows you to restrict outbound access for the deployment to the specified list of CIDR blocks, or specific security groups. 
+For example, to restrict outbound access to just Postgres DBs running in the 172.18.0.0/16 subnet, use the following definition:
+
+```
+outbound_access_destinations = [{
+  cidr_block = "172.18.0.0/16",
+  from_port  = 5432,
+  to_port    = 5432,
+  protocol   = "tcp"
+}]
+```
+
+Alternatively, you can restrict based on a security group ID instead of a CIDR block when the security group is in the same VPC as Etleap is deployed in:
+
+```
+outbound_access_destinations = [{
+  target_security_group_id = "sg-xxxxx",
+  from_port                = 5432,
+  to_port                  = 5432,
+  protocol                 = "tcp"
+}]
+```
+
+> **Warning**
+> The deployment will always have outbound access to ports 80 and 443, for license checking, instance lifecycle purposes (e.g. applying security upgrades), and access to the AWS APIs.
