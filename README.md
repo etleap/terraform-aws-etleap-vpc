@@ -5,14 +5,14 @@ Contains templates for Etleap VPC deployments.
 Below is the minimal module instantiation to run Etleap inside your own VPC.
 This will create a new VPC, and deploy Etleap and its associated resources inside. 
 
-Note: This deployment requires Amazon Timestream for InfluxDB to be available in the region Etleap is deployed to, which are currently the following regions: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`, and `eu-north-1`. If you are deploying Etleap in a region that's not in this list, you will need to create a secondary VPC in one of these regions and peer the primary VPC to it. To do this, please follow the instructions for [Deploying Etleap in a region where Amazon Timestream for InfluxDB is not available](#deploying-etleap-in-a-region-where-amazon-timestream-for-influxdb-is-not-available).
+Note: This deployment requires Amazon Timestream for InfluxDB to be available in the region Etleap is deployed to, which are currently the following regions: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-southeast-3`, `ap-northeast-1`, `ca-central-1`, `eu-central-1`, `eu-west-1`, `eu-west-2`, `eu-west-3`, `eu-north-1`, `eu-south-1`, `eu-south-2` and `me-central-1`. If you are deploying Etleap in a region that's not in this list, you will need to create a secondary VPC in one of these regions and peer the primary VPC to it. To do this, please follow the instructions for [Deploying Etleap in a region where Amazon Timestream for InfluxDB is not available](#deploying-etleap-in-a-region-where-amazon-timestream-for-influxdb-is-not-available).
 
 ## New VPC deployment
 
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.10.1"
+  version = "1.10.3"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -442,7 +442,7 @@ resource "aws_route" "main_to_influx_route" {
 
 2. Make the following changes in your new file: 
 
-  - Replace `<region>` in the secondary AWS provider with one of the regions that support Amazon Timestream for InfluxDB: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`, or `eu-north-1`.
+  - Replace `<region>` in the secondary AWS provider with one of the regions that support Amazon Timestream for InfluxDB: `us-east-1`, `us-east-2`, `us-west-2`, `ap-south-1`, `ap-southeast-1`, `ap-southeast-2`, `ap-southeast-3`, `ap-northeast-1`, `ca-central-1`, `eu-central-1`, `eu-west-1`, `eu-west-2`, `eu-west-3`, `eu-north-1`, `eu-south-1`, `eu-south-2` and `me-central-1`.
   ```
   provider "aws" {
     alias   = "secondary"

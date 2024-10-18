@@ -1,3 +1,7 @@
+# Release 1.10.3
+
+Removes the need to have a secondary VPC for the Amazon Timestream for InfluxDB instance in some AWS regions, as AWS has recently expanded support for Timestream for InfluxDB. Applies to Etleap deployments in the following AWS regions: `ap-southeast-3`, `ca-central-1`, `eu-west-2`, `eu-west-3`, `eu-south-1`, `eu-south-2` and `me-central-1`.
+
 # Release 1.10.2
 
 Allows specifying a Security Group ID instead of a CIDR block as part of the the `outbound_access_destinations` configuration. 

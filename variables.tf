@@ -365,15 +365,22 @@ variable "outbound_access_destinations" {
 
 locals {
   validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1", 
-                                                                    "us-east-2", 
+                                                                    "us-east-2",
                                                                     "us-west-2",
-                                                                    "ap-south-1", 
+                                                                    "ap-south-1",
                                                                     "ap-southeast-1",
-                                                                    "ap-southeast-2", 
-                                                                    "ap-northeast-1", 
-                                                                    "eu-central-1", 
+                                                                    "ap-southeast-2",
+                                                                    "ap-southeast-3",
+                                                                    "ap-northeast-1",
+                                                                    "ca-central-1",
+                                                                    "eu-central-1",
                                                                     "eu-west-1",
-                                                                    "eu-north-1"
+                                                                    "eu-west-2",
+                                                                    "eu-west-3",
+                                                                    "eu-north-1",
+                                                                    "eu-south-1",
+                                                                    "eu-south-2",
+                                                                    "me-central-1"
                                                                   ], data.aws_region.current.name))
   validate_influx_db_hostname_and_password_err_msg = "If you are deploying Etleap in a region that doesn't yet support Amazon Timestream for InfluxDB, then follow the instructions in the README for deploying InfluxDB in a secondary region, set `is_influx_db_in_secondary_region` to `true`, and specify `influx_db_hostname` and `influx_db_password_arn`. If `is_influx_db_in_secondary_region` is set to `false` (default), then neither `influx_db_hostname` or `influx_db_password_arn` should be set."
 }
