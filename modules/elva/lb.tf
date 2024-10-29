@@ -10,36 +10,6 @@ resource "aws_lb" "elva" {
   idle_timeout       = 300
 }
 
-# Get the private IP address assigned to the load balancer for each subnet
-# Used by app to access Elva internally, even when IP addresses have been restricted
-data "aws_network_interface" "lb_subnet_a_ni" {
-  tags = var.tags
-
-  filter {
-    name   = "description"
-    values = ["ELB ${aws_lb.elva.arn_suffix}"]
-  }
-
-  filter {
-    name   = "subnet-id"
-    values = [var.subnet_a_public_id]
-  }
-}
-
-# Get the private IP address assigned to the load balancer for each subnet
-# Used by app to access Elva internally, even when IP addresses have been restricted
-data "aws_network_interface" "lb_subnet_b_ni" {
-  filter {
-    name   = "description"
-    values = ["ELB ${aws_lb.elva.arn_suffix}"]
-  }
-
-  filter {
-    name   = "subnet-id"
-    values = [var.subnet_b_public_id]
-  }
-}
-
 resource "aws_lb_listener" "elva_https" {
   tags              = var.tags
   load_balancer_arn = aws_lb.elva.arn
