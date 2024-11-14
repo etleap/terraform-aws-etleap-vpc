@@ -4,6 +4,7 @@ resource "aws_kms_key" "etleap_encryption_key" {
   deletion_window_in_days = 30
   policy                  = templatefile("${path.module}/kms-policy.json", {
     account_id            = data.aws_caller_identity.current.account_id,
-    resource_name_suffix  = local.resource_name_suffix
+    resource_name_suffix  = local.resource_name_suffix,
+    additional_policies   = var.kms_key_additional_policies
   })
 }

@@ -363,6 +363,28 @@ variable "outbound_access_destinations" {
   description = "(Optional) Restrict outbound access for the deployment to the specified list of CIDR blocks or security groups, ports and protocols. If unspecified, this will default to the `0.0.0.0/0' CIDR block, and all ports and protocols. See the Readme section for details about the usage of this argument: https://registry.terraform.io/modules/etleap/etleap-vpc/aws/latest#restricting-outbound-access."
 }
 
+variable "kms_key_additional_policies" {
+  default = []
+  type = list(object({
+    Sid       = optional(string)
+    Effect    = string
+    Action    = list(string)
+    Principal = map(string)
+    Resource  = string
+    Condition = optional(map(any))
+  }))
+
+  validation {
+    condition = alltrue([
+      for policy in var.kms_key_additional_policies : (policy.Effect == "Allow" || policy.Effect == "Deny" && length(policy.Action) > 0 && length(policy.Principal) > 0 && length(policy.Resource) > 0)
+    ])
+    error_message = "Each policy in 'kms_key_additional_policies' must specify 'Effect', 'Action', 'Principal', and 'Resource'. 'Sid' and 'Condition' are optional."
+  }
+
+  description = "(Optional) List of additional policy statements to be included in the deployment's KMS key's policy."
+}
+
+
 locals {
   validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1", 
                                                                     "us-east-2",

@@ -48,5 +48,19 @@
         }
       }
     }
+    %{ for policy in additional_policies }
+    ,{
+      %{ if policy.Sid != null }
+        "Sid": "${policy.Sid}",
+      %{ endif }
+        "Effect": "${policy.Effect}",
+        "Principal": ${jsonencode(policy.Principal)},
+        "Action": ${jsonencode(policy.Action)},
+        "Resource": "${policy.Resource}"
+      %{ if policy.Condition != null }
+        ,"Condition": ${jsonencode(policy.Condition)}
+      %{ endif }
+    }
+    %{ endfor }
   ]
 }

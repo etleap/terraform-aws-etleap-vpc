@@ -1,3 +1,7 @@
+# Release 1.10.5
+
+Adds a new optional variable, `kms_key_additional_policies`, which allows specifying a list of additional KMS key policy statements to attach to the KMS key created by the module.
+
 # Release 1.10.4
 
 Fixes an issue which in rare cases could block Terraform operations when attempting to upgrade the module. This was resolved by removing some unused references to a load balancer.

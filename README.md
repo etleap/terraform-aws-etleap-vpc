@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.10.4"
+  version = "1.10.5"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -101,7 +101,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `streaming_endpoint_hostname` | The hostname the streaming ingestion webhook will be accessible from. Only has an effect if `enable_streaming_ingestion` is set to `true`. If left empty, the default Load Balancer DNS name will be used. | `string` | `null` | no |
 | `streaming_endpoint_acm_certificate_arn` | ARN Certificate to use for SSL connections to the streaming ingestion webhook. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
 | `streaming_endpoint_access_cidr_blocks` | CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses. | `list(string)` | ``["0.0.0.0/0"]`` | no |
-
+| `kms_key_additional_policies` | List of additional policy statements to be included in the deployment's KMS key's policy. | `list(object({SID = optional(string), Effect = string, Action = list(string), Principal = map(string), Resource = string, Condition = optional(map(any))}))` | `[]` | no |
 
 ## Outputs
 
