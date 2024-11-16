@@ -1,3 +1,9 @@
+# Release 1.10.6
+
+Increases DMS storage to 250 GB from 50 GB to better handle large transactions. Also increases the alarm threshold to 125 GB.
+
+Removed the optional, deprecated `downgrade_cdc` variable and associated DMS instance, as the version is no longer supported, and the underlying issue was addressed in the current version of DMS. 
+
 # Release 1.10.5
 
 Adds a new optional variable, `kms_key_additional_policies`, which allows specifying a list of additional KMS key policy statements to attach to the KMS key created by the module.

@@ -48,10 +48,7 @@ locals {
     has_dms_instance                         = !var.disable_cdc_support
     dms_role                                 = var.disable_cdc_support ? null : aws_iam_role.dms[0].arn
     dms_replication_instance_name            = var.disable_cdc_support ? null : lower(aws_dms_replication_instance.dms[0].replication_instance_id)
-    dms_replication_instance_arn             = var.disable_cdc_support ? null : aws_dms_replication_instance.dms[0].replication_instance_arn
-    has_downgraded_dms_instace               = !var.disable_cdc_support && var.downgrade_cdc
-    dms_downgraded_replication_instance_name = (!var.disable_cdc_support && var.downgrade_cdc) ? aws_dms_replication_instance.dms_downgraded[0].replication_instance_id : null
-    dms_downgraded_replication_instance_arn  = (!var.disable_cdc_support && var.downgrade_cdc) ? aws_dms_replication_instance.dms_downgraded[0].replication_instance_arn : null
+    dms_replication_instance_arn             = var.disable_cdc_support ? null : aws_dms_replication_instance.dms[0].replication_instance_arn    
     account_id                               = local.account_id
     db_address                               = aws_db_instance.db.address
     emr_cluster_config_name                  = "${local.ssm_parameter_prefix}/emr_cluster_dns"

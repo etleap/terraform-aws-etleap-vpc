@@ -350,7 +350,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_disk" {
   }
   period                    = "300"
   statistic                 = "Average"
-  threshold                 = "32212254720"
+  threshold                 = "134217728000" // 125 GB
   alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics

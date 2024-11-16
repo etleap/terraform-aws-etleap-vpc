@@ -3,24 +3,10 @@ resource "aws_dms_replication_instance" "dms" {
   tags                         = merge({Name = "Etleap DMS ${var.deployment_id}"}, local.default_tags)
   replication_instance_class   = var.dms_instance_type
   engine_version               = "3.5.1"
-  allocated_storage            = 50
+  allocated_storage            = 250
   apply_immediately            = true
   preferred_maintenance_window = "sun:10:30-sun:14:30"
   replication_instance_id      = "etleap-dms${local.resource_name_suffix}"
-  replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id
-  vpc_security_group_ids       = [aws_security_group.dms[0].id]
-  publicly_accessible          = true
-}
-
-resource "aws_dms_replication_instance" "dms_downgraded" {
-  count                        = (!var.disable_cdc_support && var.downgrade_cdc) ? 1 : 0
-  tags                         = merge({Name = "Etleap DMS Downgraded ${var.deployment_id}"}, local.default_tags)
-  replication_instance_class   = var.dms_instance_type
-  engine_version               = "3.4.6"
-  allocated_storage            = 50
-  apply_immediately            = true
-  preferred_maintenance_window = "sun:10:30-sun:14:30"
-  replication_instance_id      = "etleap-dms-downgraded${local.resource_name_suffix}"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id
   vpc_security_group_ids       = [aws_security_group.dms[0].id]
   publicly_accessible          = true

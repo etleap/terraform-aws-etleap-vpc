@@ -226,11 +226,6 @@ variable "disable_cdc_support" {
   description = "Set to true if this deployment will not use CDC pipelines. This will cause the DMS Replication Instance and associated resources not to be created. Defaults to false."
 }
 
-variable "downgrade_cdc" {
-  default     = false
-  description = "(Internal) Creates a secondary DMS Replication Instance with version 3.4.6 to work around a known limitation with 3.4.7; Defalts to false"
-}
-
 variable "app_access_cidr_blocks" {
   default     = ["0.0.0.0/0"]
   description = "CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses."
