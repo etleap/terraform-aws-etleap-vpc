@@ -1,3 +1,7 @@
+# Release 1.10.8
+
+Adds permissions for Etleap to import, manage, and remove CA certificates in DMS. This enables Etleap to automate SSL certificate verification for CDC-enabled database sources. There is no change if you have set `disable_cdc_support` to `true`.
+
 # Release 1.10.7
 
 Upgrades DMS instance version to 3.5.2 (the current preferred version). You can skip the upgrade procedure below if you have set `disable_cdc_support` to `true`.

@@ -161,7 +161,10 @@ resource "aws_iam_policy" "job_manage_dms" {
         "dms:DeleteEndpoint",
         "dms:DescribeTableStatistics",
         "dms:TestConnection",
-        "dms:DescribeConnections"
+        "dms:DescribeConnections",
+        "dms:ImportCertificate",
+        "dms:DescribeCertificates",
+        "dms:DeleteCertificate"
       ],
       "Resource": "*"
   },
