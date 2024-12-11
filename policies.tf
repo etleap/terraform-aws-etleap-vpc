@@ -170,6 +170,7 @@ resource "aws_iam_policy" "app_various_limited" {
           "ec2:DescribeInstances",
           "ec2:DescribeVpcs",
           "ec2:DescribeSubnets",
+          "ec2:DescribeSpotInstanceRequests",
           "autoscaling:DescribeAutoScalingInstances",
           "elasticmapreduce:ListInstanceFleets",
           "elasticmapreduce:ModifyInstanceFleet"

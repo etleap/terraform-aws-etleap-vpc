@@ -1,3 +1,10 @@
+# Release 1.10.9
+
+Adds permission for Etleap to describe Spot Instance Requests. This enables Etleap to track spot instances 
+provisioned and de-provisioned for the deployment's EMR cluster, along with related information such as duration and termination reason.  
+
+Also sets the minimum version of the Terraform AWS Provider to 5.73 to address [a bug where it does not detect removed/changed Security Group Rules](https://github.com/hashicorp/terraform-provider-aws/issues/39463).
+
 # Release 1.10.8
 
 Adds permissions for Etleap to import, manage, and remove CA certificates in DMS. This enables Etleap to automate SSL certificate verification for CDC-enabled database sources. There is no change if you have set `disable_cdc_support` to `true`.
