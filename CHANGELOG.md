@@ -1,3 +1,10 @@
+# Release 1.10.10
+
+Adds support for schema changes and parsing errors in pipelines processed by [Apache Flink](https://flink.apache.org/) - 
+currently those with [Apache Iceberg](https://iceberg.apache.org/) destinations - by adding an AWS Glue Catalog database for Etleap to store operational data. 
+
+Also adds permissions required for the application to read from and write to this database.
+
 # Release 1.10.9
 
 Adds permission for Etleap to describe Spot Instance Requests. This enables Etleap to track spot instances 

@@ -71,3 +71,4 @@ export USE_ZOOKEEPER_CLUSTER=true
 export ZOOKEEPER_CLUSTER_HOSTS=%{for id, addr in zookeeper_hosts_dns ~}${addr}:2181,%{endfor}
 export ETLEAP_INFLUX_DB_HOSTNAME="https://${var.influx_db_hostname}:8086"
 export ETLEAP_SECRET_INFLUX_DB_TOKEN="$(aws secretsmanager get-secret-value --secret-id ${var.influx_db_api_token_arn} | jq -r .SecretString)"
+export ETLEAP_ICEBERG_SYSTEM_TABLES_DB_NAME="${var.iceberg_system_tables_db_name}"
