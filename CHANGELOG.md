@@ -1,3 +1,13 @@
+# Release 1.10.12
+
+Changes the default instance type for the DMS instance from `dms.t2.small` to `dms.t3.small` as T2 instances are being deprecated by AWS.
+This change will have no effect if the `disable_cdc_support` module variable is set to `true`, or if the `dms_instance_type` module variable is already explicitly set.
+
+If the `dms_instance_type` module variable is already set to a C4, M4, R4, or T2 instance type, please update it to a C5, R5, R5, or T3 instance type respectively.
+Otherwise, the instance will automatically be upgraded by AWS, resulting in dirty Terraform state.
+
+This change does not cause any app downtime, however, there will be up to 30 minutes of additional latency for all CDC pipelines during the upgrade.
+
 # Release 1.10.11
 
 Upgrades the RDS instance to 8.0.40 as the 8.0.32 is approaching its end of life date in March 2025.

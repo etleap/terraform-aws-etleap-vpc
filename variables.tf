@@ -129,8 +129,8 @@ variable "rds_instance_type" {
 }
 
 variable "dms_instance_type" {
-  default     = "dms.t2.small"
-  description = "The instance type for the DMS instance.Defaults to `dms.t2.small`. Not used if `disable_cdc_support` is set to `true`."
+  default     = "dms.t3.small"
+  description = "The instance type for the DMS instance. Defaults to `dms.t3.small`. Not used if `disable_cdc_support` is set to `true`."
 }
 
 variable "dms_roles_to_be_created" {
