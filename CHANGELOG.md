@@ -1,3 +1,22 @@
+# Release 1.10.11
+
+Upgrades the RDS instance to 8.0.40 as the 8.0.32 is approaching its end of life date in March 2025.
+This release contains a DB upgrade. Please follow the steps below to ensure a safe upgrade. This will require about 20 minutes of downtime.
+
+## Upgrade instructions
+1. Don't update the module version until step 2 below.
+   Add the following property to the module definition:
+   ```
+   app_available = false
+   ```
+   Run `terraform apply` to stop the app EC2 instances that access the database.
+2. Change the module version to `1.10.11` and add the following property to the module definition:
+   ```
+   rds_apply_immediately = true
+   ```
+   Run `terraform apply` to upgrade the DB version.
+3. Once the DB is upgraded to the new version, remove the `app_available` and `rds_apply_immediately` variables and run `terraform apply` to bring the application back online.
+
 # Release 1.10.10
 
 Adds support for schema changes and parsing errors in pipelines processed by [Apache Flink](https://flink.apache.org/) - 
