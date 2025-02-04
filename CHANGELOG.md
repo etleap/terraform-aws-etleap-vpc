@@ -1,17 +1,16 @@
-# Release 1.10.12
+# Release 1.10.13
 
-Changes the default instance type for the DMS instance from `dms.t2.small` to `dms.t3.small` as T2 instances are being deprecated by AWS.
-This change will have no effect if the `disable_cdc_support` module variable is set to `true`, or if the `dms_instance_type` module variable is already explicitly set.
+## Changes
+1. Upgrades the RDS instance to 8.0.40 as 8.0.32 is approaching its end of life date in March 2025.
 
-If the `dms_instance_type` module variable is already set to a C4, M4, R4, or T2 instance type, please update it to a C5, R5, R5, or T3 instance type respectively.
-Otherwise, the instance will automatically be upgraded by AWS, resulting in dirty Terraform state.
+2. Changes the default instance type for the DMS instance from `dms.t2.small` to `dms.t3.small` as T2 instances are being deprecated by AWS.
+This will have no effect if the `disable_cdc_support` module variable is set to `true`, or if the `dms_instance_type` module variable is already explicitly set.
 
-This change does not cause any app downtime, however, there will be up to 30 minutes of additional latency for all CDC pipelines during the upgrade.
+3. Adds support for schema changes and parsing errors in pipelines processed by [Apache Flink](https://flink.apache.org/) - currently those with [Apache Iceberg](https://iceberg.apache.org/) destinations - by adding an AWS Glue Catalog database for Etleap to store operational data. 
 
-# Release 1.10.11
+4. Adds the permissions required for the application to read from and write to the new AWS Glue Catalog database.
 
-Upgrades the RDS instance to 8.0.40 as the 8.0.32 is approaching its end of life date in March 2025.
-This release contains a DB upgrade. Please follow the steps below to ensure a safe upgrade. This will require about 20 minutes of downtime.
+This release contains a DB upgrade. Please follow the steps below to ensure a safe upgrade. This will require up to 1 hour of downtime.
 
 ## Upgrade instructions
 1. Don't update the module version until step 2 below.
@@ -20,19 +19,26 @@ This release contains a DB upgrade. Please follow the steps below to ensure a sa
    app_available = false
    ```
    Run `terraform apply` to stop the app EC2 instances that access the database.
-2. Change the module version to `1.10.11` and add the following property to the module definition:
+2. Change the module version to `1.10.13` and add the following property to the module definition:
    ```
    rds_apply_immediately = true
    ```
-   Run `terraform apply` to upgrade the DB version.
-3. Once the DB is upgraded to the new version, remove the `app_available` and `rds_apply_immediately` variables and run `terraform apply` to bring the application back online.
+3. If the `dms_instance_type` module variable is already set to a C4, M4, R4, or T2 instance type, please update it to a C5, R5, R5, or T3 instance type respectively.
+   Otherwise, the instance will automatically be upgraded by AWS, resulting in dirty Terraform state.
+4. Run `terraform apply` to upgrade the DB and DMS versions.
+5. Once the previous step is complete, remove the `app_available` and `rds_apply_immediately` variables and run `terraform apply` to bring the application back online.
 
-# Release 1.10.10
+# Release 1.10.12 (Withdrawn)
 
-Adds support for schema changes and parsing errors in pipelines processed by [Apache Flink](https://flink.apache.org/) - 
-currently those with [Apache Iceberg](https://iceberg.apache.org/) destinations - by adding an AWS Glue Catalog database for Etleap to store operational data. 
+This version has been withdrawn due to a regression affecting pipelines with Apache Iceberg destinations. The issue has been resolved in version 1.10.13. Please use version 1.10.13 or later instead.
 
-Also adds permissions required for the application to read from and write to this database.
+# Release 1.10.11 (Withdrawn)
+
+This version has been withdrawn due to a regression affecting pipelines with Apache Iceberg destinations. The issue has been resolved in version 1.10.13. Please use version 1.10.13 or later instead.
+
+# Release 1.10.10 (Withdrawn)
+
+This version has been withdrawn due to a regression affecting pipelines with Apache Iceberg destinations. The issue has been resolved in version 1.10.13. Please use version 1.10.13 or later instead.
 
 # Release 1.10.9
 

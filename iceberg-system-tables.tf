@@ -1,5 +1,6 @@
 resource "aws_glue_catalog_database" "iceberg_system_tables_db" {
-  name        = "etleap_${var.deployment_id}_iceberg_system_tables"
+  # Sanitizing the name as Iceberg does not allow for table names to contain hyphens or upper-case characters
+  name        = format("etleap_%s_iceberg_system_tables", replace(lower(var.deployment_id), "-", "_"))
   description = "Glue database to catalog iceberg system tables required for certain pipeline operations, such as schema change tracking and parsing error detection, for Iceberg pipelines"
 }
 
