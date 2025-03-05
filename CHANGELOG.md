@@ -1,3 +1,9 @@
+# Release 1.10.14
+
+Upgrades DMS to version 3.5.3, the current preferred version, as version 3.5.2 will reach end of life on March 25th, 2025. 
+
+If you have `disable_cdc_support` set to `true`, there are no changes as part of this release. Otherwise, this will upgrade the DMS replication instance. Pipelines that have CDC enabled will experience an interruption of up to 20 minutes. All other pipelines, the Web UI, and the API will be unaffected by the upgrade.
+
 # Release 1.10.13
 
 ## Changes
