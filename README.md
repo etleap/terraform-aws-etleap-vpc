@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.10.14"
+  version = "1.10.15"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -242,22 +242,7 @@ Downtime:
 - API and Web UI: none
 - Pipelines: 10-15 minutes
 
-1. Remove the old cluster from the state: `terraform state rm module.etleap.aws_emr_cluster.emr` and `terraform state rm module.etleap.aws_emr_instance_group.task_spot`;
-
-2. Run `terraform apply -target module.etleap.aws_emr_cluster.emr -target module.etleap.aws_emr_instance_group.task_spot` to create a new cluster;
-
-3. Once the the apply completes, replace the main application instance: `terraform apply -target module.etleap.module.main_app[0].aws_instance.app -target module.etleap.aws_lb_target_group_attachment.main_app[0]`;
-
-4. Monitor that the instance comes online:
-
-    a. In the AWS EC2 Console, go to "Target Groups" 
-
-    b. Select the "Etleap*" Target group. To get the exact name run: `terraform state show module.etleap.aws_lb_target_group.app`.
-
-    c. Under the "Targets" tab, check that all instances are "Health". 
-
-5. Once the main instance is online, apply the remaining changes with `terraform apply`. If HA Mode is enabled, this will also replace the secondary application instace. 
-6. Manually terminate the old cluster from the AWS Console or the CLI.
+1. Run `terraform apply -replace="module.etleap.aws_emr_cluster.emr"` to replace the EMR cluster.
 
 ## Deploying Etleap in a region where Amazon Timestream for InfluxDB is not available 
 

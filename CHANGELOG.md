@@ -1,3 +1,14 @@
+# Release 1.10.15
+
+Upgrades dbt from version 1.3, which has reached end of life, to version 1.9, which is the current latest version.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
+## Upgrade instructions
+
+1. Update the module version to `1.10.15` and run `terraform apply`.
+2. [Replace the EMR Cluster](/README.md#upgrading-the-emr-cluster).
+
 # Release 1.10.14
 
 Upgrades DMS to version 3.5.3, the current preferred version, as version 3.5.2 will reach end of life on March 25th, 2025. 

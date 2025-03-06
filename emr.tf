@@ -126,7 +126,7 @@ resource "aws_emr_cluster" "emr" {
 
   bootstrap_action {
     name = "Install DBT"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-dbt.sh"
+    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-dbt-v2.sh"
   }
 
   step {
