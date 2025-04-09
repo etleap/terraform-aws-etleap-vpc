@@ -1,3 +1,7 @@
+# Release 1.10.16
+
+Added a critical alarm named `NAT Network Saturation` that triggers when there is insufficient NAT bandwidth for the data pipeline workloads. When this alarm triggers the recommended action is to contact Etleap's support team, which will assist in discovering the root cause of the bandwidth issue and propose remediation steps.
+
 # Release 1.10.15
 
 Upgrades dbt from version 1.3, which has reached end of life, to version 1.9, which is the current latest version.

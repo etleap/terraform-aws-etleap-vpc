@@ -508,3 +508,21 @@ resource "aws_cloudwatch_metric_alarm" "job_gc" {
     }
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "nat_network" {
+  count               = local.created_vpc_count
+  alarm_name          = "Etleap - ${var.deployment_id} - NAT Network Saturation"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "6"
+  metric_name         = "NetworkIn"
+  namespace           = "AWS/EC2"
+  dimensions = {
+    InstanceId = aws_instance.nat[count.index].id
+  }
+  period                    = "900"
+  statistic                 = "Sum"
+  threshold                 = "78750000000" # 78.75*1000*1000*1000
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
