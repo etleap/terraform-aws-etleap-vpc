@@ -526,3 +526,23 @@ resource "aws_cloudwatch_metric_alarm" "nat_network" {
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
+
+resource "aws_cloudwatch_metric_alarm" "database_extractor_running" {
+  tags = local.default_tags
+
+  alarm_name          = "Etleap - ${var.deployment_id} - Database extractor is running"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "DatabaseExtractorRunning"
+  namespace           = "Etleap/EC2"
+  dimensions = {
+    "Deployment" = var.deployment_id
+  }
+  period                    = 300
+  statistic                 = "Sum"
+  threshold                 = 1
+  treat_missing_data        = "breaching"
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}

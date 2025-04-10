@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.10.16"
+  version = "1.10.17"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -160,6 +160,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | * 90% Disk *                          | Yes      | Disk is getting full for one of the instances                                                                            | Increase the EBS size of the attached volumes; contact Etleap Support to diagnose to root cause                                                                                                               |
 | App is running                        | Yes      | The main web application is down and not accepting requests                                                              | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
 | Job is running                        | Yes      | The data processing application is down                                                                                  | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
+| Database extractor is running         | Yes      | The application that runs database extractions is down. This potentially impacts all pipelines that extract from a database sources.   | Contact Support                                                                                                                                                                                               | 
 | DMS Disk Space 30GB Remaining         | Yes      | DMS replication instance is running out of disk space                                                                    | Contact Support                                                                                                                                                                                               |
 | DMS Available Memory <= 10%           | No       | DMS replication instance is running out of memory                                                                        | Upgrade the instance type to the next larger size within the same instance family                                                                                                                             |
 | DMS Freeable Memory <= 10%            | No       | DMS replication instance is running out of memory                                                                        | Upgrade the instance type to the next larger size within the same instance family                                                                                                                             |

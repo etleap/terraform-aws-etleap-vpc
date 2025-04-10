@@ -1,3 +1,7 @@
+# Release 1.10.17
+
+Added a critical alarm named `Database extractor is running` that triggers when the application that runs database extractions is down. This situation affects all pipelines that extract from a database sources. This is a critical alarm. The remediation action is to contact Etleap's support team to help diagnose and address the issue.
+
 # Release 1.10.16
 
 Added a critical alarm named `NAT Network Saturation` that triggers when there is insufficient NAT bandwidth for the data pipeline workloads. When this alarm triggers the recommended action is to contact Etleap's support team, which will assist in discovering the root cause of the bandwidth issue and propose remediation steps.
