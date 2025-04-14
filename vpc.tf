@@ -121,6 +121,18 @@ resource "aws_route_table_association" "c_public" {
   route_table_id = aws_route_table.public[0].id
 }
 
+resource "aws_vpc_endpoint" "s3_endpoint" {
+  count        = local.created_vpc_count
+  vpc_id       = local.vpc_id
+  service_name = "com.amazonaws.${local.region}.s3"
+}
+
+resource "aws_vpc_endpoint_route_table_association" "s3_endpoint_route_table_association" {
+  count           = local.created_vpc_count
+  vpc_endpoint_id = aws_vpc_endpoint.s3_endpoint[count.index].id
+  route_table_id  = aws_route_table.private[0].id
+}
+
 locals {
   vpc_id              = var.vpc_id == null ? aws_vpc.etleap[0].id : var.vpc_id
   subnet_a_private_id = var.vpc_id == null ? aws_subnet.a_private[0].id : var.private_subnets[0]

@@ -1,3 +1,7 @@
+# Release 1.10.18
+
+Adds a VPC gateway endpoint to route S3 traffic through. This reduces the network load on the NAT instance without incurring additional costs. This only applies to Etleap deployments where the module has created the VPC, i.e. `vcp_id` was not provided as input to the module.
+
 # Release 1.10.17
 
 Added a critical alarm named `Database extractor is running` that triggers when the application that runs database extractions is down. This situation affects all pipelines that extract from a database sources. This is a critical alarm. The remediation action is to contact Etleap's support team to help diagnose and address the issue.
@@ -208,6 +212,7 @@ Please remove the `region` variable as it no longer exists. If you are using thi
 provider "aws" {
   region = "xx-xxxx-x"
 }
+```
 
 # Release 1.8.10
 
