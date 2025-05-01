@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.10.18"
+  version = "1.11.0"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -102,6 +102,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `streaming_endpoint_acm_certificate_arn` | ARN Certificate to use for SSL connections to the streaming ingestion webhook. If the certificate is specified, it must use either RSA_1024 or RSA_2048. See https://docs.aws.amazon.com/acm/latest/userguide/import-certificate-api-cli.html for more details. If no certificate is specified, the deployment will use a default one bundled with the template. | `string` | `null` | no |
 | `streaming_endpoint_access_cidr_blocks` | CIDR ranges that have access to the streaming ingestion webhook (both HTTP and HTTPS). Defaults to allowing all IP addresses. | `list(string)` | ``["0.0.0.0/0"]`` | no |
 | `kms_key_additional_policies` | List of additional policy statements to be included in the deployment's KMS key's policy. | `list(object({SID = optional(string), Effect = string, Action = list(string), Principal = map(string), Resource = string, Condition = optional(map(any))}))` | `[]` | no |
+| `github_webhooks_domain_name_and_certificate` | Configuration for using a custom domain with GitHub webhooks. If provided, both `name` and `certificate_arn` must be specified. <br> - `name`: A custom domain name to associate with GitHub webhooks (e.g., `github.mydomain.com`). <br> - `certificate_arn`: ARN of an existing ACM certificate to use with `name`. <br> After setting this configuration, create a DNS `CNAME` record pointing to the value of `github_webhooks_cname_target` (see the "Outputs" section). | `object({ name = optional(string), certificate_arn = optional(string) })` | `{}` | no |
 
 ## Outputs
 
@@ -127,6 +128,8 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `secondary_app_instance_id` | The instance ID of the secondary application instance. |
 | `kms_policy` | Statement to add to the KMS key if using a Customer-Manager SSE KMS key for encrypting S3 data. |
 | `nat_ami` | Status of the NAT AMI (if created) |
+| `github_webhooks_url` | The URL GitHub should send webhook payloads to when setting up [dbt CI](https://docs.etleap.com/docs/documentation/7yh44n1fjs24w-git-hub-pr-checks#step-2-create-a-github-webhook). |
+| `github_webhooks_cname_target` | The domain to route GitHub webhooks to. This output is returned only when `github_webhooks_domain_name_and_certificate` is set, and its value should be used as the target in a DNS CNAME record for `github_webhooks_domain_name_and_certificate.name`. |
 
 # Connecting to the Etleap deployment
 
@@ -513,3 +516,14 @@ outbound_access_destinations = [{
 
 > **Warning**
 > The deployment will always have outbound access to ports 80 and 443, for license checking, instance lifecycle purposes (e.g. applying security upgrades), and access to the AWS APIs.
+
+## GitHub Webhooks URL
+
+To get the URL to use with [dbt CI](https://docs.etleap.com/docs/documentation/7yh44n1fjs24w-git-hub-pr-checks), run `terraform output github_webhooks_url`.
+
+If you would like to use a different domain name you can change it as follows:
+
+1. Create an ACM certificate, and set the `github_webhooks_domain_name_and_certificate` variable to `{ name = <domain_name>, certificate = <certificate_arn> }`.
+2. Run `terraform apply`.
+3. Run `terraform output github_webhooks_cname_target`, and create a CNAME from your domain name to the output value.
+4. The URL given by `terraform output github_webhooks_url` now contains your domain name and is ready for use.

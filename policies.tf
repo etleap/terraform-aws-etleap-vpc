@@ -236,6 +236,16 @@ resource "aws_iam_policy" "app_various_limited" {
         "Effect": "Allow",
         "Action": "sns:Publish",
         "Resource": "*"
+      },
+      {
+        "Sid": "GitHubWebhooksSqsGetReceiveDelete",
+        "Effect": "Allow",
+        "Action": [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueUrl"
+        ],
+        "Resource": "${module.github_webhooks.github_webhooks_queue.arn}"
       }
     ]
 }

@@ -1,3 +1,7 @@
+# Release 1.11.0
+
+Adds support for [dbt CI](https://docs.etleap.com/docs/documentation/7yh44n1fjs24w-git-hub-pr-checks) by adding infrastructure for receiving GitHub webhooks. This includes an API Gateway and an SQS queue. The API Gateway's domain name can optionally be customized via the new `github_webhooks_domain_name_and_certificate` variable. See [usage instructions](./README.md#github-webhooks-url).
+
 # Release 1.10.18
 
 Adds a VPC gateway endpoint to route S3 traffic through. This reduces the network load on the NAT instance without incurring additional costs. This only applies to Etleap deployments where the module has created the VPC, i.e. `vcp_id` was not provided as input to the module.

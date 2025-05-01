@@ -123,3 +123,12 @@ output "zookeeper_private_ips" {
   description = "Zookeeper ensemble private ips"
 }
 
+output "github_webhooks_url" {
+  value       = module.github_webhooks.github_webhooks_url
+  description = "The URL GitHub should send webhook payloads to when setting up dbt CI"
+}
+
+output "github_webhooks_cname_target" {
+  value       = module.github_webhooks.github_webhooks_cloudfront_domain_name
+  description = "The domain to route GitHub webhooks to. This output is returned only when `github_webhooks_domain_name_and_certificate` is set, and its value should be used as the target in a DNS CNAME record for `github_webhooks_domain_name_and_certificate.name`."
+}
