@@ -1,3 +1,7 @@
+# Release 1.11.1
+
+Fixed a critical issue in the `cloud-init` configuration that prevented Zookeeper nodes from starting up. This issue was caused by a recent upgrade to a required Linux package (GRUB2).
+
 # Release 1.11.0
 
 Adds support for [dbt CI](https://docs.etleap.com/docs/documentation/7yh44n1fjs24w-git-hub-pr-checks) by adding infrastructure for receiving GitHub webhooks. This includes an API Gateway and an SQS queue. The API Gateway's domain name can optionally be customized via the new `github_webhooks_domain_name_and_certificate` variable. See [usage instructions](./README.md#github-webhooks-url).
