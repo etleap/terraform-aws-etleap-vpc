@@ -1,7 +1,6 @@
 #cloud-config
 # -*- YAML -*-
 hostname: ${hostname}
-apt_upgrade: true
 locale: en_US.UTF-8
 
 groups:
@@ -42,8 +41,9 @@ write_files:
   content: ${base64encode(file_docker_compose)}
 
 runcmd:
-  - apt-get update && apt-get install -y awscli
-  - DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
+  - echo RESET grub-efi/install_devices | debconf-communicate grub-pc
+  - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y awscli
   - crontab -u ubuntu -r
   - mkdir -p /home/ubuntu/logs/zk/
   - gunzip /home/ubuntu/*.sh.gz

@@ -64,7 +64,6 @@ resource "aws_instance" "app" {
   user_data = <<EOF
 #cloud-config 
 # -*- YAML -*-
-apt_upgrade: true
 locale: en_US.UTF-8
 packages:
 - mysql-client-core-5.7
@@ -96,6 +95,8 @@ write_files:
     region = ${var.region}
 
 runcmd:
+- echo RESET grub-efi/install_devices | debconf-communicate grub-pc 
+- apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
 - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 - "service docker restart"
 - ${var.db_init}
@@ -104,7 +105,6 @@ runcmd:
 %{ endif ~}
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
-- "apt-get update && apt-get -y upgrade"
 - echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
 - service ntp restart
 - ntpq -pn

@@ -1,3 +1,7 @@
+# Release 1.10.19
+
+Fixed a critical issue in the `cloud-init` configuration that prevented Zookeeper nodes from starting up. This issue was caused by a recent upgrade to a required Linux package (GRUB2).
+
 # Release 1.10.18
 
 Adds a VPC gateway endpoint to route S3 traffic through. This reduces the network load on the NAT instance without incurring additional costs. This only applies to Etleap deployments where the module has created the VPC, i.e. `vcp_id` was not provided as input to the module.
