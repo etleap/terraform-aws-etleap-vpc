@@ -133,17 +133,21 @@ resource "aws_api_gateway_stage" "github_webhooks_api" {
 }
 
 resource "aws_api_gateway_domain_name" "github_domain_name" {
-  count           = var.github_domain_name != null ? 1 : 0
-  domain_name     = var.github_domain_name
-  security_policy = "TLS_1_2"
-  certificate_arn = var.github_domain_name_certificate_arn
+  count                    = var.github_domain_name != null ? 1 : 0
+  domain_name              = var.github_domain_name
+  security_policy          = "TLS_1_2"
+  regional_certificate_arn = var.github_domain_name_certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
 }
 
 resource "aws_api_gateway_base_path_mapping" "github_domain_mapping" {
   count       = var.github_domain_name != null ? 1 : 0
   api_id      = aws_api_gateway_rest_api.github_webhooks_api.id
   stage_name  = aws_api_gateway_stage.github_webhooks_api.stage_name
-  domain_name = var.github_domain_name
+  domain_name = aws_api_gateway_domain_name.github_domain_name[0].domain_name
 }
 
 # Limiting access of the API to Github's hook IP ranges

@@ -7,6 +7,6 @@ output "github_webhooks_url" {
   value = var.github_domain_name == null ? "${aws_api_gateway_stage.github_webhooks_api.invoke_url}/webhooks" : "https://${var.github_domain_name}/webhooks"
 }
 
-output "github_webhooks_cloudfront_domain_name" {
-  value = var.github_domain_name != null ? aws_api_gateway_domain_name.github_domain_name[0].cloudfront_domain_name : null
+output "github_webhooks_regional_domain_name" {
+  value = var.github_domain_name != null ? aws_api_gateway_domain_name.github_domain_name[0].regional_domain_name : null
 }

@@ -1,18 +1,26 @@
-# Release 1.11.3
+# Release 1.11.4
 
-Broadens the scope of resource permissions for Kinesis stream management from streams prefixed by `etleap-{deployment_id}-dms-` to streams prefixed by `etleap-{deployment_id}-` to enable using Kinesis streams for purposes other than DMS output, in particular the new SQS queue source integration. Also adds the `ListStreams`, and `DeleteStream` permission for streams with the same prefix so they can be listed and deleted when they are no longer in use.
+1. Adds support for [dbt CI](https://docs.etleap.com/docs/documentation/7yh44n1fjs24w-git-hub-pr-checks) by adding infrastructure for receiving GitHub webhooks. This includes an API Gateway and an SQS queue. The API Gateway's domain name can optionally be customized via the new `github_webhooks_domain_name_and_certificate` variable. See [usage instructions](./README.md#github-webhooks-url). 
+
+2. Broadens the scope of resource permissions for Kinesis stream management from streams prefixed by `etleap-{deployment_id}-dms-` to streams prefixed by `etleap-{deployment_id}-` to enable using Kinesis streams for purposes other than DMS output, in particular the new SQS queue source integration. Also adds the `ListStreams`, and `DeleteStream` permission for streams with the same prefix so they can be listed and deleted when they are no longer in use.
+
+3. Fixed a critical issue in the `cloud-init` configuration that prevented Zookeeper nodes from starting up. This issue was caused by a recent upgrade to a required Linux package (GRUB2).
+
+# Release 1.11.3 (Withdrawn)
+
+This version has been withdrawn due to a GitHub webhooks configuration issue. The issue has been resolved in version 1.11.4. Please use version 1.11.4 or later instead.
 
 # Release 1.11.2 (Withdrawn)
 
 This version has been withdrawn due to an invalid IAM policy specification. The issue has been resolved in version 1.11.3. Please use version 1.11.3 or later instead.
 
-# Release 1.11.1
+# Release 1.11.1 (Withdrawn)
 
-Fixed a critical issue in the `cloud-init` configuration that prevented Zookeeper nodes from starting up. This issue was caused by a recent upgrade to a required Linux package (GRUB2).
+This version has been withdrawn due to a GitHub webhooks configuration issue. The issue has been resolved in version 1.11.4. Please use version 1.11.4 or later instead.
 
-# Release 1.11.0
+# Release 1.11.0 (Withdrawn)
 
-Adds support for [dbt CI](https://docs.etleap.com/docs/documentation/7yh44n1fjs24w-git-hub-pr-checks) by adding infrastructure for receiving GitHub webhooks. This includes an API Gateway and an SQS queue. The API Gateway's domain name can optionally be customized via the new `github_webhooks_domain_name_and_certificate` variable. See [usage instructions](./README.md#github-webhooks-url).
+This version has been withdrawn due to a GitHub webhooks configuration issue. The issue has been resolved in version 1.11.4. Please use version 1.11.4 or later instead.
 
 # Release 1.10.18
 

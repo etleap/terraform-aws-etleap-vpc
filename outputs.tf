@@ -129,6 +129,6 @@ output "github_webhooks_url" {
 }
 
 output "github_webhooks_cname_target" {
-  value       = module.github_webhooks.github_webhooks_cloudfront_domain_name
+  value       = module.github_webhooks.github_webhooks_regional_domain_name
   description = "The domain to route GitHub webhooks to. This output is returned only when `github_webhooks_domain_name_and_certificate` is set, and its value should be used as the target in a DNS CNAME record for `github_webhooks_domain_name_and_certificate.name`."
 }
