@@ -1,3 +1,11 @@
+# Release 1.11.3
+
+Broadens the scope of resource permissions for Kinesis stream management from streams prefixed by `etleap-{deployment_id}-dms-` to streams prefixed by `etleap-{deployment_id}-` to enable using Kinesis streams for purposes other than DMS output, in particular the new SQS queue source integration. Also adds the `ListStreams`, and `DeleteStream` permission for streams with the same prefix so they can be listed and deleted when they are no longer in use.
+
+# Release 1.11.2 (Withdrawn)
+
+This version has been withdrawn due to an invalid IAM policy specification. The issue has been resolved in version 1.11.3. Please use version 1.11.3 or later instead.
+
 # Release 1.11.1
 
 Fixed a critical issue in the `cloud-init` configuration that prevented Zookeeper nodes from starting up. This issue was caused by a recent upgrade to a required Linux package (GRUB2).

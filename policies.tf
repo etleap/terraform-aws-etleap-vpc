@@ -186,7 +186,15 @@ resource "aws_iam_policy" "app_various_limited" {
         "Resource": "${local.context.influx_db_api_token_arn}"
       },
       {
-        "Sid": "DmsKinesisAccess",
+        "Sid": "ListKinesisStreams",
+        "Effect": "Allow",
+        "Action": [
+          "kinesis:ListStreams"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "ManageKinesisStreams",
         "Effect": "Allow",
         "Action": [
           "kinesis:ListShards",
@@ -195,10 +203,11 @@ resource "aws_iam_policy" "app_various_limited" {
           "kinesis:DescribeStream",
           "kinesis:PutRecord*",
           "kinesis:CreateStream",
-          "kinesis:IncreaseStreamRetentionPeriod"
+          "kinesis:IncreaseStreamRetentionPeriod",
+          "kinesis:DeleteStream"
         ],
         "Resource": [
-            "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-dms-*"
+            "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-*"
         ]
       },
       {
@@ -426,10 +435,11 @@ resource "aws_iam_policy" "kinesis_emr_permissions_policy" {
         "kinesis:ListShards",
         "kinesis:GetShardIterator",
         "kinesis:GetRecords",
-        "kinesis:DescribeStream"
+        "kinesis:DescribeStream",
+        "kinesis:PutRecord*"
       ],
       "Resource": [
-          "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-dms-*"
+          "arn:aws:kinesis:${local.region}:${data.aws_caller_identity.current.account_id}:stream/etleap-${var.deployment_id}-*"
       ]
     }
   ]
