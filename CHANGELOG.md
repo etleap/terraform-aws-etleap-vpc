@@ -1,3 +1,9 @@
+# Release 1.11.5
+
+Update the README documentation to no longer advise that the EBS volume is increased in response to any 90% disk usage alarms, as there is no way to do this in the module.
+
+This is a documentation change only.
+
 # Release 1.11.4
 
 1. Adds support for [dbt CI](https://docs.etleap.com/docs/documentation/7yh44n1fjs24w-git-hub-pr-checks) by adding infrastructure for receiving GitHub webhooks. This includes an API Gateway and an SQS queue. The API Gateway's domain name can optionally be customized via the new `github_webhooks_domain_name_and_certificate` variable. See [usage instructions](./README.md#github-webhooks-url). 

@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.11.4"
+  version = "1.11.5"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -160,7 +160,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | RDS Disk Space                        | Yes      | RDS is running out of disk space                                                                                         | Increase the `allocated_storage` via Terraform, or via the console                                                                                                                                            |
 | RDS Freeable Memory                   | No       | RDS is running out of disk space                                                                                         | Increase the `allocated_storage` via Terraform, or via the console                                                                                                                                            |
 | * Node 80% CPU                        | No       | CPU usage is high on the specified instance                                                                              | Upgrade the instance type to the next larger size within the same instance family. If you wish to upgrade from `t3.2xlarge`, which is the largest `t3` instance available, please switch to the `c6a` family. |
-| * 90% Disk *                          | Yes      | Disk is getting full for one of the instances                                                                            | Increase the EBS size of the attached volumes; contact Etleap Support to diagnose to root cause                                                                                                               |
+| * 90% Disk *                          | Yes      | Disk is getting full for one of the instances                                                                            | Contact Etleap Support to diagnose to root cause.                                                                                                                                                             |
 | App is running                        | Yes      | The main web application is down and not accepting requests                                                              | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
 | Job is running                        | Yes      | The data processing application is down                                                                                  | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
 | Database extractor is running         | Yes      | The application that runs database extractions is down. This potentially impacts all pipelines that extract from a database sources.   | Contact Support                                                                                                                                                                                               | 
