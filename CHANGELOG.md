@@ -1,3 +1,7 @@
+# Release 1.11.6
+
+Release 1.11.1 updated the user data of Zookeeper instances so new instances would start up correctly. However, it also caused existing instances to be replaced, which isn't necessary and led to extra upgrade effort. This update prevents the need for replacement. 
+
 # Release 1.11.5
 
 Update the README documentation to no longer advise that the EBS volume is increased in response to any 90% disk usage alarms, as there is no way to do this in the module.

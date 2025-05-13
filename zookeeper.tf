@@ -31,6 +31,10 @@ resource "aws_instance" "zookeeper" {
 
   user_data_replace_on_change = true
 
+  lifecycle {
+    ignore_changes = [ user_data ]
+  }
+
   network_interface {
     network_interface_id = aws_network_interface.zookeeper[each.key].id
     device_index         = 0
