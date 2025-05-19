@@ -20,7 +20,7 @@ resource "aws_emr_cluster" "emr" {
   keep_job_flow_alive_when_no_steps = true
   log_uri                           = "s3://${aws_s3_bucket.intermediate.id}/emr-logs/"
   service_role                      = aws_iam_role.emr_default_role.name
-  security_configuration            = var.emr_security_configuration_name
+  security_configuration            = aws_emr_security_configuration.emrfs_sse_kms.name
 
   ec2_attributes {
     key_name                          = var.key_name
@@ -51,7 +51,7 @@ resource "aws_emr_cluster" "emr" {
       instance_type = "m5.xlarge"
       ebs_config {
         size                 = "128"
-        type                 = "gp2"
+        type                 = "gp3"
         volumes_per_instance = 1
       }
     }
@@ -74,7 +74,7 @@ resource "aws_emr_cluster" "emr" {
       # /mnt and /mnt1
       ebs_config {
         size                 = "512"
-        type                 = "gp2"
+        type                 = "gp3"
         volumes_per_instance = 2
       }
     }
@@ -249,6 +249,33 @@ EOF
 
 }
 
+# Security configurations are immutable once created, so up-version the name when we need to change it
+resource "aws_emr_security_configuration" "emrfs_sse_kms" {
+  name = "EMRFS SSE-KMS - ${var.deployment_id} - V1"
+
+  configuration = jsonencode({
+    EncryptionConfiguration = {
+      EnableAtRestEncryption    = true
+      EnableInTransitEncryption = false
+
+      AtRestEncryptionConfiguration = {
+        S3EncryptionConfiguration = var.s3_kms_encryption_key != null ? {
+          EncryptionMode = "SSE-KMS"
+          AwsKmsKey      = var.s3_kms_encryption_key
+        } : {
+          EncryptionMode = "SSE-S3" # No KMS key provided so use default S3-managed encryption
+        }
+
+        LocalDiskEncryptionConfiguration = {
+          EnableEbsEncryption       = true
+          EncryptionKeyProviderType = "AwsKms"
+          AwsKmsKey                 = aws_kms_key.etleap_emr_ebs_encryption_key.arn
+        }
+      }
+    }
+  })
+}
+
 resource "aws_emr_instance_fleet" "task_spot_xlarge" {
   count = var.emr_instance_fleet_smallest_instance_size == "xlarge" ? 1 : 0
   cluster_id           = aws_emr_cluster.emr.id
@@ -274,7 +301,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 96
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m6i.xlarge"
@@ -284,7 +311,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 224
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m6i.2xlarge"
@@ -294,7 +321,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 512
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m6i.4xlarge"
@@ -304,7 +331,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 128
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5.xlarge"
@@ -314,7 +341,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 256
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5.2xlarge"
@@ -324,7 +351,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 512
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5.4xlarge"
@@ -334,7 +361,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 128
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5a.xlarge"
@@ -344,7 +371,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 256
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5a.2xlarge"
@@ -354,7 +381,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 512
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5a.4xlarge"
@@ -364,7 +391,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 224
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c6i.4xlarge"
@@ -374,7 +401,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 64
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c5.xlarge"
@@ -384,7 +411,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 128
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c5.2xlarge"
@@ -394,7 +421,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 256
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c5.4xlarge"
@@ -404,7 +431,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 224
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c5a.4xlarge"
@@ -414,7 +441,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 128
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "r6i.xlarge"
@@ -424,7 +451,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 128
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "r5.xlarge"
@@ -434,7 +461,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 128
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "r5a.xlarge"
@@ -472,7 +499,7 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 512
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m6i.4xlarge"
@@ -482,7 +509,7 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 512
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5.4xlarge"
@@ -492,7 +519,7 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 512
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m5a.4xlarge"
@@ -502,7 +529,7 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 224
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c6i.4xlarge"
@@ -512,7 +539,7 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 256
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c5.4xlarge"
@@ -522,7 +549,7 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
       size                 = 224
-      type                 = "gp2"
+      type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c5a.4xlarge"

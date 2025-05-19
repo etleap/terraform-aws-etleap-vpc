@@ -1,3 +1,16 @@
+# Release 1.12.0
+
+This release enables encryption for all EBS volumes used by EC2 instances created by the module. This includes the EMR cluster, NAT, application instances, and Zookeeper instances.
+The EBS volumes have been upgraded to `gp3` from `gp2`, and the size of the root volumes have been increased to 32GB from 8GB. 
+EMR local disk encryption is enabled for the EMR cluster, and this uses a new KMS key created by the module.
+
+## Upgrade instructions
+
+As part of this upgrade, the NAT instance, EMR cluster, application instances and zookeeper instances will be replaced. This will cause about 30 minutes of downtime.
+
+1. The `amis` variable is now deprecated. If you have specified it, please remove it from your module definition.
+2. Update the module version to `1.12.0` and run `terraform apply`.
+
 # Release 1.11.6
 
 Release 1.11.1 updated the user data of Zookeeper instances so new instances would start up correctly. However, it also caused existing instances to be replaced, which isn't necessary and led to extra upgrade effort. This update prevents the need for replacement. 

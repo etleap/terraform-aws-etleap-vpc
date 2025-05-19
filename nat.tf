@@ -13,6 +13,12 @@ resource "aws_instance" "nat" {
   source_dest_check           = false
   private_ip                  = var.nat_private_ip
 
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 32
+    encrypted   = true
+  }
+
   lifecycle {
     create_before_destroy = true
     ignore_changes = [ ami ]

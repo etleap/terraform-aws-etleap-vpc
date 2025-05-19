@@ -452,3 +452,40 @@ resource "aws_iam_policy_attachment" "kinesis_emr_permissions_policy" {
   roles      = [aws_iam_role.emr.name]
   policy_arn = aws_iam_policy.kinesis_emr_permissions_policy.arn
 }
+
+# Provides access to the EBS EMR KMS key to encrypt and decrypt the local disk
+resource "aws_iam_policy" "emr_ebs_kms_encryption_policy" {
+  name   = "EtleapEMREbsKmsEncryptionPolicy${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "kms:ListGrants"
+      ],
+      "Resource": [
+        "${aws_kms_key.etleap_emr_ebs_encryption_key.arn}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy" {
+  for_each   = toset([
+    aws_iam_role.emr.name,
+    aws_iam_role.emr_default_role.name
+  ])
+
+  role       = each.key
+  policy_arn = aws_iam_policy.emr_ebs_kms_encryption_policy.arn
+}

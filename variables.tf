@@ -211,11 +211,6 @@ variable "private_subnets" {
   }
 }
 
-variable "emr_security_configuration_name" {
-  default     = null
-  description = "Specify the name of the security configuration to use when creating the EMR cluster."
-}
-
 variable "s3_kms_encryption_key" {
   default     = null
   description = "The key to use to encrypt S3 objects in the intermediate bucket."
@@ -451,13 +446,6 @@ resource "null_resource" "are_cidr_ranges_valid" {
 
 // -----------------------------
 // End of configurable variables
-
-variable "amis" {
-  default = {
-    app = "ami-03036c2d4d91bb77c" # Ubuntu 20.04 LTS
-  }
-}
-
 data "aws_ec2_instance_type" "dms_instance_type" {
   // DMS instance types are prefixed with "dms.", which isn't supported by "aws_ec2_instance_type" data source
   instance_type = replace(var.dms_instance_type, "dms.", "")

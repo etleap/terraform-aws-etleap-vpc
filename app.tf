@@ -13,7 +13,7 @@ module "main_app" {
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.main_app.id
 
-  ami                  = var.amis["app"]
+  ami                  = local.app_ami
   key_name             = var.key_name
   ssl_pem              = local.ssl_pem
   ssl_key              = local.ssl_key
@@ -52,7 +52,7 @@ module "secondary_app" {
   instance_profile  = aws_iam_instance_profile.app.name
   network_interface = aws_network_interface.secondary_app[0].id
 
-  ami                  = var.amis["app"]
+  ami                  = local.app_ami
   key_name             = var.key_name
   ssl_pem              = local.ssl_pem
   ssl_key              = local.ssl_key

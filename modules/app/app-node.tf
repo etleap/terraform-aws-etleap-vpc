@@ -60,6 +60,25 @@ resource "aws_instance" "app" {
     device_index         = 0
   }
 
+  root_block_device {
+    volume_type           = "gp3"
+    volume_size           = 32
+    encrypted             = true
+    delete_on_termination = true
+  }
+
+  ebs_block_device {
+    device_name           = "/dev/xvdb"
+    volume_type           = "gp3"
+    volume_size           = 60
+    encrypted             = true
+    delete_on_termination = true
+  }
+
+  lifecycle {
+    ignore_changes = [ebs_block_device]
+  }
+
   user_data_replace_on_change = true
   user_data = <<EOF
 #cloud-config 

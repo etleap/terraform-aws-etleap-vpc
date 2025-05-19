@@ -25,14 +25,14 @@ resource "aws_instance" "zookeeper" {
   volume_tags = merge({Name = "Etleap ${each.value} ${var.deployment_id}"}, local.default_tags)
 
   instance_type = "t3.small"
-  ami           = var.amis["app"]
+  ami           = local.app_ami
   key_name      = var.key_name
   iam_instance_profile = aws_iam_instance_profile.zookeeper.name
 
   user_data_replace_on_change = true
 
   lifecycle {
-    ignore_changes = [ user_data ]
+    ignore_changes = [ user_data, ebs_block_device ]
   }
 
   network_interface {
@@ -42,8 +42,16 @@ resource "aws_instance" "zookeeper" {
 
   root_block_device {
     volume_type = "gp3"
-    volume_size = 50
+    volume_size = 32
     encrypted   = true
+  }
+
+  ebs_block_device {
+    device_name           = "/dev/xvdb"
+    volume_type           = "gp3"
+    volume_size           = 32
+    encrypted             = true
+    delete_on_termination = true
   }
 
   user_data = templatefile("${path.module}/templates/zookeeper-userdata.yml.tpl", {

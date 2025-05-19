@@ -25,6 +25,31 @@ locals {
   influx_db_username                       = "root"
   influx_db_password                       = var.is_influx_db_in_secondary_region ? data.aws_secretsmanager_secret_version.influx_db_password[0].secret_string : module.influx_db_password[0].secret_string
 
+  latest_app_amis = {
+    af-south-1     = "ami-0ffd55f84d5ec9507"
+    ap-east-1      = "ami-06d0bbf820c835932"
+    ap-northeast-1 = "ami-07bab4dd9d90138ee"
+    ap-northeast-2 = "ami-0da566a25ba413cc6"
+    ap-south-1     = "ami-01709a1689f47c989"
+    ap-southeast-1 = "ami-02166f9feb1dde25c"
+    ap-southeast-2 = "ami-03281d24fed946aeb"
+    ca-central-1   = "ami-0757d2087dbeb995a"
+    eu-central-1   = "ami-0222e911aa97eda28"
+    eu-north-1     = "ami-0ca1eaa38ffe12fad"
+    eu-south-1     = "ami-096a9119b81e0f1bd"
+    eu-west-1      = "ami-0aa9c73166697f2c0"
+    eu-west-2      = "ami-07f7a576d92e62b80"
+    eu-west-3      = "ami-0b87183e8ed46df46"
+    me-south-1     = "ami-049627323abf335ca"
+    sa-east-1      = "ami-07e600cdd8ac0c3d9"
+    us-east-1      = "ami-03aed2464c9ea5f3b"
+    us-east-2      = "ami-018339281ebaf4c90"
+    us-west-1      = "ami-047e0ee2c6a5c306e"
+    us-west-2      = "ami-0dbfd22c6005ca3a3"
+  }
+
+  app_ami = local.latest_app_amis[local.region]
+
   context = {
     deployment_id                            = var.deployment_id
     vpc_cidr_block                           = local.vpc_cidr_block
