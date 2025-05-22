@@ -24,6 +24,9 @@ locals {
   is_influx_db_in_secondary_region         = var.influx_db_hostname != null && var.influx_db_password_arn != null 
   influx_db_username                       = "root"
   influx_db_password                       = var.is_influx_db_in_secondary_region ? data.aws_secretsmanager_secret_version.influx_db_password[0].secret_string : module.influx_db_password[0].secret_string
+  post_install_script_command              = (var.post_install_script != null
+    ? "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.customer_post_install_script[0].key} /tmp/post-install.sh && chmod 0755 /tmp/post-install.sh && /tmp/post-install.sh"
+    : null)
 
   latest_app_amis = {
     af-south-1     = "ami-0ffd55f84d5ec9507"

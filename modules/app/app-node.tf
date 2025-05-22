@@ -19,6 +19,9 @@ variable "db_init" {
 variable "influx_db_init" {
 }
 
+variable "post_install_script_command" {
+}
+
 variable "ami" {
 }
 
@@ -127,6 +130,9 @@ runcmd:
 - echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
 - service ntp restart
 - ntpq -pn
+%{ if var.post_install_script_command != null ~}
+- ${var.post_install_script_command}
+%{ endif ~}
 
 power_state:
   delay: "now"

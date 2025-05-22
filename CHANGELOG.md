@@ -1,3 +1,8 @@
+# Release 1.12.1
+
+Introduced a new optional variable `post_install_script` to allow specifying a custom post-installation script to be executed during initial EC2 instance startup.
+See [Custom Post-Installation script](./README.md#custom-post-installation-script) for more details.
+
 # Release 1.12.0
 
 This release enables encryption for all EBS volumes used by EC2 instances created by the module. This includes the EMR cluster, NAT, application instances, and Zookeeper instances.

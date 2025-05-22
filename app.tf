@@ -35,6 +35,8 @@ module "main_app" {
   
   # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
   influx_db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.influx_db_init_script.key} /tmp/influx-db-init.sh && chmod 0755 /tmp/influx-db-init.sh && /tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
+
+  post_install_script_command = local.post_install_script_command
 }
 
 module "secondary_app" {
@@ -74,6 +76,8 @@ module "secondary_app" {
 
   # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
   influx_db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.influx_db_init_script.key} /tmp/influx-db-init.sh && chmod 0755 /tmp/influx-db-init.sh && /tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
+
+  post_install_script_command = local.post_install_script_command
 }
 
 resource "aws_network_interface" "main_app" {

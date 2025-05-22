@@ -174,3 +174,10 @@ resource "aws_s3_bucket_policy" "intermediate" {
     intermediate_bucket_arn  = aws_s3_bucket.intermediate.arn
   })
 }
+
+resource "aws_s3_object" "customer_post_install_script" {
+  count  = var.post_install_script != null ? 1 : 0
+  bucket = aws_s3_bucket.intermediate.id
+  key    = "init-scripts/post_install_${filesha256(var.post_install_script)}.sh"
+  source = "${var.post_install_script}"
+}

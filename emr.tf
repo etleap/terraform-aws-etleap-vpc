@@ -3,10 +3,65 @@
 // we don't support multiple Spot Instance Fleets per cluster.
 // 
 // (1) https://registry.terraform.io/providers/hashicorp/aws/5.59.0/docs/resources/emr_instance_fleet
+locals {
+  base_bootstrap_actions = [
+    {
+      name = "Configure Fair Scheduler"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/download-fair-scheduler-config.sh"
+    },
+    {
+      name = "Add Etleap-provided JARs"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/add-app-provided-libs.sh"
+    },
+    {
+      name = "Replace the Java keystore with Etleap's"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-etleap-keystore.sh"
+    },
+    {
+      name = "Install Kinesis Agent"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-kinesis-agent.sh"
+      args = [var.deployment_id, local.app_main_private_ip, "false"]
+    },
+    {
+      name = "Set TCP keepalive"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/set-tcp-keepalive.sh"
+    },
+    {
+      name = "Copy HDFS init script"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/copy-hdfs-init.sh"
+    },
+    {
+      name = "Apply EMR hotfix for autoscaling bug"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/replace_hadoop_rpms.sh"
+      args = ["etleap-emr-${local.region}"]
+    },
+    {
+      name = "Install HDFS crontab"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-hdfs-crontab.sh"
+    },
+    {
+      name = "Install DBT"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-dbt-v2.sh"
+    }
+  ]
+
+  # Add the custom post install script if it's defined
+  bootstrap_actions = concat(
+    local.base_bootstrap_actions,
+      var.post_install_script != null ?
+      [{
+        name = "Run user-defined post-install script"
+        path = "s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.customer_post_install_script[0].key}"
+      }] : []
+  )
+}
+
 resource "null_resource" "emr_configuration_change" {
   triggers = {
     emr_instance_fleet_smallest_instance_size = var.emr_instance_fleet_smallest_instance_size
+    script_contents_hash                      = var.post_install_script != null ? aws_s3_object.customer_post_install_script[0].key : "no-script"
   }
+  depends_on = [aws_s3_object.customer_post_install_script]
 }
 
 resource "aws_emr_cluster" "emr" {
@@ -35,7 +90,7 @@ resource "aws_emr_cluster" "emr" {
 
   lifecycle {
     create_before_destroy = true
-    replace_triggered_by  = [ null_resource.emr_configuration_change ]
+    replace_triggered_by  = [ null_resource.emr_configuration_change]
   }
 
   master_instance_fleet {
@@ -82,51 +137,13 @@ resource "aws_emr_cluster" "emr" {
     target_on_demand_capacity = var.emr_core_node_count
   }
 
-  bootstrap_action {
-    name = "Configure Fair Scheduler"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/download-fair-scheduler-config.sh"
-  }
-
-  bootstrap_action {
-    name = "Add Etleap-provided JARs"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/add-app-provided-libs.sh"
-  }
-
-  bootstrap_action {
-    name = "Replace the Java keystore with Etleap's"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-etleap-keystore.sh"
-  }
-
-  bootstrap_action {
-    name = "Install Kinesis Agent"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-kinesis-agent.sh"
-    args = [var.deployment_id, local.app_main_private_ip, "false"]
-  }
-
-  bootstrap_action {
-    name = "Set TCP keepalive"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/set-tcp-keepalive.sh"
-  }
-
-  bootstrap_action {
-    name = "Copy HDFS init script"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/copy-hdfs-init.sh"
-  }
-
-  bootstrap_action {
-    name = "Apply EMR hotfix for autoscaling bug"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/replace_hadoop_rpms.sh"
-    args = ["etleap-emr-${local.region}"]
-  }
-
-  bootstrap_action {
-    name = "Install HDFS crontab"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-hdfs-crontab.sh"
-  }
-
-  bootstrap_action {
-    name = "Install DBT"
-    path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-dbt-v2.sh"
+  dynamic "bootstrap_action" {
+    for_each = local.bootstrap_actions
+    content {
+      name = bootstrap_action.value["name"]
+      path = bootstrap_action.value["path"]
+      args = lookup(bootstrap_action.value, "args", [])
+    }
   }
 
   step {

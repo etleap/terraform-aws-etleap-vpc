@@ -60,6 +60,7 @@ resource "aws_instance" "zookeeper" {
     hostname = each.value,
     datadog_active = 0,
     zookeeper_id = each.key,
+    post_install_script_command = local.post_install_script_command
     file_kinesis_install = file("${path.module}/templates/kinesis-install.sh"),
     file_zookeeper_install = file("${path.module}/templates/zookeeper-install.sh"),
     file_zookeeper_cron = file("${path.module}/templates/zookeeper-cron.sh"),

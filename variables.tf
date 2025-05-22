@@ -396,6 +396,12 @@ EOT
   }
 }
 
+variable "post_install_script" {
+  default     = null
+  type        = string
+  description = "The path to a custom script to be executed during initial EC2 instance startup."
+}
+
 locals {
   validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1", 
                                                                     "us-east-2",

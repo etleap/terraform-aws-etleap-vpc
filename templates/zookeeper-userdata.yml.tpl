@@ -54,6 +54,9 @@ runcmd:
   - sudo echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
   - sudo service ntp restart
   - sudo ntpq -pn
+  %{ if post_install_script_command != null ~}
+  - ${post_install_script_command}
+  %{ endif ~}
 
 power_state:
   delay: "now"

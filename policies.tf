@@ -480,12 +480,12 @@ resource "aws_iam_policy" "emr_ebs_kms_encryption_policy" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy" {
-  for_each   = toset([
-    aws_iam_role.emr.name,
-    aws_iam_role.emr_default_role.name
-  ])
+resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy_emr" {
+  role       = aws_iam_role.emr.name
+  policy_arn = aws_iam_policy.emr_ebs_kms_encryption_policy.arn
+}
 
-  role       = each.key
+resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy_emr_default" {
+  role       = aws_iam_role.emr_default_role.name
   policy_arn = aws_iam_policy.emr_ebs_kms_encryption_policy.arn
 }
