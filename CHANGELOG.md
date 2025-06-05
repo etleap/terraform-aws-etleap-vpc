@@ -1,3 +1,9 @@
+# Release 1.12.3
+
+Adds the missing `GenerateDataKey` permission for the EMR cluster to encrypt data using the KMS key created by the module. This permission was missed as part of the changes in release 1.9.0.
+
+Note: EMR does not have permission to decrypt data using the key.
+
 # Release 1.12.2
 
 Fixes an issue introduced in version 1.12.0 where a disk partition is not resized when the underlying EBS volume is larger than the one specified in the AMI.

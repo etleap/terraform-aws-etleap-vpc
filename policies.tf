@@ -407,7 +407,8 @@ resource "aws_iam_policy" "emr_kms_encryption_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "kms:Encrypt"
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
       ],
       "Resource": [
         "${aws_kms_key.etleap_encryption_key.arn}"
