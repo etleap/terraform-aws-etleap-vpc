@@ -117,6 +117,7 @@ write_files:
     region = ${var.region}
 
 runcmd:
+- resize2fs /dev/nvme1n1
 - echo RESET grub-efi/install_devices | debconf-communicate grub-pc 
 - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
 - ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf

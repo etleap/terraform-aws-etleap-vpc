@@ -1,3 +1,11 @@
+# Release 1.12.2
+
+Fixes an issue introduced in version 1.12.0 where a disk partition is not resized when the underlying EBS volume is larger than the one specified in the AMI.
+
+## Upgrade instructions
+
+As part of this upgrade, the application instances will be replaced. This will cause about 15 minutes of downtime for the Web UI, API and pipeline processing.
+
 # Release 1.12.1
 
 Introduced a new optional variable `post_install_script` to allow specifying a custom post-installation script to be executed during initial EC2 instance startup.
