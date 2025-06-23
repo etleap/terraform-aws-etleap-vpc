@@ -1,3 +1,8 @@
+# Release 1.12.4
+
+1. The module now ignores changes to `allocated_storage` on the DMS replication instance created by the module when `disable_cdc_support` is false, so operators can increase disk space manually without triggering Terraform drift.
+2. Renames the CloudWatch alarm from `DMS Disk Space 30GB Remaining` to `DMS Disk Space 125GB Remaining`, as the threshold was raised in version 1.10.6 but the name hadn’t been updated.
+
 # Release 1.12.3
 
 Adds the missing `GenerateDataKey` permission for the EMR cluster to encrypt data using the KMS key created by the module. This permission was missed as part of the changes in release 1.9.0.

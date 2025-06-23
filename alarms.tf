@@ -339,7 +339,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_disk" {
   count = var.disable_cdc_support ? 0 : 1
   tags  = local.default_tags
 
-  alarm_name          = "Etleap - ${var.deployment_id} - DMS Disk Space 30GB Remaining"
+  alarm_name          = "Etleap - ${var.deployment_id} - DMS Disk Space 125GB Remaining"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "3"
   datapoints_to_alarm = "3"

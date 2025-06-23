@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.12.3"
+  version = "1.12.4"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -75,7 +75,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `app_instance_type` | The instance type for the main app node(s). Defaults to `t3.xlarge`. We do not recommend using a smaller instance type. | `string` | `t3.xlarge` | no |
 | `nat_instance_type` | The instance type for the NAT instance. Defaults to `m5n.large`. | `string` | `m5n.large` | no |
 | `rds_instance_type` | The instance type for the RDS instance. Defaults to `db.m5.large`. We do not recommend using a smaller instance type. | `string` | `db.m5.large` | no |
-| `dms_instance_type` | The instance type for the DMS instance. Defaults to `dms.t2.small`. Not used if `disable_cdc_support` is set to `true`. | `boolean` | `true` | no |
+| `dms_instance_type` | The instance type for the DMS instance. Defaults to `dms.t3.small`. Not used if `disable_cdc_support` is set to `true`. | `string` | `dms.t3.small` | no |
 | `disable_cdc_support` | Set to true if this deployment will not use CDC pipelines. This will cause the DMS Replication Instance and associated resources not to be created. Defaults to `false`. | `boolean` | `false` | no |
 | `dms_roles_to_be_created` | Set to `true` if this template should create the roles required by DMS, `dms-vpc-role` and `dms-cloudwatch-logs-role`. Set to `false` if are already using DMS in the account where you deploy Etleap. | `boolean` | `true` | no |
 | `unique_resource_names` | If set to 'true', a suffix is appended to resource names to make them unique per deployment. Recommend leaving this as 'true' except in the case of migrations from earlier versions. | `boolean` | `true` | no |
@@ -165,7 +165,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | App is running                        | Yes      | The main web application is down and not accepting requests                                                              | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
 | Job is running                        | Yes      | The data processing application is down                                                                                  | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
 | Database extractor is running         | Yes      | The application that runs database extractions is down. This potentially impacts all pipelines that extract from a database sources.   | Contact Support                                                                                                                                                                                               | 
-| DMS Disk Space 30GB Remaining         | Yes      | DMS replication instance is running out of disk space                                                                    | Contact Support                                                                                                                                                                                               |
+| DMS Disk Space 125GB Remaining        | Yes      | DMS replication instance is running out of disk space                                                                    | Contact Support                                                                                                                                                                                               |
 | DMS Available Memory <= 10%           | No       | DMS replication instance is running out of memory                                                                        | Upgrade the instance type to the next larger size within the same instance family                                                                                                                             |
 | DMS Freeable Memory <= 10%            | No       | DMS replication instance is running out of memory                                                                        | Upgrade the instance type to the next larger size within the same instance family                                                                                                                             |
 | Elva Healthy Host Count               | Yes      | The number of streaming ingestion nodes is too low.                                                                      | Contact Support                                                                                                                                                                                               |

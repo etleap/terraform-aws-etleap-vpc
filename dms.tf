@@ -10,6 +10,12 @@ resource "aws_dms_replication_instance" "dms" {
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id
   vpc_security_group_ids       = [aws_security_group.dms[0].id]
   publicly_accessible          = true
+
+  lifecycle {
+    ignore_changes = [
+      allocated_storage
+    ]
+  }
 }
 
 resource "aws_dms_replication_subnet_group" "dms" {
