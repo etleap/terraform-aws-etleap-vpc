@@ -54,6 +54,65 @@ locals {
         path = "s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.customer_post_install_script[0].key}"
       }] : []
   )
+
+  m7i_supported_regions = [
+    "ap-east-1",
+    "ap-east-2",
+    "ap-northeast-1",
+    "ap-northeast-2",
+    "ap-south-1",
+    "ap-southeast-1",
+    "ap-southeast-2",
+    "ap-southeast-3",
+    "ap-southeast-4",
+    "ap-southeast-5",
+    "ap-southeast-7",
+    "ca-central-1",
+    "eu-central-1",
+    "eu-north-1",
+    "eu-south-2",
+    "eu-west-1",
+    "eu-west-2",
+    "eu-west-3",
+    "mx-central-1",
+    "sa-east-1",
+    "us-east-1",
+    "us-east-2",
+    "us-west-1",
+    "us-west-2"
+  ]
+
+  r7i_supported_regions = [
+    "ap-east-2",
+    "ap-northeast-1",
+    "ap-northeast-2",
+    "ap-northeast-3",
+    "ap-south-1",
+    "ap-south-2",
+    "ap-southeast-1",
+    "ap-southeast-2",
+    "ap-southeast-3",
+    "ap-southeast-4",
+    "ap-southeast-5",
+    "ap-southeast-7",
+    "ca-central-1",
+    "eu-central-1",
+    "eu-north-1",
+    "eu-south-1",
+    "eu-south-2",
+    "eu-west-1",
+    "eu-west-2",
+    "eu-west-3",
+    "mx-central-1",
+    "sa-east-1",
+    "us-east-1",
+    "us-east-2",
+    "us-west-1",
+    "us-west-2"
+  ]
+
+  master_instance_type = contains(local.m7i_supported_regions, data.aws_region.current.name) ? "m7i.xlarge" : "m6i.xlarge"
+  core_instance_type   = contains(local.r7i_supported_regions, data.aws_region.current.name) ? "r7i.xlarge" : "r6i.xlarge"
 }
 
 resource "null_resource" "emr_configuration_change" {
@@ -70,7 +129,7 @@ resource "aws_emr_cluster" "emr" {
   ]
   tags                              = merge({Name = "Etleap EMR ${var.deployment_id}"}, local.default_tags)
   name                              = "Etleap EMR"
-  release_label                     = "emr-5.35.0"
+  release_label                     = "emr-5.36.2"
   applications                      = ["Hadoop", "Spark"]
   keep_job_flow_alive_when_no_steps = true
   log_uri                           = "s3://${aws_s3_bucket.intermediate.id}/emr-logs/"
@@ -103,7 +162,7 @@ resource "aws_emr_cluster" "emr" {
     }
 
     instance_type_configs {
-      instance_type = "m5.xlarge"
+      instance_type = local.master_instance_type
       ebs_config {
         size                 = "128"
         type                 = "gp3"
@@ -124,7 +183,7 @@ resource "aws_emr_cluster" "emr" {
     }
 
     instance_type_configs {
-      instance_type = "r5.xlarge"
+      instance_type = local.core_instance_type
 
       # /mnt and /mnt1
       ebs_config {
@@ -314,6 +373,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
     }
   }
 
+  // m6i family
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
@@ -327,162 +387,246 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 224
+      size                 = 192
       type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m6i.2xlarge"
-    weighted_capacity = 7
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 512
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m6i.4xlarge"
-    weighted_capacity = 16
+    weighted_capacity = 14
   }
+
+  // m7i family
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 128
+      size                 = 96
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5.xlarge"
-    weighted_capacity = 4
+    instance_type     = "m7i.xlarge"
+    weighted_capacity = 3
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 256
+      size                 = 192
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5.2xlarge"
-    weighted_capacity = 8
+    instance_type     = "m7i.2xlarge"
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 512
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5.4xlarge"
-    weighted_capacity = 16
+    instance_type     = "m7i.4xlarge"
+    weighted_capacity = 14
   }
+
+  // m6a family
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 128
+      size                 = 96
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5a.xlarge"
-    weighted_capacity = 4
+    instance_type     = "m6a.xlarge"
+    weighted_capacity = 3
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 256
+      size                 = 192
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5a.2xlarge"
-    weighted_capacity = 8
+    instance_type     = "m6a.2xlarge"
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 512
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5a.4xlarge"
-    weighted_capacity = 16
+    instance_type     = "m6a.4xlarge"
+    weighted_capacity = 14
+  }
+
+  // m7a family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 96
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m7a.xlarge"
+    weighted_capacity = 3
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 224
+      size                 = 192
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m7a.2xlarge"
+    weighted_capacity = 6
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 448
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m7a.4xlarge"
+    weighted_capacity = 14
+  }
+
+  // c6i family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 96
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6i.2xlarge"
+    weighted_capacity = 3
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 192
       type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c6i.4xlarge"
-    weighted_capacity = 7
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 64
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "c5.xlarge"
-    weighted_capacity = 2
+    instance_type     = "c6i.8xlarge"
+    weighted_capacity = 14
+  }
+
+  // c7i family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 96
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c7i.2xlarge"
+    weighted_capacity = 3
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 128
+      size                 = 192
       type                 = "gp3"
-      volumes_per_instance = 1
+      volumes_per_instance = 6
     }
-    instance_type     = "c5.2xlarge"
-    weighted_capacity = 4
+    instance_type     = "c7i.4xlarge"
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 256
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "c5.4xlarge"
-    weighted_capacity = 8
+    instance_type     = "c7i.8xlarge"
+    weighted_capacity = 14
+  }
+
+  // c6a family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 96
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6a.2xlarge"
+    weighted_capacity = 3
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 224
+      size                 = 192
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "c5a.4xlarge"
-    weighted_capacity = 7
+    instance_type     = "c6a.4xlarge"
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 128
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "r6i.xlarge"
-    weighted_capacity = 4
+    instance_type     = "c6a.8xlarge"
+    weighted_capacity = 14
+  }
+
+  // c7a family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 96
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c7a.2xlarge"
+    weighted_capacity = 3
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 128
+      size                 = 192
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "r5.xlarge"
-    weighted_capacity = 4
+    instance_type     = "c7a.4xlarge"
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 128
+      size                 = 448
       type                 = "gp3"
-      volumes_per_instance = 1
+      volumes_per_instance = 14
     }
-    instance_type     = "r5a.xlarge"
-    weighted_capacity = 4
+    instance_type     = "c7a.8xlarge"
+    weighted_capacity = 14
   }
 }
 
@@ -512,65 +656,140 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
     }
   }
 
+  // m6i family
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 512
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "m6i.4xlarge"
-    weighted_capacity = 16
+    weighted_capacity = 14
   }
+
+  // m7i family
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 512
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5.4xlarge"
-    weighted_capacity = 16
+    instance_type     = "m7i.4xlarge"
+    weighted_capacity = 14
   }
+
+  // m6a family
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 512
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "m5a.4xlarge"
-    weighted_capacity = 16
+    instance_type     = "m6a.4xlarge"
+    weighted_capacity = 14
   }
+
+  // m7a family
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 224
+      size                 = 448
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "m7a.4xlarge"
+    weighted_capacity = 14
+  }
+
+  // c6i family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 192
       type                 = "gp3"
       volumes_per_instance = 1
     }
     instance_type     = "c6i.4xlarge"
-    weighted_capacity = 7
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 256
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "c5.4xlarge"
-    weighted_capacity = 8
+    instance_type     = "c6i.8xlarge"
+    weighted_capacity = 14
+  }
+
+  // c7i family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 192
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c7i.4xlarge"
+    weighted_capacity = 6
   }
   instance_type_configs {
     bid_price_as_percentage_of_on_demand_price = 100
     ebs_config {
-      size                 = 224
+      size                 = 448
       type                 = "gp3"
       volumes_per_instance = 1
     }
-    instance_type     = "c5a.4xlarge"
-    weighted_capacity = 7
+    instance_type     = "c7i.8xlarge"
+    weighted_capacity = 14
+  }
+
+  // c6a family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 192
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6a.4xlarge"
+    weighted_capacity = 6
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 448
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c6a.8xlarge"
+    weighted_capacity = 14
+  }
+
+  // c7a family
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 192
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c7a.4xlarge"
+    weighted_capacity = 6
+  }
+  instance_type_configs {
+    bid_price_as_percentage_of_on_demand_price = 100
+    ebs_config {
+      size                 = 448
+      type                 = "gp3"
+      volumes_per_instance = 1
+    }
+    instance_type     = "c7a.8xlarge"
+    weighted_capacity = 14
   }
 }
 

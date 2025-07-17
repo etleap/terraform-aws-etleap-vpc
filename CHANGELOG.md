@@ -1,3 +1,14 @@
+# Release 1.12.5
+
+This release upgrades EMR to version 5.36.2, and upgrades the instance fleet to only use 6th and 7th generation EC2 instance types.
+
+Note that with EMR version 5.36.2 onwards, when an EMR cluster is replaced, it will automatically use the latest default patch version for the Amazon Linux 2 AMI. 
+You can check the latest patch version in the [Amazon Linux 2 release notes](https://docs.aws.amazon.com/AL2/latest/relnotes/relnotes-al2.html).
+
+## Upgrade instructions
+
+This upgrade will replace the EMR cluster, which will cause about 10-15 minutes of downtime for pipelines. The API and Web UI will be unaffected.
+
 # Release 1.12.4
 
 1. The module now ignores changes to `allocated_storage` on the DMS replication instance created by the module when `disable_cdc_support` is false, so operators can increase disk space manually without triggering Terraform drift.
