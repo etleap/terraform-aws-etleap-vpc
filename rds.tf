@@ -203,3 +203,9 @@ resource "aws_ssm_parameter" "rds_support_password_arn" {
   type        = "String"
   value       = local.context.db_support_password_arn
 }
+
+resource "aws_s3_object" "db_init_script" {
+  bucket  = aws_s3_bucket.intermediate.id
+  key     = "init-scripts/db_init.sh"
+  source  = "${path.module}/templates/db-init.sh"
+}
