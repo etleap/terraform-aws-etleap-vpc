@@ -99,11 +99,6 @@ write_files:
   content: |
     ${indent(4, var.ssl_key)}
   owner: ubuntu:ubuntu
-- path: /tmp/db-init.sh
-  content: |
-    ${indent(4, file("${path.module}/db-init.sh"))}
-  owner: ubuntu:ubuntu
-  permissions: "0755"
 - path: /home/ubuntu/.etleap
   content: |
     ${indent(4, var.config)}

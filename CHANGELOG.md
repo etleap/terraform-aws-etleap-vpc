@@ -1,3 +1,13 @@
+# Release 1.12.6
+Refactors the app node user-data to reduce its length to avoid certain deployments reaching the user-data length limit of 16k characters.
+This is done by storing the RDS database initialization script in S3, instead of including it in the instance `user_data`, and fetching it on EC2 instance startup.
+
+Note: This change is a refactoring only and no functional or behavioural changes are introduced by this version.
+
+## Upgrade instructions
+
+As part of this upgrade, the application instances will be replaced. This will cause about 15 minutes of downtime for the Web UI, API and pipeline processing.
+
 # Release 1.12.5
 
 This release upgrades EMR to version 5.36.2, and upgrades the instance fleet to only use 6th and 7th generation EC2 instance types.

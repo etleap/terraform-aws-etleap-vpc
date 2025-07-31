@@ -31,7 +31,7 @@ module "main_app" {
   })
 
   # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
-  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
+  db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.db_init_script.key} /tmp/db-init.sh && chmod 0755 /tmp/db-init.sh && /tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
   
   # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
   influx_db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.influx_db_init_script.key} /tmp/influx-db-init.sh && chmod 0755 /tmp/influx-db-init.sh && /tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
@@ -72,7 +72,7 @@ module "secondary_app" {
   })
 
   # Arguments: DB_ROOT_PASSWORD, ETLEAP_DB_PASSWORD, ETLEAP_RDS_HOSTNAME, ETLEAP_DB_SUPPORT_USERNAME, ETLEAP_DB_SUPPORT_PASSWORD
-  db_init = "/tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
+  db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.db_init_script.key} /tmp/db-init.sh && chmod 0755 /tmp/db-init.sh && /tmp/db-init.sh $(aws secretsmanager get-secret-value --secret-id ${module.db_root_password.arn} | jq -r .SecretString) $(aws secretsmanager get-secret-value --secret-id ${module.db_password.arn} | jq -r .SecretString) ${aws_db_instance.db.address} etleap-support $(aws secretsmanager get-secret-value --secret-id ${module.db_support_password.arn} | jq -r .SecretString)"
 
   # Arguments: INFLUX_HOSTNAME, INFLUX_USERNAME, INFLUX_PASSWORD, SECRET_ARN
   influx_db_init = "aws s3 cp s3://${aws_s3_bucket.intermediate.bucket}/${aws_s3_object.influx_db_init_script.key} /tmp/influx-db-init.sh && chmod 0755 /tmp/influx-db-init.sh && /tmp/influx-db-init.sh ${local.context.influx_db_hostname} ${local.influx_db_username} ${local.influx_db_password} ${local.context.influx_db_api_token_arn}"
