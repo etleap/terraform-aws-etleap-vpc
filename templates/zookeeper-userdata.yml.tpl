@@ -41,22 +41,22 @@ write_files:
   content: ${base64encode(file_docker_compose)}
 
 runcmd:
-  - echo RESET grub-efi/install_devices | debconf-communicate grub-pc
-  - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
-  - DEBIAN_FRONTEND=noninteractive apt-get install -y awscli
-  - crontab -u ubuntu -r
-  - mkdir -p /home/ubuntu/logs/zk/
-  - gunzip /home/ubuntu/*.sh.gz
-  - chmod +x /home/ubuntu/*.sh
-  - chown ubuntu:ubuntu -R /home/ubuntu
-  - sudo /bin/bash /home/ubuntu/kinesis-install.sh > /home/ubuntu/logs/kinesis-install.log 2>&1
-  - sudo /bin/bash /home/ubuntu/zookeeper-install.sh > /home/ubuntu/logs/zookeeper-install.log 2>&1
-  - sudo echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
-  - sudo service ntp restart
-  - sudo ntpq -pn
-  %{ if post_install_script_command != null ~}
-  - ${post_install_script_command}
-  %{ endif ~}
+- echo RESET grub-efi/install_devices | debconf-communicate grub-pc
+- apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
+- DEBIAN_FRONTEND=noninteractive apt-get install -y awscli
+- crontab -u ubuntu -r
+- mkdir -p /home/ubuntu/logs/zk/
+- gunzip /home/ubuntu/*.sh.gz
+- chmod +x /home/ubuntu/*.sh
+- chown ubuntu:ubuntu -R /home/ubuntu
+- sudo /bin/bash /home/ubuntu/kinesis-install.sh > /home/ubuntu/logs/kinesis-install.log 2>&1
+- sudo /bin/bash /home/ubuntu/zookeeper-install.sh > /home/ubuntu/logs/zookeeper-install.log 2>&1
+- sudo echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
+- sudo service ntp restart
+- sudo ntpq -pn
+%{ if post_install_script_command != null ~}
+- ${post_install_script_command}
+%{ endif ~}
 
 power_state:
   delay: "now"

@@ -34,6 +34,11 @@ resource "aws_iam_role_policy_attachment" "zookeeper-ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "zookeeper_read_init_script" {
+  role = aws_iam_role.zookeeper.name
+  policy_arn = aws_iam_policy.zookeeper_read_init_script_policy.arn
+}
+
 resource "aws_iam_role_policy_attachment" "emr-ssm" {
   count      = var.allow_iam_support_role ? 1 : 0
   role       = aws_iam_role.emr.name
@@ -276,6 +281,28 @@ resource "aws_iam_policy" "cloudwatch_metric_data" {
             ],
             "Resource": [
                 "*"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "zookeeper_read_init_script_policy" {
+  tags   = local.default_tags
+  name   = "Etleap-${var.deployment_id}-Zookeeper-Init-Scripts-Read-Policy"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "InitScriptsGet",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.intermediate.id}/init-scripts/*"
             ]
         }
     ]

@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.12.6"
+  version = "1.12.7"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172

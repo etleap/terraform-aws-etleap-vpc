@@ -1,3 +1,14 @@
+# Release 1.12.7
+
+Fixes an issue where the post-install script was not being executed on Zookeeper instances when the `post_install_script` variable, introduced in 1.12.1, was set.
+This release adds a minimal permission for Zookeeper EC2 instances to correctly fetch the post-install script from the `init-scripts` directory in the intermediate bucket.
+
+# Upgrade instructions
+
+1. Update the module version to `1.12.7` and run `terraform apply`.
+2. If you have set the `post_install_script` variable, you will need to replace the Zookeeper instances to rerun the post-install script for them,
+see [Upgrading the Zookeeper Cluster](./README.md#upgrading-the-zookeeper-cluster). 
+
 # Release 1.12.6
 Refactors the app node user-data to reduce its length to avoid certain deployments reaching the user-data length limit of 16k characters.
 This is done by storing the RDS database initialization script in S3, instead of including it in the instance `user_data`, and fetching it on EC2 instance startup.

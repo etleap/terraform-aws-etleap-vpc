@@ -179,5 +179,5 @@ resource "aws_s3_object" "customer_post_install_script" {
   count  = var.post_install_script != null ? 1 : 0
   bucket = aws_s3_bucket.intermediate.id
   key    = "init-scripts/post_install_${filesha256(var.post_install_script)}.sh"
-  source = "${var.post_install_script}"
+  source = var.post_install_script
 }
