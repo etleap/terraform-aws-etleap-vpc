@@ -1,3 +1,8 @@
+# Release 1.12.8
+
+Fixes EMR startup failures in some regions by excluding EC2 instance types not supported there.
+This release makes no infrastructure changes.
+
 # Release 1.12.7
 
 Fixes an issue where the post-install script was not being executed on Zookeeper instances when the `post_install_script` variable, introduced in 1.12.1, was set.
