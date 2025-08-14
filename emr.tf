@@ -720,3 +720,27 @@ data "aws_instance" "emr-master" {
     values = [aws_emr_cluster.emr.master_public_dns]
   }
 }
+
+# EventBridge rule to capture EMR scaling events indicating spot capacity issues
+# This enables detection of insufficient spot capacity events that should trigger
+# a switch from spot instances to on-demand instances
+resource "aws_cloudwatch_event_rule" "emr_spot_capacity_shortage" {
+  name        = "emr-scaling-events"
+  description = "Capture EMR Instance Fleet Resize events indicating spot capacity shortage"
+  tags        = merge({ Name = "Etleap EMR Spot Capacity Shortage" }, local.default_tags)
+
+  event_pattern = jsonencode({
+    source = [
+      "aws.emr"
+    ],
+    detail-type = [
+      "EMR Instance Fleet Resize"
+    ],
+    detail = {
+      severity = ["WARNING"],
+      clusterId = [
+        aws_emr_cluster.emr.id
+      ]
+    }
+  })
+}

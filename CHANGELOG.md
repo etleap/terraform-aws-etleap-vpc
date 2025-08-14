@@ -1,3 +1,7 @@
+# Release 1.12.9
+
+Adds monitoring to capture EMR spot capacity shortage events, enabling the automatic switching to on-demand instances when spot capacity is unavailable.
+
 # Release 1.12.8
 
 Fixes EMR startup failures in some regions by excluding EC2 instance types not supported there.
