@@ -46,8 +46,9 @@ memory_usage() {
   ZK_CONTAINER_ID=`docker ps -q --no-trunc | grep "$ZK_CONTAINER_ID"`
   ZK_CONTAINER_NAME=`echo $ZK_CONTAINER_ID_AND_NAME | cut -d, -f2`
 
-  RSS=`cat /sys/fs/cgroup/memory/docker/$ZK_CONTAINER_ID/memory.stat | grep -Eo "^rss (.*)$" | sed -n -r 's/rss (.*)/\1/p'`
-  SWAP=`cat /sys/fs/cgroup/memory/docker/$ZK_CONTAINER_ID/memory.stat | grep -Eo "^swap (.*)$" | sed -n -r 's/swap (.*)/\1/p'`
+  CGROUP="/sys/fs/cgroup/system.slice/docker-$ZK_CONTAINER_ID.scope"
+  RSS=$(cat "$CGROUP/memory.current")
+  SWAP=$(cat "$CGROUP/memory.swap.current")
 
   echo    "RSS:  $RSS"
   echo -n "SWAP: "

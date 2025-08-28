@@ -54,6 +54,12 @@ resource "aws_instance" "zookeeper" {
     delete_on_termination = true
   }
 
+  metadata_options {
+    http_tokens                 = "optional"  # Allows IMDSv1
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 2
+  }
+
   user_data = templatefile("${path.module}/templates/zookeeper-userdata.yml.tpl", {
     env = "vpc",
     region = local.region,

@@ -42,8 +42,14 @@ write_files:
 
 runcmd:
 - echo RESET grub-efi/install_devices | debconf-communicate grub-pc
+- sed -i "s/\$nrconf{restart} = 'i'/\$nrconf{restart} = 'a'/g" /etc/needrestart/needrestart.conf
+- sed -i '/\$nrconf{restart}/s/^#//g' /etc/needrestart/needrestart.conf
 - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
-- DEBIAN_FRONTEND=noninteractive apt-get install -y awscli
+- DEBIAN_FRONTEND=noninteractive apt-get install -y unzip
+- curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+- unzip -q -o /tmp/awscliv2.zip -d /tmp
+- sudo /tmp/aws/install --update
+- sudo rm -rf /tmp/aws /tmp/awscliv2.zip
 - crontab -u ubuntu -r
 - mkdir -p /home/ubuntu/logs/zk/
 - gunzip /home/ubuntu/*.sh.gz

@@ -10,7 +10,7 @@ deploymentId=$ETLEAP_DEPLOYMENT_ID
 secretKey=$ETLEAP_SECRET_APPLICATION_SECRET
 
 # Pull an ECR authentication token and store it locally
-printf "[ZOOKEEPER_CRON] Starting docker-compose"
+printf "[ZOOKEEPER_CRON] Starting docker compose"
 export AWS_DEFAULT_REGION=us-east-1
 BEARER=$(echo -n "$ETLEAP_DEPLOYMENT_ID:$ETLEAP_SECRET_APPLICATION_SECRET" | openssl base64 -A)
 EC2_IDENTITY_DOCUMENT=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | openssl base64 -A)
@@ -26,9 +26,9 @@ ECR_AUTH_TOKEN_JSON=$(grep -A7 "docker_config.write" /home/ubuntu/.deployScript 
 mkdir -p /home/ubuntu/.docker
 echo "{$ECR_AUTH_TOKEN_JSON" > /home/ubuntu/.docker/config.json
 
-# Start docker-compose
-printf "[ZOOKEEPER_CRON] Starting docker-compose"
-docker-compose -f /home/ubuntu/docker-compose.yml up -d
+# Start docker compose
+printf "[ZOOKEEPER_CRON] Starting docker compose"
+docker compose -f /home/ubuntu/docker-compose.yml up -d
 
 # Clean up unused images
 docker rmi $(docker images -q --filter "dangling=true") > /dev/null || true

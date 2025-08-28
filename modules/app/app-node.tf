@@ -78,6 +78,12 @@ resource "aws_instance" "app" {
     delete_on_termination = true
   }
 
+  metadata_options {
+    http_tokens                 = "optional"  # Allows IMDSv1
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 2
+  }
+
   lifecycle {
     ignore_changes = [ebs_block_device]
   }

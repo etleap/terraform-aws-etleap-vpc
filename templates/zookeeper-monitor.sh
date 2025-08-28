@@ -3,7 +3,8 @@
 export AWS_DEFAULT_REGION=us-east-1
 
 # Zookeeper might catch more than 1 security group, so let's fetch the first one
-SECURITY_GROUP=$(curl -s http://169.254.169.254/latest/meta-data/security-groups | grep 'app\|monitor\|job\|customervpc\|zookeeper' | head -n1)
+IMDS_TOKEN=$(curl -X PUT "http://instance-data/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" -s)
+SECURITY_GROUP=$(curl -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" http://169.254.169.254/latest/meta-data/security-groups | grep 'app\|monitor\|job\|customervpc\|zookeeper' | head -n1)
 ZK_HOST="localhost"
 RETRIES=5
 
@@ -43,8 +44,9 @@ check_zk_running() {
 }
 
 submit_memory_usage() {
-  RSS=`cat /sys/fs/cgroup/memory/docker/$ZK_CONTAINER_ID/memory.stat | grep -Eo "^rss (.*)$" | sed -n -r 's/rss (.*)/\1/p'`
-  SWAP=`cat /sys/fs/cgroup/memory/docker/$ZK_CONTAINER_ID/memory.stat | grep -Eo "^swap (.*)$" | sed -n -r 's/swap (.*)/\1/p'`
+  CGROUP="/sys/fs/cgroup/system.slice/docker-$ZK_CONTAINER_ID.scope"
+  RSS=$(cat "$CGROUP/memory.current")
+  SWAP=$(cat "$CGROUP/memory.swap.current")
 
   echo "[ZooKeeperMonitor] $INSTANCE_NAME: Etleap/ZooKeeper RSS $RSS"
 

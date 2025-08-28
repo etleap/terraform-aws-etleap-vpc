@@ -1,3 +1,33 @@
+# Release 1.13.0
+
+Upgrades the Application and Zookeeper EC2 instances to use Ubuntu 24.04 LTS.
+
+## Upgrade instructions
+
+This upgrade will replace the application and Zookeeper EC2 instances, and this will cause about 15 minutes of downtime.
+If your AWS policies block AMIs by default, please whitelist the AMI for your deployment's region before applying:
+
+af-south-1: ami-02cb3e4084f9ce0ba
+ap-east-1: ami-0fdaff15803e47630
+ap-northeast-1: ami-02ad584f3f0b7fa08
+ap-northeast-2: ami-0973b9699cae043e0
+ap-south-1: ami-0b9db28497f390dfc
+ap-southeast-1: ami-08be11789fd91b5dc
+ap-southeast-2: ami-0ee526f6ebcc05b45
+ca-central-1: ami-0f9d27516ce5dd62c
+eu-central-1: ami-0af8da5d15f2d73b2
+eu-north-1: ami-06d85b0fb796725d3
+eu-south-1: ami-05b2089088824e498
+eu-west-1: ami-0e7a71a279e5e3195
+eu-west-2: ami-02c0dda056afbbbfc
+eu-west-3: ami-0c6ed391eaa94a3cd
+me-south-1: ami-09cf190512458a456
+sa-east-1: ami-0d4dcfdd604ad4f00
+us-east-1: ami-01a5f88b519cc1804
+us-east-2: ami-0470f71d9b27d37c5
+us-west-1: ami-03148d94d3f13d5ad
+us-west-2: ami-0a7bf5a0b2820c543
+
 # Release 1.12.9
 
 Adds monitoring to capture EMR spot capacity shortage events, enabling the automatic switching to on-demand instances when spot capacity is unavailable.
