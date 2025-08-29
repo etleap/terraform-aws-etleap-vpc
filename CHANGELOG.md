@@ -1,3 +1,8 @@
+# Release 1.13.1
+
+Fixes an issue introduced in version 1.12.9 that caused oscillating Terraform plans for the additional monitoring rules added in that release. 
+This issue only affects AWS accounts with more than one Etleap VPC deployment.
+
 # Release 1.13.0
 
 Upgrades the Application and Zookeeper EC2 instances to use Ubuntu 24.04 LTS.

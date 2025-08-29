@@ -725,7 +725,7 @@ data "aws_instance" "emr-master" {
 # This enables detection of insufficient spot capacity events that should trigger
 # a switch from spot instances to on-demand instances
 resource "aws_cloudwatch_event_rule" "emr_spot_capacity_shortage" {
-  name        = "emr-scaling-events"
+  name        = "etleap-${var.deployment_id}-emr-scaling-events"
   description = "Capture EMR Instance Fleet Resize events indicating spot capacity shortage"
   tags        = merge({ Name = "Etleap EMR Spot Capacity Shortage" }, local.default_tags)
 
