@@ -1,3 +1,7 @@
+# Release 1.13.2
+
+Adds an Amazon Cognito identity pool resource in order to support Microsoft Entra ID identity federation. There is no charge for this AWS resource.
+
 # Release 1.13.1
 
 Fixes an issue introduced in version 1.12.9 that caused oscillating Terraform plans for the additional monitoring rules added in that release. 

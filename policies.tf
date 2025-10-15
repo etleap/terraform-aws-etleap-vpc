@@ -260,6 +260,15 @@ resource "aws_iam_policy" "app_various_limited" {
           "sqs:GetQueueUrl"
         ],
         "Resource": "${module.github_webhooks.github_webhooks_queue.arn}"
+      },
+      {
+        "Sid": "CognitoIdentityPoolAccess",
+        "Effect": "Allow",
+        "Action": [
+          "cognito-identity:GetOpenIdTokenForDeveloperIdentity",
+          "cognito-identity:LookupDeveloperIdentity"
+        ],
+        "Resource": "${aws_cognito_identity_pool.etleap_azure_identity_pool.arn}"
       }
     ]
 }
