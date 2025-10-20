@@ -260,15 +260,6 @@ resource "aws_iam_policy" "app_various_limited" {
           "sqs:GetQueueUrl"
         ],
         "Resource": "${module.github_webhooks.github_webhooks_queue.arn}"
-      },
-      {
-        "Sid": "CognitoIdentityPoolAccess",
-        "Effect": "Allow",
-        "Action": [
-          "cognito-identity:GetOpenIdTokenForDeveloperIdentity",
-          "cognito-identity:LookupDeveloperIdentity"
-        ],
-        "Resource": "${aws_cognito_identity_pool.etleap_azure_identity_pool.arn}"
       }
     ]
 }
@@ -525,4 +516,31 @@ resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy_emr" {
 resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy_emr_default" {
   role       = aws_iam_role.emr_default_role.name
   policy_arn = aws_iam_policy.emr_ebs_kms_encryption_policy.arn
+}
+
+resource aws_iam_policy "cognito_open_id_token" {
+  name   = "EtleapCognitoOpenIdToken${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CognitoIdentityPoolAccess",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-identity:GetOpenIdTokenForDeveloperIdentity",
+        "cognito-identity:LookupDeveloperIdentity"
+      ],
+      "Resource": "${aws_cognito_identity_pool.etleap_azure_identity_pool.arn}"
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_iam_policy_attachment" "cognito_open_id_token" {
+  name       = "EtleapCognitoOpenIDTokenPolicy${local.resource_name_suffix}"
+  roles      = [aws_iam_role.app.name, aws_iam_role.emr.name]
+  policy_arn = aws_iam_policy.cognito_open_id_token.arn
 }

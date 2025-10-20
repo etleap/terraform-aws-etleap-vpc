@@ -1,3 +1,7 @@
+# Release 1.13.3
+
+Fixes an issue introduced in version 1.13.2 where the IAM role used by EMR was missing the new IAM policy to access Amazon Cognito.
+
 # Release 1.13.2
 
 Adds an Amazon Cognito identity pool resource in order to support Microsoft Entra ID identity federation. There is no charge for this AWS resource.
