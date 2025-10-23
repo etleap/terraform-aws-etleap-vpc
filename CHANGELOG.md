@@ -1,3 +1,17 @@
+# Release 1.13.4
+
+Upgrades RDS storage class from `gp2` to `gp3`.
+This operation is performed without downtime, but it will affect database performance for up to 12 hours after the change.
+We recommend performing this upgrade during periods with low activity, e.g. overnight or during weekends.
+
+## Upgrade instructions
+1. Change the module version to `1.13.4` and add the following property to the module definition:
+   ```
+   rds_apply_immediately = true
+   ```
+2. Run `terraform apply` to upgrade the DB storage type.
+3. Once the previous step is complete, remove the `rds_apply_immediately` variable and run `terraform apply` again.
+
 # Release 1.13.3
 
 Fixes an issue introduced in version 1.13.2 where the IAM role used by EMR was missing the new IAM policy to access Amazon Cognito.

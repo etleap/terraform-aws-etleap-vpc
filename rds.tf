@@ -2,7 +2,7 @@ resource "aws_db_instance" "db" {
   tags                         = local.default_tags
   identifier_prefix            = "etleap"
   allocated_storage            = 500
-  storage_type                 = "gp2"
+  storage_type                 = "gp3"
   engine                       = "mysql"
   engine_version               = "8.0.40"
   instance_class               = var.rds_instance_type
