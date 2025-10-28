@@ -57,9 +57,6 @@ runcmd:
 - chown ubuntu:ubuntu -R /home/ubuntu
 - sudo /bin/bash /home/ubuntu/kinesis-install.sh > /home/ubuntu/logs/kinesis-install.log 2>&1
 - sudo /bin/bash /home/ubuntu/zookeeper-install.sh > /home/ubuntu/logs/zookeeper-install.log 2>&1
-- sudo echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
-- sudo service ntp restart
-- sudo ntpq -pn
 %{ if post_install_script_command != null ~}
 - ${post_install_script_command}
 %{ endif ~}

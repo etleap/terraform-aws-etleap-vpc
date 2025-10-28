@@ -21,6 +21,8 @@ resource "aws_db_instance" "db" {
   performance_insights_enabled = true
   multi_az                     = var.ha_mode
   ca_cert_identifier           = "rds-ca-rsa4096-g1"
+  iops                         = 12000
+  storage_throughput           = 500
 
   allow_major_version_upgrade = var.rds_allow_major_version_upgrade
   apply_immediately           = var.rds_apply_immediately

@@ -1,16 +1,49 @@
-# Release 1.13.4
+# Release 1.13.5
 
-Upgrades RDS storage class from `gp2` to `gp3`.
-This operation is performed without downtime, but it will affect database performance for up to 12 hours after the change.
-We recommend performing this upgrade during periods with low activity, e.g. overnight or during weekends.
+- Fixes an issue that caused the system clocks on the App and Zookeeper EC2 instances to fall out of sync after upgrading to Ubuntu 24.04 in 1.13.0.
+- Upgrades RDS storage class from `gp2` to `gp3`.
+- Resolves an issue in version 1.13.4 that caused `terraform apply` to fail due to a missing `iops` variable for RDS instances using gp3 volumes. 
+- The module now ignores changes to `target_on_demand_capacity` for EMR instance fleets, so manual changes by operators or automatic changes by the application do not cause Terraform drift.
 
 ## Upgrade instructions
-1. Change the module version to `1.13.4` and add the following property to the module definition:
+
+The upgrade to RDS is performed without downtime of the database, but it will affect database performance for up to 12 hours after the change.
+We recommend performing this upgrade during periods with low activity, e.g. overnight or during weekends.
+
+This upgrade will also replace the application and Zookeeper EC2 instances, and this will cause about 15 minutes of downtime.
+If your AWS policies block AMIs by default, please whitelist the AMI for your deployment's region before applying:
+
+af-south-1: ami-00c3d948804bc9ac0
+ap-east-1: ami-04900dbefe52f0292
+ap-northeast-1: ami-03b4e26264e79e1b3
+ap-northeast-2: ami-04d8c19ce85bf7bc4
+ap-south-1: ami-05b4d805e813a75a3
+ap-southeast-1: ami-0ed4ad5c849aae7fe
+ap-southeast-2: ami-07950cf97c5b22ecd
+ca-central-1: ami-015345ee32700d712
+eu-central-1: ami-0f3c0b99dee438443
+eu-north-1: ami-04769c93e87653487
+eu-south-1: ami-04889e7fd638ca39b
+eu-west-1: ami-01d7ca7d503247c4a
+eu-west-2: ami-0eb8840519b09339f
+eu-west-3: ami-07f529eb42ada0d59
+me-south-1: ami-017505227fb051406
+sa-east-1: ami-0759355ae132089e2
+us-east-1: ami-0e0a4106402da2799
+us-east-2: ami-079378cd1a0c35a49
+us-west-1: ami-0047b1dbf7c01e21f
+us-west-2: ami-0f4ef8559c70234eb
+
+1. Change the module version to `1.13.5` and add the following property to the module definition:
    ```
    rds_apply_immediately = true
    ```
-2. Run `terraform apply` to upgrade the DB storage type.
+2. Run `terraform apply` to upgrade the DB storage type and replace the Application and Zookeeper instances.
 3. Once the previous step is complete, remove the `rds_apply_immediately` variable and run `terraform apply` again.
+
+# Release 1.13.4 (Withdrawn)
+
+This version has been withdrawn due to a missing required RDS variable. The issue has been resolved in version 1.13.5. Please use version 1.13.5 or later instead.
 
 # Release 1.13.3
 

@@ -477,6 +477,7 @@ resource "aws_emr_instance_fleet" "task_spot_xlarge" {
   lifecycle {
     ignore_changes = [
       target_spot_capacity,
+      target_on_demand_capacity,
       launch_specifications[0].spot_specification["allocation_strategy"] // Workaround for bug: https://github.com/hashicorp/terraform-provider-aws/issues/34151
     ]
   }
@@ -517,6 +518,7 @@ resource "aws_emr_instance_fleet" "task_spot_4xlarge" {
   lifecycle {
     ignore_changes = [
       target_spot_capacity,
+      target_on_demand_capacity,
       launch_specifications[0].spot_specification["allocation_strategy"] // Workaround for bug: https://github.com/hashicorp/terraform-provider-aws/issues/34151
     ]
   }

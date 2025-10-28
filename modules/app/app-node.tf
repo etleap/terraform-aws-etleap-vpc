@@ -129,9 +129,6 @@ runcmd:
 %{ endif ~}
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
-- echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
-- service ntp restart
-- ntpq -pn
 %{ if var.post_install_script_command != null ~}
 - ${var.post_install_script_command}
 %{ endif ~}
