@@ -257,9 +257,13 @@ resource "aws_iam_policy" "app_various_limited" {
         "Action": [
           "sqs:ReceiveMessage",
           "sqs:DeleteMessage",
-          "sqs:GetQueueUrl"
+          "sqs:GetQueueUrl",
+          "sqs:GetQueueAttributes"
         ],
-        "Resource": "${module.github_webhooks.github_webhooks_queue.arn}"
+        "Resource": [
+          "${module.github_webhooks.github_webhooks_queue.arn}",
+          "arn:aws:sqs:us-east-1:841591717599:Etleap-${var.deployment_id}-github-app-webhooks-queue"
+        ]
       }
     ]
 }

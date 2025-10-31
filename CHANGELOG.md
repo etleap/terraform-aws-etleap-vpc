@@ -1,3 +1,7 @@
+# Release 1.13.6
+
+Adds permissions to read from Etleap's deployment specific GitHub SQS queue, to deliver GitHub webhooks for dbt CI.
+
 # Release 1.13.5
 
 - Fixes an issue that caused the system clocks on the App and Zookeeper EC2 instances to fall out of sync after upgrading to Ubuntu 24.04 in 1.13.0.
