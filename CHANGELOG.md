@@ -1,3 +1,7 @@
+# Release 1.13.8
+
+Fixed an issue with the Zookeeper installation script that prevented upgrades from being performed after the initial boot.
+
 # Release 1.13.7
 
 Fixed an issue with EMR Configuration where disabling logs and metric will not correctly propagate to the EMR cluster.

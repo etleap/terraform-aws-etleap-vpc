@@ -8,12 +8,6 @@ printf "[ZOOKEEPER_INIT] Starting instance init"
   sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -q -y
 }
 
-printf "[ZOOKEEPER_INIT] Installing Docker, docker compose"
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-  sudo gpg --dearmor -o /usr/share/keyrings/docker.gpg
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $UBUNTU_CODENAME stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo add-apt-repository -y -u "deb [arch=amd64] https://download.docker.com/linux/ubuntu noble stable"
 sudo apt-get update
 printf "[ZOOKEEPER_INIT] Available docker-ce packages"
 apt-cache policy docker-ce
