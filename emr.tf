@@ -20,7 +20,7 @@ locals {
     {
       name = "Install Kinesis Agent"
       path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-kinesis-agent.sh"
-      args = [var.deployment_id, local.app_main_private_ip, "false"]
+      args = [var.deployment_id, local.zookeeper1_private_ip, "false"]
     },
     {
       name = "Set TCP keepalive"

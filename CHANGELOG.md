@@ -1,3 +1,9 @@
+# Release 1.13.7
+
+Fixed an issue with EMR Configuration where disabling logs and metric will not correctly propagate to the EMR cluster.
+
+This will require replacing the EMR cluster. Expect 10-15 minutes of downtime for pipelines. The API and Web UI will be unaffected.
+
 # Release 1.13.6
 
 Adds permissions to read from Etleap's deployment specific GitHub SQS queue, to deliver GitHub webhooks for dbt CI.

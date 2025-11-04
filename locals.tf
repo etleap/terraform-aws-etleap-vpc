@@ -8,6 +8,7 @@ locals {
   app_hostname_config_name   = "${local.ssm_parameter_prefix}/app_hostname"
   app_main_private_ip        = element(tolist(aws_network_interface.main_app.private_ips[*]), 0)
   app_private_ip_config_name = "${local.ssm_parameter_prefix}/app_private_ip"
+  zookeeper1_private_ip      = element(tolist(aws_network_interface.zookeeper["1"].private_ips[*]), 0)
 
   rds_hostname_config_name             = "${local.ssm_parameter_prefix}/rds_hostname"
   rds_username_config_name             = "${local.ssm_parameter_prefix}/rds_username"
