@@ -13,7 +13,9 @@ secretKey=$ETLEAP_SECRET_APPLICATION_SECRET
 printf "[ZOOKEEPER_CRON] Starting docker compose"
 export AWS_DEFAULT_REGION=us-east-1
 BEARER=$(echo -n "$ETLEAP_DEPLOYMENT_ID:$ETLEAP_SECRET_APPLICATION_SECRET" | openssl base64 -A)
-EC2_IDENTITY_DOCUMENT=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | openssl base64 -A)
+IMDS_TOKEN=$(curl -X PUT "http://instance-data/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60" -s)
+EC2_IDENTITY_DOCUMENT=$(curl -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" http://169.254.169.254/latest/dynamic/instance-identity/document | openssl base64 -A)
+HOST_ADDRESS=$(curl --connect-timeout 3 -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
 curl \
    --header "Authorization: Basic $BEARER" \
    --header "Ec2Metadata: $EC2_IDENTITY_DOCUMENT" \
@@ -92,11 +94,9 @@ if [ ! "$secretKey" ]; then
 fi
 
 if [ ! `command -v openssl` ]; then
-  echo "Dependency not found: it's required to 'openssl' be available in your system"
+  echo "Dependency not found: it is required to 'openssl' be available in your system"
   exit 2
 fi
 
-hostAddress="`curl --connect-timeout 3 -s http://169.254.169.254/latest/meta-data/local-ipv4`"
-
 # Enable or disable Kinesis Logging Agent
-setup_logging $HOSTNAME $deploymentId
+setup_logging $HOST_ADDRESS $deploymentId

@@ -79,7 +79,7 @@ resource "aws_instance" "app" {
   }
 
   metadata_options {
-    http_tokens                 = "optional"  # Allows IMDSv1
+    http_tokens                 = "required"
     http_endpoint               = "enabled"
     http_put_response_hop_limit = 2
   }

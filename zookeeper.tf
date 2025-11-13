@@ -32,7 +32,7 @@ resource "aws_instance" "zookeeper" {
   user_data_replace_on_change = true
 
   lifecycle {
-    ignore_changes = [ user_data, ebs_block_device ]
+    ignore_changes = [ ebs_block_device ]
   }
 
   network_interface {
@@ -55,7 +55,7 @@ resource "aws_instance" "zookeeper" {
   }
 
   metadata_options {
-    http_tokens                 = "optional"  # Allows IMDSv1
+    http_tokens                 = "required"
     http_endpoint               = "enabled"
     http_put_response_hop_limit = 2
   }
