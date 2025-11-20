@@ -48,6 +48,9 @@ echo "Writing agent service update script"
 cat << EOF > /root/restart_kinesis_agent.sh
 #!/bin/bash -e
 
+echo "Adding the aws-kinesis-agent to the ubuntu group"
+sudo usermod -a -G ubuntu aws-kinesis-agent-user
+
 echo "Starting log delivery"
 sudo service aws-kinesis-agent restart
 EOF

@@ -129,6 +129,7 @@ runcmd:
 %{ endif ~}
 - yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
 - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
+- usermod -a -G ubuntu aws-kinesis-agent-user
 %{ if var.post_install_script_command != null ~}
 - ${var.post_install_script_command}
 %{ endif ~}

@@ -1,3 +1,12 @@
+# Release 1.13.10
+
+Fixes an issue introduced in version 1.13.0 where certain logs were not forwarded from the App instances, and resolves a long-standing issue with log forwarding from the Zookeeper instances.
+
+## Upgrade instructions
+
+This upgrade will replace the App and Zookeeper instances, causing 10-15 minutes of downtime.
+If you would like to upgrade without downtime, please follow the instructions for [upgrading the App](./README.md#upgrading-the-application-instances) and [Zookeeper](./README.md#upgrading-the-zookeeper-cluster) instances.
+
 # Release 1.13.9
 
 Upgrades App and Etleap Zookeeper EC2 instances to use and require IMDSv2 instead of IMDSv1.

@@ -52,7 +52,7 @@ runcmd:
 - sudo rm -rf /tmp/aws /tmp/awscliv2.zip
 - crontab -u ubuntu -r
 - mkdir -p /home/ubuntu/logs/zk/
-- gunzip /home/ubuntu/*.sh.gz
+- gunzip -f /home/ubuntu/*.sh.gz
 - chmod +x /home/ubuntu/*.sh
 - chown ubuntu:ubuntu -R /home/ubuntu
 - sudo /bin/bash /home/ubuntu/kinesis-install.sh > /home/ubuntu/logs/kinesis-install.log 2>&1

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZK_CONTAINER="zookeeper"
+ZK_CONTAINER="ubuntu-zookeeper-1"
 ZK_HOST="localhost"
 ZK_PORT=2181
 RETRIES=5

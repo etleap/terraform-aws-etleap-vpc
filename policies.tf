@@ -16,10 +16,10 @@ resource "aws_iam_policy_attachment" "cloudwatch_metric_data" {
   policy_arn = aws_iam_policy.cloudwatch_metric_data.arn
 }
 
-resource "aws_iam_policy_attachment" "assume_roles" {
-  name       = "App and EMR assume any role"
+resource "aws_iam_policy_attachment" "assume_data_roles" {
+  name       = "App and EMR assume data role"
   roles      = [aws_iam_role.app.name, aws_iam_role.emr.name, aws_iam_role.emr_default_role.name]
-  policy_arn = aws_iam_policy.assume_roles.arn
+  policy_arn = aws_iam_policy.assume_data_roles.arn
 }
 
 resource "aws_iam_role_policy_attachment" "app-ssm" {
@@ -35,8 +35,13 @@ resource "aws_iam_role_policy_attachment" "zookeeper-ssm" {
 }
 
 resource "aws_iam_role_policy_attachment" "zookeeper_read_init_script" {
-  role = aws_iam_role.zookeeper.name
+  role       = aws_iam_role.zookeeper.name
   policy_arn = aws_iam_policy.zookeeper_read_init_script_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "zookepeer_assume_etleap_roles" {
+  role       = aws_iam_role.zookeeper.name
+  policy_arn = aws_iam_policy.assume_etleap_roles.arn
 }
 
 resource "aws_iam_role_policy_attachment" "emr-ssm" {
@@ -348,9 +353,9 @@ resource "aws_iam_policy" "emr_profile_policy" {
 EOF
 }
 
-resource "aws_iam_policy" "assume_roles" {
+resource "aws_iam_policy" "assume_data_roles" {
   tags   = local.default_tags
-  name   = "Etleap_assume_roles${local.resource_name_suffix}"
+  name   = "Etleap_assume_data_roles${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -373,6 +378,28 @@ resource "aws_iam_policy" "assume_roles" {
         "sts:AssumeRole"
       ],
       "Resource": ${jsonencode(var.roles_allowed_to_be_assumed)}
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "assume_etleap_roles" {
+  tags   = local.default_tags
+  name   = "Etleap_assume_etleap_roles${local.resource_name_suffix}"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowEtleapRoles",
+      "Effect": "Allow",
+      "Action": [
+        "sts:AssumeRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::841591717599:role/*"
+      ]
     }
   ]
 }
