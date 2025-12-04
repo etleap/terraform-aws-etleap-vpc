@@ -1,3 +1,14 @@
+# Release 1.13.11
+
+Upgrades dbt from version 1.9, which has reached end of life, to version 1.10.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
+## Upgrade instructions
+
+1. Update the module version to `1.13.11` and run `terraform apply`.
+2. [Replace the EMR Cluster](/README.md#upgrading-the-emr-cluster).
+
 # Release 1.13.10
 
 Fixes an issue introduced in version 1.13.0 where certain logs were not forwarded from the App instances, and resolves a long-standing issue with log forwarding from the Zookeeper instances.
