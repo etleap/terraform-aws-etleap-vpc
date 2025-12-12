@@ -1,3 +1,9 @@
+# Release 1.13.12
+
+Resolves a rare issue where EMR disks would fill up due to memory heap dumps, by removing excess memory heap dumps regularly.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
 # Release 1.13.11
 
 Upgrades dbt from version 1.9, which has reached end of life, to version 1.10.
