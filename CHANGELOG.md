@@ -2,7 +2,6 @@
 
 This changes the DMS replication instance from a specific engine version to being automatically updated before deprecation.
 
-
 # Release 1.13.12
 
 Resolves a rare issue where EMR disks would fill up due to memory heap dumps, by removing excess memory heap dumps regularly.
