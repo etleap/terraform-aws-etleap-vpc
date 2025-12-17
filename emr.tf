@@ -42,6 +42,10 @@ locals {
     {
       name = "Install DBT"
       path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-dbt-v3.sh"
+    },
+    {
+      name = "Reglarly clean up EMR heap dumps"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/clean-java-heap-dumps.sh"
     }
   ]
 
