@@ -2,9 +2,10 @@ resource "aws_dms_replication_instance" "dms" {
   count                        = var.disable_cdc_support ? 0 : 1
   tags                         = merge({Name = "Etleap DMS ${var.deployment_id}"}, local.default_tags)
   replication_instance_class   = var.dms_instance_type
-  engine_version               = "3.5.3"
   allocated_storage            = 250
   apply_immediately            = true
+  auto_minor_version_upgrade   = true
+  allow_major_version_upgrade  = true
   preferred_maintenance_window = "sun:10:30-sun:14:30"
   replication_instance_id      = "etleap-dms${local.resource_name_suffix}"
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms[0].id

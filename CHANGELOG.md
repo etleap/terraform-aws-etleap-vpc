@@ -1,3 +1,7 @@
+# Release 1.13.13
+
+Adds automatic version upgrades for AWS DMS, eliminating the need for manual upgrades when new versions become the default.
+
 # Release 1.13.12
 
 Resolves a rare issue where EMR disks would fill up due to memory heap dumps, by removing excess memory heap dumps regularly.
