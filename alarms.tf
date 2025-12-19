@@ -407,6 +407,7 @@ resource "aws_cloudwatch_metric_alarm" "zookeeper_unhealthy_nodes" {
   dimensions = {
     Node = "zookeeper"
     Instance = "${each.value}"
+    Deployment = var.deployment_id
   }
   period                    = "60"
   statistic                 = "Average"

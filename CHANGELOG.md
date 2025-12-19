@@ -1,3 +1,7 @@
+# Release 1.13.14
+
+Adds deployment ID as a dimension to the Zookeeper CloudWatch metrics. This scopes the metrics to a specific Etleap deployment and fixes an issue where the “Zookeeper cluster has Unhealthy Nodes” alarm would only fire when nodes across all deployments in the AWS account were unhealthy.
+
 # Release 1.13.13
 
 Adds automatic version upgrades for AWS DMS, eliminating the need for manual upgrades when new versions become the default.

@@ -2,6 +2,10 @@
 # Reports outstanding requests, avg latency, RSS and swap usage for running ZooKeeper container
 export AWS_DEFAULT_REGION=us-east-1
 
+# Load deployment ID from .etleap environment file
+source /home/ubuntu/.etleap
+DEPLOYMENT_ID=$ETLEAP_DEPLOYMENT_ID
+
 # Zookeeper might catch more than 1 security group, so let's fetch the first one
 IMDS_TOKEN=$(curl -X PUT "http://instance-data/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60" -s)
 SECURITY_GROUP=$(curl -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" http://169.254.169.254/latest/meta-data/security-groups | grep 'app\|monitor\|job\|customervpc\|zookeeper' | head -n1)
@@ -14,6 +18,32 @@ ZK_CONTAINER_ID_AND_NAME=`docker ps | tail -n +2 | sed 's/\([^ ]\+\).* \([^ ]\+\
 ZK_CONTAINER_ID=`echo $ZK_CONTAINER_ID_AND_NAME | cut -d, -f1`
 # Get full-length container ID
 ZK_CONTAINER_ID=`docker ps -q --no-trunc | grep "$ZK_CONTAINER_ID"`
+
+# Define common dimensions
+METRIC_DIMENSIONS="[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"},{\"Name\":\"Deployment\",\"Value\":\"$DEPLOYMENT_ID\"}]"
+
+# Helper function to sends multiple CloudWatch metrics in a single API call.
+# Arguments must be in name/value pairs. e.g. name1 value1 name2 value2
+put_metrics() {
+  if (( $# % 2 != 0 )); then
+    echo "Error: put_metrics requires name/value pairs"
+    return 1
+  fi
+
+  local METRICS_JSON="["
+  while [[ $# -gt 0 ]]; do
+    local NAME=$1
+    local VALUE=$2
+    METRICS_JSON+="{\"MetricName\":\"$NAME\",\"Value\":$VALUE,\"Dimensions\":$METRIC_DIMENSIONS}"
+    shift 2
+    [[ $# -gt 0 ]] && METRICS_JSON+=","
+  done
+  METRICS_JSON+="]"
+
+  aws cloudwatch put-metric-data \
+    --namespace "Etleap/ZooKeeper" \
+    --metric-data "$METRICS_JSON"
+}
 
 check_zk_running() {
   n=0
@@ -31,11 +61,7 @@ check_zk_running() {
 
   echo "[ZooKeeperMonitor] $INSTANCE_NAME: Etleap/ZooKeeper Ruok IMOK=$IMOK RUOK=$RUOK"
 
-  aws cloudwatch put-metric-data \
-    --namespace "Etleap/ZooKeeper" \
-    --metric-data "[
-      {\"MetricName\":\"Ruok\",\"Value\":$RUOK,\"Dimensions\":[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"}]}
-    ]"
+  put_metrics "Ruok" $RUOK
 
   if [[ -z "$IMOK" ]]; then
     echo "ZooKeeper node '$INSTANCE_NAME-$SECURITY_GROUP' is down"
@@ -50,19 +76,11 @@ submit_memory_usage() {
 
   echo "[ZooKeeperMonitor] $INSTANCE_NAME: Etleap/ZooKeeper RSS $RSS"
 
-  aws cloudwatch put-metric-data \
-    --namespace "Etleap/ZooKeeper" \
-    --metric-data "[
-      {\"MetricName\":\"RSS\",\"Value\":$RSS,\"Dimensions\":[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"}]}
-    ]"
-
-  if [[ ! -z "$SWAP" ]]; then
+  if [[ -n "$SWAP" ]]; then
     echo "[ZooKeeperMonitor] $INSTANCE_NAME: Etleap/ZooKeeper Swap $SWAP"
-    aws cloudwatch put-metric-data \
-      --namespace "Etleap/ZooKeeper" \
-      --metric-data "[
-        {\"MetricName\":\"Swap\",\"Value\":$SWAP,\"Dimensions\":[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"}]}
-      ]"
+    put_metrics "RSS" $RSS "Swap" $SWAP
+  else
+    put_metrics "RSS" $RSS
   fi
 }
 
@@ -91,13 +109,7 @@ submit_zk_stats() {
   fi
 
   echo "[ZooKeeperMonitor] $INSTANCE_NAME: Etleap/ZooKeeper Leader $LEADER"
-  aws cloudwatch put-metric-data \
-    --namespace "Etleap/ZooKeeper" \
-    --metric-data "[
-      {\"MetricName\":\"OutstandingRequests\",\"Value\":$OUTSTANDING,\"Dimensions\":[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"}]},
-      {\"MetricName\":\"AvgLatency\",\"Value\":$AVG_LATENCY,\"Dimensions\":[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"}]},
-      {\"MetricName\":\"Leader\",\"Value\":$LEADER,\"Dimensions\":[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"}]}
-    ]"
+  put_metrics "OutstandingRequests" $OUTSTANDING "AvgLatency" $AVG_LATENCY "Leader" $LEADER
 }
 
 # MAIN
