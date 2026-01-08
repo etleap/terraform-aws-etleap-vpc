@@ -1,3 +1,13 @@
+# Release 1.14.0
+
+Removes GitHub webhook infrastructure previously used for dbt CI that was introduced in version 1.11.4, as webhooks are now received and processed centrally. The API Gateway and associated resources have been removed.
+
+The `github_webhooks_domain_name_and_certificate` variable has been removed.
+
+## Upgrade instructions
+
+If you have specified the `github_webhooks_domain_name_and_certificate` variable, please remove it from your module definition.
+
 # Release 1.13.14
 
 Adds deployment ID as a dimension to the Zookeeper CloudWatch metrics. This scopes the metrics to a specific Etleap deployment and fixes an issue where the “Zookeeper cluster has Unhealthy Nodes” alarm would only fire when nodes across all deployments in the AWS account were unhealthy.

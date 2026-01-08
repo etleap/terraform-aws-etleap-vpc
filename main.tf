@@ -32,11 +32,3 @@ module "elva" {
   acm_certificate_arn                      = var.streaming_endpoint_acm_certificate_arn == null ? aws_acm_certificate.etleap[0].arn : var.streaming_endpoint_acm_certificate_arn
 }
 
-module "github_webhooks" {
-  source                             = "./modules/github_webhooks"
-  deployment_id                      = var.deployment_id
-  region                             = local.region
-  account_id                         = local.account_id
-  github_domain_name                 = var.github_webhooks_domain_name_and_certificate.name
-  github_domain_name_certificate_arn = var.github_webhooks_domain_name_and_certificate.certificate_arn
-}

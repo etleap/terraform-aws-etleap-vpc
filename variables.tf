@@ -374,28 +374,6 @@ variable "kms_key_additional_policies" {
   description = "(Optional) List of additional policy statements to be included in the deployment's KMS key's policy."
 }
 
-variable "github_webhooks_domain_name_and_certificate" {
-  type = object({
-    name            = optional(string)
-    certificate_arn = optional(string)
-  })
-  default = {}
-
-  description = <<EOT
-(Optional) Configuration for using a custom domain with GitHub webhooks.
-- `name`: A custom domain name to associate with GitHub webhooks (e.g., github.mydomain.com).
-- `certificate_arn`: ARN of an existing ACM certificate to use with `name`. Required if `name` is set.
-EOT
-
-  validation {
-    condition = (
-      (var.github_webhooks_domain_name_and_certificate.name == null && var.github_webhooks_domain_name_and_certificate.certificate_arn == null) ||
-      (var.github_webhooks_domain_name_and_certificate.name != null && var.github_webhooks_domain_name_and_certificate.certificate_arn != null)
-    )
-    error_message = "If 'github_webhooks_domain_name_and_certificate' is provided, both 'name' and 'certificate_arn' must be specified."
-  }
-}
-
 variable "post_install_script" {
   default     = null
   type        = string
