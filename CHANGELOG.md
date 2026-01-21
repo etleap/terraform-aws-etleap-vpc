@@ -12,6 +12,11 @@ If you have specified the `github_webhooks_domain_name_and_certificate` variable
 
 Adds deployment ID as a dimension to the Zookeeper CloudWatch metrics. This scopes the metrics to a specific Etleap deployment and fixes an issue where the “Zookeeper cluster has Unhealthy Nodes” alarm would only fire when nodes across all deployments in the AWS account were unhealthy.
 
+## Upgrade instructions
+
+This upgrade will replace the Zookeeper instances, causing 10-15 minutes of downtime.
+If you would like to upgrade without downtime, please follow the instructions for [upgrading the Zookeeper Cluster](./README.md#upgrading-the-zookeeper-cluster).
+
 # Release 1.13.13
 
 Adds automatic version upgrades for AWS DMS, eliminating the need for manual upgrades when new versions become the default.
