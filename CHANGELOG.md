@@ -1,3 +1,13 @@
+# Release 1.14.1
+
+Adds the `emr_kms_encryption_key` variable to allow specifying an existing KMS key for EMR local disk encryption, instead of creating a new one.
+
+Also adds an internal variable to disable the creation of Cognito identity pools.
+
+Fixes an issue where updating the `s3_kms_encryption_key` would cause `terraform apply` to fail because the module would attempt to replace the EMR Security Configuration without replacing the EMR cluster.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
 # Release 1.14.0
 
 Removes GitHub webhook infrastructure previously used for dbt CI that was introduced in version 1.11.4, as webhooks are now received and processed centrally. The API Gateway and associated resources have been removed.

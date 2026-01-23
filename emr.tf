@@ -233,6 +233,10 @@ locals {
     for instance_type, config in local.all_task_instance_types_4xlarge :
     instance_type => config if !contains(lookup(local.unsupported_instance_types_by_region, data.aws_region.current.name, []), instance_type)
   }
+
+  emr_kms_key_arn          = var.emr_kms_encryption_key != null ? var.emr_kms_encryption_key : aws_kms_key.etleap_emr_ebs_encryption_key[0].arn
+  # Add a suffix to the EMR security configuration name so that updating the resource works if the KMS key variables change
+  security_config_name_suffix = "(${var.s3_kms_encryption_key != null ? regex("[^/]+$", var.s3_kms_encryption_key) : "SSE-S3"}/${regex("[^/]+$", local.emr_kms_key_arn)})"
 }
 
 resource "null_resource" "emr_configuration_change" {
@@ -269,7 +273,7 @@ resource "aws_emr_cluster" "emr" {
 
   lifecycle {
     create_before_destroy = true
-    replace_triggered_by  = [ null_resource.emr_configuration_change]
+    replace_triggered_by  = [ null_resource.emr_configuration_change ]
   }
 
   master_instance_fleet {
@@ -447,7 +451,7 @@ EOF
 
 # Security configurations are immutable once created, so up-version the name when we need to change it
 resource "aws_emr_security_configuration" "emrfs_sse_kms" {
-  name = "EMRFS SSE-KMS - ${var.deployment_id} - V1"
+  name = "EMRFS SSE-KMS - ${var.deployment_id} - V1 ${local.security_config_name_suffix}"
 
   configuration = jsonencode({
     EncryptionConfiguration = {
@@ -465,7 +469,7 @@ resource "aws_emr_security_configuration" "emrfs_sse_kms" {
         LocalDiskEncryptionConfiguration = {
           EnableEbsEncryption       = true
           EncryptionKeyProviderType = "AwsKms"
-          AwsKmsKey                 = aws_kms_key.etleap_emr_ebs_encryption_key.arn
+          AwsKmsKey                 = local.emr_kms_key_arn
         }
       }
     }

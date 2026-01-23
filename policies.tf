@@ -530,7 +530,7 @@ resource "aws_iam_policy" "emr_ebs_kms_encryption_policy" {
         "kms:ListGrants"
       ],
       "Resource": [
-        "${aws_kms_key.etleap_emr_ebs_encryption_key.arn}"
+        "${var.emr_kms_encryption_key != null ? var.emr_kms_encryption_key : aws_kms_key.etleap_emr_ebs_encryption_key[0].arn}"
       ]
     }
   ]
@@ -549,6 +549,7 @@ resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy_emr_def
 }
 
 resource aws_iam_policy "cognito_open_id_token" {
+  count  = var.disable_cognito_identity_pool ? 0 : 1
   name   = "EtleapCognitoOpenIdToken${local.resource_name_suffix}"
   policy = <<EOF
 {
@@ -561,7 +562,7 @@ resource aws_iam_policy "cognito_open_id_token" {
         "cognito-identity:GetOpenIdTokenForDeveloperIdentity",
         "cognito-identity:LookupDeveloperIdentity"
       ],
-      "Resource": "${aws_cognito_identity_pool.etleap_azure_identity_pool.arn}"
+      "Resource": "${aws_cognito_identity_pool.etleap_azure_identity_pool[0].arn}"
     }
   ]
 }
@@ -570,7 +571,8 @@ EOF
 }
 
 resource "aws_iam_policy_attachment" "cognito_open_id_token" {
+  count      = var.disable_cognito_identity_pool ? 0 : 1
   name       = "EtleapCognitoOpenIDTokenPolicy${local.resource_name_suffix}"
   roles      = [aws_iam_role.app.name, aws_iam_role.emr.name]
-  policy_arn = aws_iam_policy.cognito_open_id_token.arn
+  policy_arn = aws_iam_policy.cognito_open_id_token[0].arn
 }

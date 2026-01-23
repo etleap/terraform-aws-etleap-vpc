@@ -10,6 +10,7 @@ resource "aws_kms_key" "etleap_encryption_key" {
 }
 
 resource "aws_kms_key" "etleap_emr_ebs_encryption_key" {
+  count                   = var.emr_kms_encryption_key == null ? 1 : 0
   tags                    = merge({ Name = "Etleap EMR EBS KMS" }, local.default_tags)
   description             = "Etleap EMR EBS encryption key"
   deletion_window_in_days = 30

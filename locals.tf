@@ -96,7 +96,7 @@ locals {
     influx_db_hostname                       = var.is_influx_db_in_secondary_region ? var.influx_db_hostname : aws_timestreaminfluxdb_db_instance.influx_db[0].endpoint
     influx_db_api_token_arn                  = aws_secretsmanager_secret.influx_db_api_token.arn
     iceberg_system_tables_db_name            = aws_glue_catalog_database.iceberg_system_tables_db.name
-    cognito_azure_identity_pool              = aws_cognito_identity_pool.etleap_azure_identity_pool.id
+    cognito_azure_identity_pool              = var.disable_cognito_identity_pool ? null : aws_cognito_identity_pool.etleap_azure_identity_pool[0].id
   }
 }
 

@@ -213,7 +213,12 @@ variable "private_subnets" {
 
 variable "s3_kms_encryption_key" {
   default     = null
-  description = "The key to use to encrypt S3 objects in the intermediate bucket."
+  description = "The ARN of an AWS KMS key to use to encrypt S3 objects in the intermediate bucket. If not specified, server-side encryption with Amazon S3-managed keys (SSE-S3) will be used."
+}
+
+variable "emr_kms_encryption_key" {
+  default     = null
+  description = "The ARN of an AWS KMS key to use to encrypt the local disk for EMR nodes. If not specified, a new KMS key will be created."
 }
 
 variable "disable_cdc_support" {
@@ -330,6 +335,11 @@ variable "influx_db_hostname" {
 variable "influx_db_password_arn" {
   default     = null
   description = "The password ARN of the InfluxDB instance if it is deployed in a secondary region. See `is_influx_db_in_secondary_region`."
+}
+
+variable "disable_cognito_identity_pool" {
+  default     = false
+  description = "(Internal) Set to true to disable creation of the Cognito Identity Pool for Azure Entra ID federation. This will prevent Azure Blob Storage connections from working. Only change from the default value if requested by Etleap's support team."
 }
 
 variable "outbound_access_destinations" {

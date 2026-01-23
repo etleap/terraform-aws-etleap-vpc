@@ -72,4 +72,7 @@ export ZOOKEEPER_CLUSTER_HOSTS=%{for id, addr in zookeeper_hosts_dns ~}${addr}:2
 export ETLEAP_INFLUX_DB_HOSTNAME="https://${var.influx_db_hostname}:8086"
 export ETLEAP_SECRET_INFLUX_DB_TOKEN="$(aws secretsmanager get-secret-value --secret-id ${var.influx_db_api_token_arn} | jq -r .SecretString)"
 export ETLEAP_ICEBERG_SYSTEM_TABLES_DB_NAME="${var.iceberg_system_tables_db_name}"
+
+%{~ if var.cognito_azure_identity_pool != null ~}
 export ETLEAP_COGNITO_AZURE_IDENTITY_POOL_ID="${var.cognito_azure_identity_pool}"
+%{~ endif }
