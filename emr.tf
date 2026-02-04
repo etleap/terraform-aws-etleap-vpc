@@ -236,7 +236,7 @@ locals {
 
   emr_kms_key_arn          = var.emr_kms_encryption_key != null ? var.emr_kms_encryption_key : aws_kms_key.etleap_emr_ebs_encryption_key[0].arn
   # Add a suffix to the EMR security configuration name so that updating the resource works if the KMS key variables change
-  security_config_name_suffix = "(${var.s3_kms_encryption_key != null ? regex("[^/]+$", var.s3_kms_encryption_key) : "SSE-S3"}/${regex("[^/]+$", local.emr_kms_key_arn)})"
+  security_config_name_suffix = "${var.s3_kms_encryption_key != null ? regex("[^/]+$", var.s3_kms_encryption_key) : "SSE-S3"}--${regex("[^/]+$", local.emr_kms_key_arn)}"
 }
 
 resource "null_resource" "emr_configuration_change" {
@@ -451,7 +451,7 @@ EOF
 
 # Security configurations are immutable once created, so up-version the name when we need to change it
 resource "aws_emr_security_configuration" "emrfs_sse_kms" {
-  name = "EMRFS SSE-KMS - ${var.deployment_id} - V1 ${local.security_config_name_suffix}"
+  name = "EMRFS-SSE-KMS-${var.deployment_id}-V1-${local.security_config_name_suffix}"
 
   configuration = jsonencode({
     EncryptionConfiguration = {
