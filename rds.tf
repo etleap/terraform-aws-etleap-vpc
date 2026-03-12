@@ -4,13 +4,13 @@ resource "aws_db_instance" "db" {
   allocated_storage            = 500
   storage_type                 = "gp3"
   engine                       = "mysql"
-  engine_version               = "8.0.40"
+  engine_version               = "8.4.7"
   instance_class               = var.rds_instance_type
   db_name                      = "EtleapDB"
   username                     = "root"
   password                     = module.db_root_password.secret_string
   db_subnet_group_name         = aws_db_subnet_group.db.name
-  parameter_group_name         = aws_db_parameter_group.mysql8-0-etleap.name
+  parameter_group_name         = aws_db_parameter_group.mysql8-4-etleap.name
   vpc_security_group_ids       = [aws_security_group.db.id]
   backup_retention_period      = var.rds_backup_retention_period
   auto_minor_version_upgrade   = false
@@ -45,6 +45,135 @@ resource "aws_db_subnet_group" "db" {
       name,
       description
     ]
+  }
+}
+
+resource "aws_db_parameter_group" "mysql8-4-etleap" {
+  tags        = local.default_tags
+  name        = "etleap-mysql-8-4-${local.deployment_random}"
+  description = "MySQL 8.4 with Etleap modifications"
+  family      = "mysql8.4"
+
+  parameter {
+    name         = "max_allowed_packet"
+    value        = 546308096
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "collation_server"
+    value        = "utf8mb4_bin"
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "character_set_server"
+    value        = "utf8mb4"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "log_bin_trust_function_creators"
+    value        = 1
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "binlog_format"
+    value        = "row"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "innodb_lock_wait_timeout"
+    value        = 250
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "general_log"
+    value        = "0"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "long_query_time"
+    value        = 0.05
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "slow_query_log"
+    value        = 1
+    apply_method = "immediate"
+  }
+
+  # https://dev.mysql.com/doc/relnotes/mysql/8.0/en/news-8-0-3.html#mysqld-8-0-3-deprecation-removal
+  parameter {
+    name         = "log_error_verbosity"
+    value        = 2
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "log_output"
+    value        = "file"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "binlog_checksum"
+    value        = "none"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "innodb_buffer_pool_dump_at_shutdown"
+    value        = 1
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "innodb_buffer_pool_load_at_startup"
+    value        = 1
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "innodb_redo_log_capacity"
+    value        = 10737418240
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "innodb_print_all_deadlocks"
+    value        = 1
+    apply_method = "immediate"
+  }
+
+  # Parallel replica properties
+  parameter {
+    name         = "replica_preserve_commit_order"
+    value        = "1"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "replica_parallel_workers"
+    value        = "4"
+    apply_method = "immediate"
+  }
+
+  parameter {
+    name         = "replica_parallel_type"
+    value        = "LOGICAL_CLOCK"
+    apply_method = "pending-reboot"
+  }
+
+  parameter {
+    name         = "sync_binlog"
+    value        = "1"
+    apply_method = "pending-reboot"
   }
 }
 

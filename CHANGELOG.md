@@ -1,3 +1,29 @@
+# Release 1.15.0
+
+Upgrades the RDS instance MySQL version to 8.4.7 from 8.0.40, as 8.0.40 is approaching end of life in July 2026.
+
+This release contains a DB upgrade. Please follow the steps below to ensure a safe upgrade. This will require up to an hour of downtime.
+
+## Upgrade Instructions
+
+This will upgrade the database version in-place.
+
+1. Add the following property to the module definition:
+   ```
+   app_available = false
+   ```
+   Run `terraform apply` to stop the app EC2 instances that access the database. 
+2. Take a backup of the RDS instance. Do this by going to RDS \> (your instance) \> Actions \> Take snapshot. Ensure that the snapshot is complete, and the instance shows as "Available" before continuing.
+3. Change the module version to `1.15.0` and add the following properties to the module definition:
+   ```
+   rds_allow_major_version_upgrade = true
+   rds_apply_immediately = true
+   ```
+4. Run `terraform apply` to upgrade the database version. Ensure the RDS instance shows as "Available" again.
+5. Once complete, remove `app_available`, `rds_allow_major_version_upgrade`, and `rds_apply_immediately`, and run `terraform apply` to bring the application back online.
+6. When the application is back online, delete the manual backup taken in step 2.
+
+
 # Release 1.14.2
 
 Adds the `emr_kms_encryption_key` variable to allow specifying an existing KMS key for EMR local disk encryption, instead of creating a new one.
