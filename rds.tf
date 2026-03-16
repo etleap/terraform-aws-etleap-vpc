@@ -62,25 +62,25 @@ resource "aws_db_parameter_group" "mysql8-4-etleap" {
 
   parameter {
     name         = "collation_server"
-    value        = "utf8mb4_bin"
+    value        = "latin1_swedish_ci"
     apply_method = "pending-reboot"
   }
 
   parameter {
     name         = "character_set_server"
-    value        = "utf8mb4"
+    value        = "latin1"
     apply_method = "immediate"
   }
 
   parameter {
     name         = "log_bin_trust_function_creators"
     value        = 1
-    apply_method = "immediate"
+    apply_method = "pending-reboot"
   }
 
   parameter {
     name         = "binlog_format"
-    value        = "row"
+    value        = "ROW"
     apply_method = "immediate"
   }
 
@@ -108,7 +108,6 @@ resource "aws_db_parameter_group" "mysql8-4-etleap" {
     apply_method = "immediate"
   }
 
-  # https://dev.mysql.com/doc/relnotes/mysql/8.0/en/news-8-0-3.html#mysqld-8-0-3-deprecation-removal
   parameter {
     name         = "log_error_verbosity"
     value        = 2
@@ -128,51 +127,8 @@ resource "aws_db_parameter_group" "mysql8-4-etleap" {
   }
 
   parameter {
-    name         = "innodb_buffer_pool_dump_at_shutdown"
-    value        = 1
-    apply_method = "immediate"
-  }
-
-  parameter {
-    name         = "innodb_buffer_pool_load_at_startup"
-    value        = 1
-    apply_method = "pending-reboot"
-  }
-
-  parameter {
     name         = "innodb_redo_log_capacity"
-    value        = 10737418240
-    apply_method = "pending-reboot"
-  }
-
-  parameter {
-    name         = "innodb_print_all_deadlocks"
-    value        = 1
-    apply_method = "immediate"
-  }
-
-  # Parallel replica properties
-  parameter {
-    name         = "replica_preserve_commit_order"
-    value        = "1"
-    apply_method = "immediate"
-  }
-
-  parameter {
-    name         = "replica_parallel_workers"
-    value        = "4"
-    apply_method = "immediate"
-  }
-
-  parameter {
-    name         = "replica_parallel_type"
-    value        = "LOGICAL_CLOCK"
-    apply_method = "pending-reboot"
-  }
-
-  parameter {
-    name         = "sync_binlog"
-    value        = "1"
+    value        = 10737418240 # 10x max_allowed_packet
     apply_method = "pending-reboot"
   }
 }
