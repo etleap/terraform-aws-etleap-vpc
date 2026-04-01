@@ -100,6 +100,42 @@ resource aws_cloudwatch_metric_alarm "emr_namenode_disk" {
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
+resource "aws_cloudwatch_metric_alarm" "emr_core_cpu" {
+  count = var.app_available ? 1 : 0
+  tags  = local.default_tags
+
+  alarm_name                = "Etleap - ${var.deployment_id} - EMR Core 80% CPU"
+  comparison_operator       = "GreaterThanThreshold"
+  evaluation_periods        = "3"
+  threshold                 = "80"
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
+
+  metric_query {
+    id          = "max_cpu"
+    expression  = "MAX(METRICS())"
+    label       = "Max Core CPU"
+    return_data = "true"
+  }
+
+  dynamic "metric_query" {
+    for_each = toset(data.aws_instances.emr-core.ids)
+    content {
+      id = replace(metric_query.value, "-", "_")
+      metric {
+        metric_name = "CPUUtilization"
+        namespace   = "AWS/EC2"
+        period      = 300
+        stat        = "Average"
+        dimensions = {
+          InstanceId = metric_query.value
+        }
+      }
+    }
+  }
+}
+
 resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   tags = local.default_tags
 
@@ -547,3 +583,4 @@ resource "aws_cloudwatch_metric_alarm" "database_extractor_running" {
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
+

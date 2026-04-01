@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.15.0"
+  version = "1.15.1"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -153,6 +153,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | EMR Cluster Running                   | Yes      | EMR cluster is not running                                                                                               | See the section on *Reprovisioning a new EMR cluster*                                                                                                                                                         |
 | 60% Disk EMR HDFS                     | No       | Not enough core nodes for the workload                                                                                   | Increase the number of core nodes via the Terraform variable `emr_core_node_count`.                                                                                                                           |
+| EMR Core 80% CPU                      | No       | CPU usage is high on EMR core nodes                                                                                      | Increase the number of core nodes via the Terraform variable `emr_core_node_count`. |
 | EMR Unhealthy Nodes                   | No       | EMR cluster is in a bad state                                                                                            | Taint the cluster and see the section on *Reprovisioning a new EMR cluster*                                                                                                                                   |
 | EMR Missing Blocks                    | No       | Missing HDFS blocks means we lost one or more core nodes                                                                 | Taint the cluster and the section on *Reprovisioning a new EMR cluster*                                                                                                                                       |
 | 80% Disk EMR NameNode                 | Yes      | The disk is filling up on the name ndoe                                                                                  | Taint the cluster and the section on *Reprovisioning a new EMR cluster*                                                                                                                                       |

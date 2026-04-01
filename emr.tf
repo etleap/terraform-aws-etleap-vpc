@@ -28,7 +28,7 @@ locals {
     },
     {
       name = "Copy HDFS init script"
-      path = "s3://etleap-emr-${local.region}/conf-hadoop2/copy-hdfs-init.sh"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/copy-hdfs-init-v2.sh"
     },
     {
       name = "Apply EMR hotfix for autoscaling bug"
@@ -46,6 +46,10 @@ locals {
     {
       name = "Reglarly clean up EMR heap dumps"
       path = "s3://etleap-emr-${local.region}/conf-hadoop2/clean-java-heap-dumps.sh"
+    },
+    {
+      name = "Install node label script"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-node-label-script.sh"
     }
   ]
 
@@ -368,9 +372,11 @@ resource "aws_emr_cluster" "emr" {
         "yarn.log-aggregation-enable": "true",
         "yarn.log-aggregation.retain-seconds": "7200",
         "yarn.nodemanager.remote-app-log-dir": "/log",
-        "yarn.node-labels.am.default-node-label-expression": "CORE_OR_TASK",
-        "yarn.nodemanager.node-labels.provider": "config",
-        "yarn.nodemanager.node-labels.provider.configured-node-partition": "CORE_OR_TASK",
+        "yarn.node-labels.am.default-node-label-expression": "TASK",
+        "yarn.node-labels.configuration-type": "distributed",
+        "yarn.nodemanager.node-labels.provider": "script",
+        "yarn.nodemanager.node-labels.provider.script.path": "/etc/hadoop/conf/get-node-label.sh",
+        "yarn.nodemanager.node-labels.provider.fetch-interval-ms": "300000",
         "yarn.system-metrics-publisher.enabled": "false",
         "yarn.timeline-service.enabled": "false",
         "yarn.nodemanager.local-dirs": "/mnt/yarn",
@@ -395,9 +401,9 @@ resource "aws_emr_cluster" "emr" {
       "Classification": "capacity-scheduler",
       "Properties": {
         "yarn.scheduler.capacity.root.accessible-node-labels.CORE.capacity": "0",
-        "yarn.scheduler.capacity.root.accessible-node-labels.CORE_OR_TASK.capacity": "100",
+        "yarn.scheduler.capacity.root.accessible-node-labels.TASK.capacity": "100",
         "yarn.scheduler.capacity.root.default.accessible-node-labels.CORE.capacity": "0",
-        "yarn.scheduler.capacity.root.default.accessible-node-labels.CORE_OR_TASK.capacity": "100"
+        "yarn.scheduler.capacity.root.default.accessible-node-labels.TASK.capacity": "100"
       }
     },
     {
@@ -728,6 +734,17 @@ data "aws_instance" "emr-master" {
   filter {
     name   = "network-interface.private-dns-name"
     values = [aws_emr_cluster.emr.master_public_dns]
+  }
+}
+
+data "aws_instances" "emr-core" {
+  filter {
+    name   = "tag:aws:elasticmapreduce:job-flow-id"
+    values = [aws_emr_cluster.emr.id]
+  }
+  filter {
+    name   = "tag:aws:elasticmapreduce:instance-group-role"
+    values = ["CORE"]
   }
 }
 

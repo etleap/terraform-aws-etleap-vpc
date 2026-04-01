@@ -1,3 +1,12 @@
+# Release 1.15.1
+
+Allocates EMR tasks to task nodes only, removing load from core nodes. Previously, jobs could run on core nodes, which also manage HDFS. This caused resource contention that could impact pipeline performance.
+
+Adds a non-critical CloudWatch alarm, `EMR Core 80% CPU`, that triggers when any core node sustains more than 80% CPU usage for 15 minutes. This will be resolved by adding more nodes to the cluster.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
+
 # Release 1.15.0
 
 Upgrades the RDS instance MySQL version to 8.4.7 from 8.0.40, as 8.0.40 is approaching end of life in July 2026.
