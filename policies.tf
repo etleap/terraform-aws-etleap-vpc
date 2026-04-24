@@ -345,7 +345,10 @@ resource "aws_iam_policy" "emr_profile_policy" {
             "ec2:AttachVolume",
             "ec2:ModifyInstanceAttribute",
             "ec2:DeleteVolume",
-            "ec2:CreateTags"
+            "ec2:CreateTags",
+            "ecr:GetAuthorizationToken",
+            "ecr:BatchGetImage",
+            "ecr:GetDownloadUrlForLayer"
         ]
     }]
 }

@@ -1,3 +1,11 @@
+# Release 1.16.0
+
+Upgrades the EMR version to 7.12.0 from 5.36.2, as 5.36.2 is approaching end of life in July 2026.
+
+This upgrades Hadoop to 3, which enables YARN NodeManager to launch Docker containers as custom execution environments. Etleap now uses Docker containers for job execution, which requires this upgrade. The IAM policy used by EMR has been updated to allow pulling images from ECR.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
 # Release 1.15.1
 
 Allocates EMR tasks to task nodes only, removing load from core nodes. Previously, jobs could run on core nodes, which also manage HDFS. This caused resource contention that could impact pipeline performance.
@@ -5,7 +13,6 @@ Allocates EMR tasks to task nodes only, removing load from core nodes. Previousl
 Adds a non-critical CloudWatch alarm, `EMR Core 80% CPU`, that triggers when any core node sustains more than 80% CPU usage for 15 minutes. This will be resolved by adding more nodes to the cluster.
 
 This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
-
 
 # Release 1.15.0
 

@@ -7,7 +7,7 @@ locals {
   base_bootstrap_actions = [
     {
       name = "Configure Fair Scheduler"
-      path = "s3://etleap-emr-${local.region}/conf-hadoop2/download-fair-scheduler-config.sh"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/download-fair-scheduler-config-v2.sh"
     },
     {
       name = "Add Etleap-provided JARs"
@@ -28,7 +28,7 @@ locals {
     },
     {
       name = "Copy HDFS init script"
-      path = "s3://etleap-emr-${local.region}/conf-hadoop2/copy-hdfs-init-v2.sh"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/copy-hdfs-init-v3.sh"
     },
     {
       name = "Apply EMR hotfix for autoscaling bug"
@@ -38,10 +38,6 @@ locals {
     {
       name = "Install HDFS crontab"
       path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-hdfs-crontab.sh"
-    },
-    {
-      name = "Install DBT"
-      path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-dbt-v3.sh"
     },
     {
       name = "Reglarly clean up EMR heap dumps"
@@ -257,7 +253,7 @@ resource "aws_emr_cluster" "emr" {
   ]
   tags                              = merge({Name = "Etleap EMR ${var.deployment_id}"}, local.default_tags)
   name                              = "Etleap EMR"
-  release_label                     = "emr-5.36.2"
+  release_label                     = "emr-7.12.0"
   applications                      = ["Hadoop", "Spark"]
   keep_job_flow_alive_when_no_steps = true
   log_uri                           = "s3://${aws_s3_bucket.intermediate.id}/emr-logs/"
@@ -360,7 +356,7 @@ resource "aws_emr_cluster" "emr" {
       "Configurations": [{
         "Classification": "export",
         "Properties": {
-          "HADOOP_USER_CLASSPATH_FIRST": "true"
+          "JAVA_HOME": "/usr/lib/jvm/java-1.8.0"
         }
       }]
     },
@@ -372,13 +368,15 @@ resource "aws_emr_cluster" "emr" {
         "yarn.log-aggregation-enable": "true",
         "yarn.log-aggregation.retain-seconds": "7200",
         "yarn.nodemanager.remote-app-log-dir": "/log",
+        "yarn.node-labels.enabled": "true",
         "yarn.node-labels.am.default-node-label-expression": "TASK",
         "yarn.node-labels.configuration-type": "distributed",
         "yarn.nodemanager.node-labels.provider": "script",
         "yarn.nodemanager.node-labels.provider.script.path": "/etc/hadoop/conf/get-node-label.sh",
         "yarn.nodemanager.node-labels.provider.fetch-interval-ms": "300000",
         "yarn.system-metrics-publisher.enabled": "false",
-        "yarn.timeline-service.enabled": "false",
+        "yarn.timeline-service.enabled": "false",  
+        "yarn.nodemanager.env-whitelist": "JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME,PATH,LANG",
         "yarn.nodemanager.local-dirs": "/mnt/yarn",
         "yarn.resourcemanager.nodemanager-graceful-decommission-timeout-secs": "-1"
       }
@@ -392,7 +390,8 @@ resource "aws_emr_cluster" "emr" {
           "Classification": "export",
           "Properties": {
             "YARN_RESOURCEMANAGER_OPTS": "\"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=8001 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/tmp\"",
-            "YARN_RESOURCEMANAGER_HEAPSIZE": "4832"
+            "YARN_RESOURCEMANAGER_HEAPSIZE": "4832",
+            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0"
           }
         }
       ]
@@ -409,6 +408,7 @@ resource "aws_emr_cluster" "emr" {
     {
       "Classification": "core-site",
       "Properties": {
+        "fs.s3.impl": "com.amazon.ws.emr.hadoop.fs.EmrFileSystem",
         "fs.s3.buffer.dir": "/mnt/s3"
       }
     },
@@ -424,16 +424,11 @@ resource "aws_emr_cluster" "emr" {
     {
       "Classification": "mapred-site",
       "Properties": {
-        "mapreduce.job.counters.limit": "512",
+        "mapreduce.job.counters.max": "512",
         "mapreduce.client.submit.file.replication": "2",
         "mapreduce.job.counters.counter.name.max": "255",
-        "mapred.local.dir": "/mnt/mapred"
-      }
-    },
-    {
-      "Classification": "emrfs-site",
-      "Properties": {
-        "fs.s3.enableServerSideEncryption": "true"
+        "mapreduce.cluster.local.dir": "/mnt/mapred",
+        "mapreduce.fileoutputcommitter.algorithm.version": "1"
       }
     },
     {
@@ -441,14 +436,41 @@ resource "aws_emr_cluster" "emr" {
       "Properties": {
         "spark.history.fs.cleaner.enabled": "true",
         "spark.history.fs.cleaner.interval": "1h",
-        "spark.history.fs.cleaner.maxAge": "3h"
+        "spark.history.fs.cleaner.maxAge": "3h",
+        "spark.executorEnv.JAVA_HOME": "/usr/lib/jvm/java-1.8.0",
+        "spark.yarn.appMasterEnv.JAVA_HOME": "/usr/lib/jvm/java-1.8.0"
       }
+    },
+    {
+      "Classification": "spark-env",
+      "Configurations": [
+        {
+          "Classification": "export",
+          "Properties": {
+            "JAVA_HOME": "/usr/lib/jvm/java-1.8.0"
+          }
+        }
+      ],
+      "Properties": {}
     },
     {
       "Classification": "container-log4j",
       "Properties": {
         "log4j.threshold": "WARN"
       }
+    },
+    {
+      "Classification": "container-executor",
+      "Configurations": [
+        {
+          "Classification": "docker",
+          "Properties": {
+              "docker.trusted.registries": "841591717599.dkr.ecr.${data.aws_region.current.name}.amazonaws.com",
+              "docker.allowed.ro-mounts": "/usr/lib,/usr/share,/etc/hadoop/conf,/etc/passwd,/etc/group"
+          }
+        }
+      ],
+      "Properties": {}
     }
   ]
 EOF
