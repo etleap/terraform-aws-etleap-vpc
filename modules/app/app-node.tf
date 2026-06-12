@@ -116,6 +116,16 @@ write_files:
   content: |
     [default]
     region = ${var.region}
+- path: /etc/logrotate.d/amazon-ssm-agent
+  content: |
+    /var/log/amazon/ssm/*.log {
+        daily
+        rotate 3
+        compress
+        missingok
+        notifempty
+        copytruncate
+    }
 
 runcmd:
 - resize2fs /dev/nvme1n1

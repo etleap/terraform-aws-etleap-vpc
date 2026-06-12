@@ -46,6 +46,10 @@ locals {
     {
       name = "Install node label script"
       path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-node-label-script.sh"
+    },
+    {
+      name = "Rotate SSM agent logs"
+      path = "s3://etleap-emr-${local.region}/conf-hadoop2/install-ssm-logrotate.sh"
     }
   ]
 

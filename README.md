@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.16.0"
+  version = "1.16.1"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -140,6 +140,12 @@ Go to the URL in the `app-hostname`, and use the email provided in the template 
 A temporary password was created as part of the deployment, and it's value is the output of `terraform output setup-password`.
 
 Once logged in you'll be prompted to create a new password.
+
+# SSM session logging
+
+Interactive AWS Systems Manager (SSM) Session Manager sessions on the deployment's EC2 instances (app, Zookeeper, and EMR) are recorded to the deployment's intermediate S3 bucket under the `ssm-session-logs/` prefix and retained for one year. Each log file is named after the SSM session, which begins with the session name chosen by the connecting user.
+
+To keep a complete, attributable audit trail, make sure your SSM session name is your username. The session name is taken from your IAM identity: when you connect as an IAM user it is already your user name, but when you connect via an assumed role you must set the role session name to your username (e.g. `aws sts assume-role --role-arn <role-arn> --role-session-name <your-username>`). The session name becomes part of the log file name, so this ties recorded activity back to a specific person directly from the S3 logs. Sessions whose name is not a username can only be attributed by cross-referencing CloudTrail, whose events expire after 90 days.
 
 # Monitoring and operation
 
