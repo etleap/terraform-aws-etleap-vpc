@@ -351,6 +351,19 @@ resource "aws_emr_cluster" "emr" {
     }
   }
 
+  # We don't use the YARN Timeline Service, but EMR starts the hadoop-yarn-timelineserver
+  # daemon regardless of "yarn.timeline-service.enabled": "false" (that flag only stops
+  # clients writing to it). It has been observed leaking memory on the master until the node
+  # OOMs (VIK-7860). It only runs on the master, where steps run, so stop and disable it here.
+  step {
+    action_on_failure = "CONTINUE"
+    name = "Disable YARN Timeline Service"
+    hadoop_jar_step {
+      jar = "command-runner.jar"
+      args = ["bash", "-c", "sudo systemctl stop hadoop-yarn-timelineserver; sudo systemctl disable hadoop-yarn-timelineserver"]
+    }
+  }
+
   configurations_json = <<EOF
   [
     {
