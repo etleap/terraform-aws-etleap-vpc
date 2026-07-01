@@ -39,16 +39,6 @@ write_files:
 - path: /home/ubuntu/docker-compose.yml
   encoding: b64
   content: ${base64encode(file_docker_compose)}
-- path: /etc/logrotate.d/amazon-ssm-agent
-  content: |
-    /var/log/amazon/ssm/*.log {
-        daily
-        rotate 3
-        compress
-        missingok
-        notifempty
-        copytruncate
-    }
 
 runcmd:
 - echo RESET grub-efi/install_devices | debconf-communicate grub-pc

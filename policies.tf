@@ -96,9 +96,9 @@ resource "aws_iam_role" "zookeeper" {
 }
 EOF
 
-  lifecycle {
-    ignore_changes = [name, description, tags]
-  }
+lifecycle {
+  ignore_changes = [name, description, tags]
+}
 }
 
 resource "aws_iam_role" "emr" {
@@ -268,27 +268,7 @@ resource "aws_iam_policy" "app_various_limited" {
         "Resource": [
           "arn:aws:sqs:us-east-1:841591717599:Etleap-${var.deployment_id}-github-app-webhooks-queue"
         ]
-      },
-      {
-        "Sid": "PutSsmSessionLogs",
-        "Effect": "Allow",
-        "Action": [
-          "s3:PutObject"
-        ],
-        "Resource": [
-          "arn:aws:s3:::${aws_s3_bucket.intermediate.id}/ssm-session-logs/*"
-        ]
-      },
-      {
-        "Sid": "GetSsmSessionLogsBucketEncryption",
-        "Effect": "Allow",
-        "Action": [
-          "s3:GetEncryptionConfiguration"
-        ],
-        "Resource": [
-          "arn:aws:s3:::${aws_s3_bucket.intermediate.id}"
-        ]
-      }${var.s3_kms_encryption_key == null ? "" : ",${jsonencode({ Sid = "SsmSessionLogsKms", Effect = "Allow", Action = ["kms:GenerateDataKey", "kms:Encrypt"], Resource = [var.s3_kms_encryption_key] })}"}
+      }
     ]
 }
 EOF
@@ -505,7 +485,7 @@ resource "aws_iam_role_policy_attachment" "emr_kms_encryption_policy" {
 }
 
 resource "aws_iam_policy" "kinesis_emr_permissions_policy" {
-  name   = "EtleapEMRKinesisPermissionPolicy${local.resource_name_suffix}"
+  name = "EtleapEMRKinesisPermissionPolicy${local.resource_name_suffix}"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -571,7 +551,7 @@ resource "aws_iam_role_policy_attachment" "emr_ebs_kms_encryption_policy_emr_def
   policy_arn = aws_iam_policy.emr_ebs_kms_encryption_policy.arn
 }
 
-resource "aws_iam_policy" "cognito_open_id_token" {
+resource aws_iam_policy "cognito_open_id_token" {
   count  = var.disable_cognito_identity_pool ? 0 : 1
   name   = "EtleapCognitoOpenIdToken${local.resource_name_suffix}"
   policy = <<EOF
@@ -598,45 +578,4 @@ resource "aws_iam_policy_attachment" "cognito_open_id_token" {
   name       = "EtleapCognitoOpenIDTokenPolicy${local.resource_name_suffix}"
   roles      = [aws_iam_role.app.name, aws_iam_role.emr.name]
   policy_arn = aws_iam_policy.cognito_open_id_token[0].arn
-}
-
-# Allows zookeeper and emr to write SSM Session Manager logs to the intermediate bucket.
-# The app gets the same permissions via aws_iam_policy.app_various_limited, to stay within the 10-managed-policies-per-role IAM quota.
-resource "aws_iam_policy" "ssm_session_logs" {
-  tags = local.default_tags
-  name = "EtleapSsmSessionLogs${local.resource_name_suffix}"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = concat(
-      [
-        {
-          Sid      = "PutSsmSessionLogs"
-          Effect   = "Allow"
-          Action   = ["s3:PutObject"]
-          Resource = ["arn:aws:s3:::${aws_s3_bucket.intermediate.id}/ssm-session-logs/*"]
-        },
-        {
-          Sid      = "GetSsmSessionLogsBucketEncryption"
-          Effect   = "Allow"
-          Action   = ["s3:GetEncryptionConfiguration"]
-          Resource = ["arn:aws:s3:::${aws_s3_bucket.intermediate.id}"]
-        }
-      ],
-      var.s3_kms_encryption_key == null ? [] : [
-        {
-          Sid      = "SsmSessionLogsKms"
-          Effect   = "Allow"
-          Action   = ["kms:GenerateDataKey", "kms:Encrypt"]
-          Resource = [var.s3_kms_encryption_key]
-        }
-      ]
-    )
-  })
-}
-
-resource "aws_iam_policy_attachment" "ssm_session_logs" {
-  name       = "SSM Session Logs Write"
-  roles      = [aws_iam_role.zookeeper.name, aws_iam_role.emr.name]
-  policy_arn = aws_iam_policy.ssm_session_logs.arn
 }

@@ -1,8 +1,6 @@
 # Release 1.16.1
 
-Enables logging of interactive AWS Systems Manager (SSM) Session Manager sessions on the deployment's EC2 nodes (app, Zookeeper, and EMR). Full session activity is recorded to the intermediate S3 bucket under the `ssm-session-logs/` prefix and retained for one year. The SSM agent's own on-disk logs are rotated to prevent the root disk from filling up.
-
-This release replaces the App, Zookeeper EC2 instances, and the EMR cluster. This will cause 10-15 minutes of downtime to pipelines, the API and Web UI.
+This version is deprecated due to an issue, and will be replaced in a future version. Please skip this version.
 
 # Release 1.16.0
 

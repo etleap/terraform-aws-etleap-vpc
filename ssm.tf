@@ -1,24 +1,4 @@
 
-# Logs all interactive SSM sessions in the account to the intermediate bucket (VIK-6560).
-resource "aws_ssm_document" "session_manager_prefs" {
-  tags            = local.default_tags
-  name            = "SSM-SessionManagerRunShell"
-  document_type   = "Session"
-  document_format = "JSON"
-
-  content = jsonencode({
-    schemaVersion = "1.0"
-    description   = "Session Manager preferences: log interactive sessions to S3"
-    sessionType   = "Standard_Stream"
-    inputs = {
-      s3BucketName        = aws_s3_bucket.intermediate.id
-      s3KeyPrefix         = "ssm-session-logs/"
-      s3EncryptionEnabled = true
-      idleSessionTimeout  = "20"
-    }
-  })
-}
-
 resource "aws_ssm_document" "portforward_socks" {
   count         = var.allow_iam_devops_role || var.allow_iam_support_role ? 1 : 0
   tags          = local.default_tags

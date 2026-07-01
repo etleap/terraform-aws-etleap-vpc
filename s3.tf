@@ -34,18 +34,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "intermediate-lifecycle" {
       days = 90
     }
   }
-
-  rule {
-    id      = "ssm-session-logs"
-    status  = "Enabled"
-    filter {
-      prefix  = "ssm-session-logs/"
-    }
-
-    expiration {
-      days = 365
-    }
-  }
 }
 
 locals {
