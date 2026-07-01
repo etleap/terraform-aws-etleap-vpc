@@ -347,6 +347,15 @@ resource "aws_emr_cluster" "emr" {
     }
   }
 
+  step {
+    action_on_failure = "CANCEL_AND_WAIT"
+    name = "Disable YARN Timeline Service"
+    hadoop_jar_step {
+      jar = "command-runner.jar"
+      args = ["bash", "-c", "sudo systemctl stop hadoop-yarn-timelineserver; sudo systemctl disable hadoop-yarn-timelineserver"]
+    }
+  }
+
   configurations_json = <<EOF
   [
     {

@@ -1,3 +1,9 @@
+# Release 1.16.2
+
+Disables the YARN Timeline Service on the EMR cluster. The service is unused and leaks memory on the master node over time.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines.
+
 # Release 1.16.1
 
 This version is deprecated due to an issue, and will be replaced in a future version. Please skip this version.
