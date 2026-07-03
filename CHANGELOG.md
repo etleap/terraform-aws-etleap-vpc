@@ -1,3 +1,7 @@
+# Release 1.16.3
+
+Addresses a permission error when using Iceberg pipelines in the case where the AWS Glue Data Catalog is in Lake Formation enforced mode. Grants Etleap's IAM roles the Lake Formation permissions needed to manage Etleap's Iceberg system tables when the AWS Glue Data Catalog is in Lake Formation enforced mode.
+
 # Release 1.16.2
 
 Disables the YARN Timeline Service on the EMR cluster. The service is unused and leaks memory on the master node over time.
