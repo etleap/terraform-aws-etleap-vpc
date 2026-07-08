@@ -60,15 +60,15 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `first_name` | The first name to use when creating the first Etleap user account. | `string` | n/a | yes |
 | `last_name` | The last name to use when creating the first Etleap user account. | `string` | n/a | yes |
 | `email` | The email to use when creating the first Etleap user account. | `string` | n/a | yes |
-| `vcp_id` | Existing VPC to deploy Etleap in. VPC's that have a CIDR range that overlaps `192.168.0.1/24` are not currently supported. | `string` | n/a | no |
+| `vpc_id` | Existing VPC to deploy Etleap in. VPC's that have a CIDR range that overlaps `192.168.0.1/24` are not currently supported. | `string` | n/a | no |
 | `public_subnets` | Existing public subnets to deploy Etleap in. | `list(string)` | n/a | no |
 | `private_subnets` | Existing private subnets to deploy Etleap in. | `list(string)` | n/a | no |
 | `extra_security_groups` | Grant access to the DB, EC2 instance, and EMR cluster to the specified Security Groups | `list(string)` | `[]` | no |
 | `app_hostname`| The hostname where Etleap will be accessible from. If left empty, the default Load Balancer DNS name will be used. | `string` | `null` | no |
 | `app_available`| Only use this if instructed by ETLeap support. Enable or disable to start or destroy the app instance. | `boolean` | `true` | yes |
-| `ha_mode`| Enables High Availability mode. This will run two redundant Etleap instances in 2 availability zones, and set the RDS instace to "multi-az" mode. | `boolean` | `false` | no | 
+| `ha_mode`| Enables High Availability mode. This will run two redundant Etleap instances in 2 availability zones, and set the RDS instance to "multi-az" mode. | `boolean` | `false` | no |
 | `app_private_ip` | The Private IP for the main application instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP. | `string` | `null` | no |
-| `secondary_private_ip`| The Private IP for the seconday application instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP. | `string` | `null` | no |
+| `secondary_app_private_ip`| The Private IP for the secondary application instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP. | `string` | `null` | no |
 | `nat_private_ip` | The Private IP for the NAT instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP. | `string` | `null` | no |
 | `non_critical_cloudwatch_alarm_sns_topics` | A list of SNS topics to notify when non critical alarms are triggered. For the list of non-critical alarms, see _CloudWatch Alarms_ under _Monitoring and operation_. | `list(string)` | `[]` | no |
 | `critical_cloudwatch_alarm_sns_topics` | A list of SNS topics to notify when critical alarms are triggered. For the list of critical alarms, see _CloudWatch Alarms_ under _Monitoring and operation_. | `list(string)` | `[]` | no |
@@ -79,14 +79,14 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `disable_cdc_support` | Set to true if this deployment will not use CDC pipelines. This will cause the DMS Replication Instance and associated resources not to be created. Defaults to `false`. | `boolean` | `false` | no |
 | `dms_roles_to_be_created` | Set to `true` if this template should create the roles required by DMS, `dms-vpc-role` and `dms-cloudwatch-logs-role`. Set to `false` if are already using DMS in the account where you deploy Etleap. | `boolean` | `true` | no |
 | `unique_resource_names` | If set to 'true', a suffix is appended to resource names to make them unique per deployment. Recommend leaving this as 'true' except in the case of migrations from earlier versions. | `boolean` | `true` | no |
-| `s3_input_buckets` | The names of the S3 buckets which will be used with "S3 Input" connections. The module will create an IAM role to be specified with the "S3 Input" connections, together with a bucket policy that needs to be applied to the bucket. | `list(string)` | `[]` | no
+| `s3_input_buckets` | The names of the S3 buckets which will be used with "S3 Input" connections. The module will create an IAM role to be specified with the "S3 Input" connections, together with a bucket policy that needs to be applied to the bucket. | `list(string)` | `[]` | no |
 | `s3_data_lake_account_ids` | The 12-digit IDs of the AWS accounts containing the roles specified with "S3 Data Lake" connections. IAM roles in these accounts are given read access to the intermediate data S3 bucket. | `list(string)` | `[]` | no |
-| `github_username` | Github username to use when accessing custom transforms | `string` | `null` | no | 
+| `github_username` | GitHub username to use when accessing custom transforms | `string` | `null` | no |
 | `github_access_token_arn` | ARN of the secret containing the GitHub access token | `string` | `null` | no |
 | `connection_secrets` | A map between environment variables and Secrets Manager Secret ARN for secrets to be injected into the application. This is only used for enabling certain integration. | `map(string, string)` | `{}` | no |
-| `resource_tags` | Resource tags to be applied to all resources create by this template. | `map(string, string)` | `{}` | no |
-| `app_access_cidr_blocks` | CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
-| `ssh_access_cidr_blocks` | CIDR ranges that have SSH access to the application instance(s) (port 22).  Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
+| `resource_tags` | Resource tags to be applied to all resources created by this template. | `map(string, string)` | `{}` | no |
+| `app_access_cidr_blocks` | CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0/0"]` | no |
+| `ssh_access_cidr_blocks` | CIDR ranges that have SSH access to the application instance(s) (port 22).  Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0/0"]` | no |
 | `outbound_access_destinations` | CIDR ranges, ports and protocols to allow outbound access to for pipeline sources and destinations. Defaults to allowing all outbound traffic. Note that regardless of this value, outbound traffic to ports 80 and 443 is always allowed. | `list(map(string, any))` | all outbound traffic | no |
 | `roles_allowed_to_be_assumed` |A list of external roles that can be assumed by the app. When not specified, it defaults to all roles (*) | `list(string)` | `[]` | no |
 | `enable_public_access` |Enable public access to the Etleap deployment. This will create an _Internet facing_ ALB. Defaults to `true`. | `boolean` | `true` | no |
@@ -113,7 +113,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `app_public_address` | The DNS address of the ALB that serves the Etleap Web UI. |
 | `streaming_endpoint_public_address` | The DNS address of the ALB that serves the streaming ingestion webhook. |
 | `s3_input_role_arn` | Role to use when setting up S3 Input connections with a bucket from a different AWS account. |
-| `s3_input_bucket_policy` | Policies that need to applied to the S3 buckets specified by 's3_input_buckets' so Etleap's role can read from them. |
+| `s3_input_bucket_policy` | Policies that need to be applied to the S3 buckets specified by 's3_input_buckets' so Etleap's role can read from them. |
 | `setup_password` | The password to log into Etleap for the first time. You'll be prompted to change it after on first login. |
 | `vpc_id` | The VPC ID where Etleap is deployed |
 | `public_subnet_a` | The first public subnet for Etleap's VPC | 
@@ -121,8 +121,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `private_subnet_a` | The first private subnet for Etleap's VPC |
 | `private_subnet_b` | The second private subnet for Etleap's VPC |
 | `public_route_table_id` | The public subnets' route table, if managed by the module |
-| `private_route_table_id` | The public subnets' route table, if managed by the module |
-| `private_route_table_id` | The public subnets' route table, if managed by the module |
+| `private_route_table_id` | The private subnets' route table, if managed by the module |
 | `emr_cluster_id` | The ID of Etleap's EMR cluster | 
 | `intermediate_bucket_id` | The ID of Etleap's intermediate bucket |
 | `deployment_id` | The Deployment ID |
@@ -156,14 +155,14 @@ Critical alarms are for conditions that cause pipelines to stop.
 | EMR Core 80% CPU                      | No       | CPU usage is high on EMR core nodes                                                                                      | Increase the number of core nodes via the Terraform variable `emr_core_node_count`. |
 | EMR Unhealthy Nodes                   | No       | EMR cluster is in a bad state                                                                                            | Taint the cluster and see the section on *Reprovisioning a new EMR cluster*                                                                                                                                   |
 | EMR Missing Blocks                    | No       | Missing HDFS blocks means we lost one or more core nodes                                                                 | Taint the cluster and the section on *Reprovisioning a new EMR cluster*                                                                                                                                       |
-| 80% Disk EMR NameNode                 | Yes      | The disk is filling up on the name ndoe                                                                                  | Taint the cluster and the section on *Reprovisioning a new EMR cluster*                                                                                                                                       |
+| 80% Disk EMR NameNode                 | Yes      | The disk is filling up on the name node                                                                                  | Taint the cluster and the section on *Reprovisioning a new EMR cluster*                                                                                                                                       |
 | RDS CPU 90%                           | No       | RDS instance is saturating CPU                                                                                           | Increase the RDS instance size                                                                                                                                                                                |
 | RDS Disk Space                        | Yes      | RDS is running out of disk space                                                                                         | Increase the `allocated_storage` via Terraform, or via the console                                                                                                                                            |
 | RDS Freeable Memory                   | No       | RDS is running out of disk space                                                                                         | Increase the `allocated_storage` via Terraform, or via the console                                                                                                                                            |
 | * Node 80% CPU                        | No       | CPU usage is high on the specified instance                                                                              | Upgrade the instance type to the next larger size within the same instance family. If you wish to upgrade from `t3.2xlarge`, which is the largest `t3` instance available, please switch to the `c6a` family. |
 | * 90% Disk *                          | Yes      | Disk is getting full for one of the instances                                                                            | Contact Etleap Support to diagnose the root cause.                                                                                                                                                             |
-| App is running                        | Yes      | The main web application is down and not accepting requests                                                              | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
-| Job is running                        | Yes      | The data processing application is down                                                                                  | If in single-availability node, reprovision the instance. If in High-Availablity mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
+| App is running                        | Yes      | The main web application is down and not accepting requests                                                              | If in single-availability node, reprovision the instance. If in High-Availability mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
+| Job is running                        | Yes      | The data processing application is down                                                                                  | If in single-availability node, reprovision the instance. If in High-Availability mode, reprovision both instances, and contact Etleap Support to determine the cause of the outage                            |
 | Database extractor is running         | Yes      | The application that runs database extractions is down. This potentially impacts all pipelines that extract from a database sources.   | Contact Support                                                                                                                                                                                               | 
 | DMS Disk Space 125GB Remaining        | Yes      | DMS replication instance is running out of disk space                                                                    | Contact Support                                                                                                                                                                                               |
 | DMS Available Memory <= 10%           | No       | DMS replication instance is running out of memory                                                                        | Upgrade the instance type to the next larger size within the same instance family                                                                                                                             |
@@ -186,14 +185,14 @@ DEPLOYMENT_ID=$(terraform output -raw deployment_id)
 aws s3 cp s3://$INTERMEDIATE_BUCKET/emr-logs/$CLUSTER_ID/ s3://etleap-vpc-emr-logs/$DEPLOYMENT_ID/$CLUSTER_ID/ --acl bucket-owner-full-control --recursive
 ```
 
-Once this is done, you can run `terrafrom apply` to recreate or replace the cluster, as the need may be.
+Once this is done, you can run `terraform apply` to recreate or replace the cluster, as the need may be.
 
 # Security upgrades
 
 This section provides information on how to run security upgrade for the deployment.
 
 EC2 instances that are part of this deployment are designed to upgrade and apply any updates when they first start up.
-We do not support patching existing instances, so the following instruction swill guide you on how to replace the instances while minimizing downtime.
+We do not support patching existing instances, so the following instructions will guide you on how to replace the instances while minimizing downtime.
 
 ## Upgrading the Application Instances
 

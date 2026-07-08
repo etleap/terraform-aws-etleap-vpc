@@ -85,7 +85,7 @@ variable "app_available" {
 
 variable "ha_mode" {
   default     = false
-  description = "Enables High Availability mode. This will run two redundant Etleap instances in 2 availability zones, and set the RDS instace to \"multi-az\" mode."
+  description = "Enables High Availability mode. This will run two redundant Etleap instances in 2 availability zones, and set the RDS instance to \"multi-az\" mode."
 }
 
 variable "app_private_ip" {
@@ -100,7 +100,7 @@ variable "nat_private_ip" {
 
 variable "secondary_app_private_ip" {
   default     = null
-  description = "The Private IP for the seconday application instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP."
+  description = "The Private IP for the secondary application instance. Use if you want to set it to a predetermined value. By default, the application will be assigned a random IP."
 }
 
 variable "non_critical_cloudwatch_alarm_sns_topics" {
@@ -155,7 +155,7 @@ variable "s3_data_lake_account_ids" {
 
 variable "github_username" {
   default     = null
-  description = "Github username to use when accessing custom transforms"
+  description = "GitHub username to use when accessing custom transforms"
 }
 
 variable "github_access_token_arn" {
@@ -170,7 +170,7 @@ variable "connection_secrets" {
 
 variable "resource_tags" {
   default     = {}
-  description = "Resource tags to be applied to all resources create by this template."
+  description = "Resource tags to be applied to all resources created by this template."
   type        = map(string)
 }
 
@@ -360,7 +360,7 @@ variable "outbound_access_destinations" {
     error_message = "Exactly one of `cidr_block` and `target_security_group_id` must be specified."
   }
 
-  description = "(Optional) Restrict outbound access for the deployment to the specified list of CIDR blocks or security groups, ports and protocols. If unspecified, this will default to the `0.0.0.0/0' CIDR block, and all ports and protocols. See the Readme section for details about the usage of this argument: https://registry.terraform.io/modules/etleap/etleap-vpc/aws/latest#restricting-outbound-access."
+  description = "(Optional) Restrict outbound access for the deployment to the specified list of CIDR blocks or security groups, ports and protocols. If unspecified, this will default to the `0.0.0.0/0` CIDR block, and all ports and protocols. See the Readme section for details about the usage of this argument: https://registry.terraform.io/modules/etleap/etleap-vpc/aws/latest#restricting-outbound-access."
 }
 
 variable "kms_key_additional_policies" {
@@ -376,7 +376,7 @@ variable "kms_key_additional_policies" {
 
   validation {
     condition = alltrue([
-      for policy in var.kms_key_additional_policies : (policy.Effect == "Allow" || policy.Effect == "Deny" && length(policy.Action) > 0 && length(policy.Principal) > 0 && length(policy.Resource) > 0)
+      for policy in var.kms_key_additional_policies : contains(["Allow", "Deny"], policy.Effect) && length(policy.Action) > 0 && length(policy.Principal) > 0 && length(policy.Resource) > 0
     ])
     error_message = "Each policy in 'kms_key_additional_policies' must specify 'Effect', 'Action', 'Principal', and 'Resource'. 'Sid' and 'Condition' are optional."
   }
@@ -391,24 +391,24 @@ variable "post_install_script" {
 }
 
 locals {
-  validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1", 
-                                                                    "us-east-2",
-                                                                    "us-west-2",
-                                                                    "ap-south-1",
-                                                                    "ap-southeast-1",
-                                                                    "ap-southeast-2",
-                                                                    "ap-southeast-3",
-                                                                    "ap-northeast-1",
-                                                                    "ca-central-1",
-                                                                    "eu-central-1",
-                                                                    "eu-west-1",
-                                                                    "eu-west-2",
-                                                                    "eu-west-3",
-                                                                    "eu-north-1",
-                                                                    "eu-south-1",
-                                                                    "eu-south-2",
-                                                                    "me-central-1"
-                                                                  ], data.aws_region.current.name))
+  validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1",
+    "us-east-2",
+    "us-west-2",
+    "ap-south-1",
+    "ap-southeast-1",
+    "ap-southeast-2",
+    "ap-southeast-3",
+    "ap-northeast-1",
+    "ca-central-1",
+    "eu-central-1",
+    "eu-west-1",
+    "eu-west-2",
+    "eu-west-3",
+    "eu-north-1",
+    "eu-south-1",
+    "eu-south-2",
+    "me-central-1"
+  ], data.aws_region.current.name))
   validate_influx_db_hostname_and_password_err_msg = "If you are deploying Etleap in a region that doesn't yet support Amazon Timestream for InfluxDB, then follow the instructions in the README for deploying InfluxDB in a secondary region, set `is_influx_db_in_secondary_region` to `true`, and specify `influx_db_hostname` and `influx_db_password_arn`. If `is_influx_db_in_secondary_region` is set to `false` (default), then neither `influx_db_hostname` or `influx_db_password_arn` should be set."
 }
 
@@ -428,7 +428,7 @@ resource "null_resource" "is_vpc_spec_valid" {
 
 locals {
   is_valid_10_subnet_range  = var.vpc_cidr_block_1 == 10
-  is_valid_172_subnet_range = var.vpc_cidr_block_1 == 172 && var.vpc_cidr_block_2 >= 16 && var.vpc_cidr_block_2 <= 32
+  is_valid_172_subnet_range = var.vpc_cidr_block_1 == 172 && var.vpc_cidr_block_2 >= 16 && var.vpc_cidr_block_2 <= 31
   is_valid_192_subnet_range = var.vpc_cidr_block_1 == 192 && var.vpc_cidr_block_2 == 168
   is_cidr_range_valid_cnd   = var.vpc_id == null ? (local.is_valid_10_subnet_range || local.is_valid_172_subnet_range || local.is_valid_192_subnet_range) : true
   is_cidr_range_valid_msg   = "CIDR blocks must be in the following ranges: 10.0.0.0/8, 172.16.0.0/12 or 192.168.0.0/16."
