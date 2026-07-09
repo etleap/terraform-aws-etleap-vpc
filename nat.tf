@@ -4,7 +4,7 @@ resource "aws_instance" "nat" {
   tags        = merge({Name = "Etleap NAT ${var.deployment_id}"}, local.default_tags)
   volume_tags = merge({Name = "Etleap NAT", }, local.default_tags)
 
-  ami                         = data.aws_ami.nat.id
+  ami                         = local.nat_ami
   instance_type               = var.nat_instance_type
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.nat[0].id]
@@ -21,34 +21,6 @@ resource "aws_instance" "nat" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = [ ami ]
-  }
-}
-
-# Automates the search for the latest NAT AMI
-data "aws_ami" "nat" {
-  most_recent      = true
-  name_regex       = "^etleap-nat-gateway-*"
-  owners           = [local.hosted_account_id]
-
-  filter {
-    name   = "name"
-    values = ["etleap-nat-gateway-x86_64-*"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
   }
 }
 

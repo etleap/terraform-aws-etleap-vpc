@@ -54,6 +54,28 @@ locals {
 
   app_ami = local.latest_app_amis[local.region]
 
+  latest_nat_amis = {
+    ap-northeast-1 = "ami-04105315e4af0eb33"
+    ap-northeast-2 = "ami-04c9587692d8d61cd"
+    ap-northeast-3 = "ami-0954fb6cc525faea9"
+    ap-south-1     = "ami-0d987e1565167afbd"
+    ap-southeast-1 = "ami-0578e77caf866f7de"
+    ap-southeast-2 = "ami-00c53aab380797a3a"
+    ca-central-1   = "ami-08d4fce19663e0e16"
+    eu-central-1   = "ami-0c07db924117f765e"
+    eu-north-1     = "ami-0ed78b85c80886c04"
+    eu-west-1      = "ami-0afe5581a85a44d6f"
+    eu-west-2      = "ami-0c8a44b5649708f33"
+    eu-west-3      = "ami-0db94e21394fe467d"
+    sa-east-1      = "ami-06f52948b037ced34"
+    us-east-1      = "ami-0c8380aa4368b10f5"
+    us-east-2      = "ami-0c6d4210ad2e9f3ef"
+    us-west-1      = "ami-0b5c3673e0e8f729d"
+    us-west-2      = "ami-0aa259f1cd40306d5"
+  }
+
+  nat_ami = local.latest_nat_amis[local.region]
+
   context = {
     deployment_id                            = var.deployment_id
     vpc_cidr_block                           = local.vpc_cidr_block
