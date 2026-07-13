@@ -25,7 +25,9 @@ resource "aws_instance" "zookeeper" {
   volume_tags = merge({Name = "Etleap ${each.value} ${var.deployment_id}"}, local.default_tags)
 
   instance_type = "t3.small"
-  ami           = local.app_ami
+  # TEMPORARY: Zookeeper stays on Ubuntu until it is migrated to AL2023 (VIK-7449).
+  # The app nodes use the AL2023 `local.app_ami`.
+  ami           = local.zookeeper_ami
   key_name      = var.key_name
   iam_instance_profile = aws_iam_instance_profile.zookeeper.name
 

@@ -1,3 +1,32 @@
+# Release 1.17.0
+
+Migrates the `app` instances to Amazon Linux 2023 from Ubuntu 24.04. Also enables kernel live patching for automated security updates.
+
+## Upgrade instructions
+
+This upgrade will replace the application EC2 instance(s), which will cause about 15 minutes of downtime.
+If your AWS policies block AMIs by default, please whitelist the AMI for your deployment's region before applying:
+
+af-south-1: ami-076f2ec206175a448
+ap-east-1: ami-07ce822dd776185e8
+ap-northeast-1: ami-0082fe279c753cef4
+ap-northeast-2: ami-004edbfd4cd5c86b9
+ap-south-1: ami-0104150ac67fd163e
+ap-southeast-1: ami-0f6cd7c4e897dc4c1
+ap-southeast-2: ami-0a461faa94a17cb86
+ca-central-1: ami-0df83b68cb56797a4
+eu-central-1: ami-050c409fd76e91d29
+eu-north-1: ami-0e1378816aebb6d5f
+eu-south-1: ami-05ab3e2a5dadef6df
+eu-west-1: ami-00b37175a0d95d6ab
+eu-west-2: ami-01037125fafa99d01
+eu-west-3: ami-0b82bc806ea92a0d1
+sa-east-1: ami-0578cf56aafeec7ac
+us-east-1: ami-0e46dc1901a488282
+us-east-2: ami-0e8bbefe6c5a24eff
+us-west-1: ami-0e14063325f608c6d
+us-west-2: ami-0c951270ac7e74796
+
 # Release 1.16.4
 
 Upgrades the NAT instance from Amazon Linux 2, which has reached end of life, to Amazon Linux 2023.

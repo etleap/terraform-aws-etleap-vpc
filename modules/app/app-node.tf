@@ -90,46 +90,42 @@ resource "aws_instance" "app" {
 
   user_data_replace_on_change = true
   user_data = <<EOF
-#cloud-config 
+#cloud-config
 # -*- YAML -*-
 locale: en_US.UTF-8
-packages:
-- mysql-client-core-5.7
 
 write_files:
-- path: /home/ubuntu/ssl_certificate/ssl.pem
+- path: /home/ec2-user/ssl_certificate/ssl.pem
   content: |
     ${indent(4, var.ssl_pem)}
-  owner: ubuntu:ubuntu
-- path: /home/ubuntu/ssl_certificate/ssl.key
+  owner: ec2-user:ec2-user
+- path: /home/ec2-user/ssl_certificate/ssl.key
   content: |
     ${indent(4, var.ssl_key)}
-  owner: ubuntu:ubuntu
-- path: /home/ubuntu/.etleap
+  owner: ec2-user:ec2-user
+- path: /home/ec2-user/.etleap
   content: |
     ${indent(4, var.config)}
 - path: /root/.aws/config
   content: |
     [default]
     region = ${var.region}
-- path: /home/ubuntu/.aws/config
+- path: /home/ec2-user/.aws/config
   content: |
     [default]
     region = ${var.region}
 
 runcmd:
 - resize2fs /dev/nvme1n1
-- echo RESET grub-efi/install_devices | debconf-communicate grub-pc 
-- apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y
-- ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+- dnf upgrade -y
 - "service docker restart"
 - ${var.db_init}
 %{ if var.app_role == "main" ~}
 - ${var.influx_db_init}
 %{ endif ~}
-- yes | ssh-keygen -f /home/ubuntu/.ssh/id_rsa -N ''
-- cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
-- usermod -a -G ubuntu aws-kinesis-agent-user
+- yes | ssh-keygen -f /home/ec2-user/.ssh/id_rsa -N ''
+- cat /home/ec2-user/.ssh/id_rsa.pub >> /home/ec2-user/.ssh/authorized_keys
+- usermod -a -G ec2-user aws-kinesis-agent-user
 %{ if var.post_install_script_command != null ~}
 - ${var.post_install_script_command}
 %{ endif ~}

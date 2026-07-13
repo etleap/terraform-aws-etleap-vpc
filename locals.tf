@@ -30,6 +30,31 @@ locals {
     : null)
 
   latest_app_amis = {
+    af-south-1     = "ami-076f2ec206175a448"
+    ap-east-1      = "ami-07ce822dd776185e8"
+    ap-northeast-1 = "ami-0082fe279c753cef4"
+    ap-northeast-2 = "ami-004edbfd4cd5c86b9"
+    ap-south-1     = "ami-0104150ac67fd163e"
+    ap-southeast-1 = "ami-0f6cd7c4e897dc4c1"
+    ap-southeast-2 = "ami-0a461faa94a17cb86"
+    ca-central-1   = "ami-0df83b68cb56797a4"
+    eu-central-1   = "ami-050c409fd76e91d29"
+    eu-north-1     = "ami-0e1378816aebb6d5f"
+    eu-south-1     = "ami-05ab3e2a5dadef6df"
+    eu-west-1      = "ami-00b37175a0d95d6ab"
+    eu-west-2      = "ami-01037125fafa99d01"
+    eu-west-3      = "ami-0b82bc806ea92a0d1"
+    sa-east-1      = "ami-0578cf56aafeec7ac"
+    us-east-1      = "ami-0e46dc1901a488282"
+    us-east-2      = "ami-0e8bbefe6c5a24eff"
+    us-west-1      = "ami-0e14063325f608c6d"
+    us-west-2      = "ami-0c951270ac7e74796"
+  }
+
+  # TEMPORARY: Zookeeper stays on Ubuntu until it is migrated to AL2023
+  # (VIK-7449). These are the Ubuntu AMIs that latest_app_amis held before the
+  # AL2023 migration. Remove this map and zookeeper_ami once ZK is on AL2023.
+  zookeeper_amis = {
     af-south-1     = "ami-00c3d948804bc9ac0"
     ap-east-1      = "ami-04900dbefe52f0292"
     ap-northeast-1 = "ami-03b4e26264e79e1b3"
@@ -44,7 +69,6 @@ locals {
     eu-west-1      = "ami-01d7ca7d503247c4a"
     eu-west-2      = "ami-0eb8840519b09339f"
     eu-west-3      = "ami-07f529eb42ada0d59"
-    me-south-1     = "ami-017505227fb051406"
     sa-east-1      = "ami-0759355ae132089e2"
     us-east-1      = "ami-0e0a4106402da2799"
     us-east-2      = "ami-079378cd1a0c35a49"
@@ -52,7 +76,8 @@ locals {
     us-west-2      = "ami-0f4ef8559c70234eb"
   }
 
-  app_ami = local.latest_app_amis[local.region]
+  app_ami       = local.latest_app_amis[local.region]
+  zookeeper_ami = local.zookeeper_amis[local.region]
 
   latest_nat_amis = {
     ap-northeast-1 = "ami-04105315e4af0eb33"
