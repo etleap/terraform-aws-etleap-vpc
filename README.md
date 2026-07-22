@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.17.0"
+  version = "1.18.0"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -105,6 +105,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `s3_kms_encryption_key` | The ARN of an AWS KMS key to use to encrypt S3 objects in the intermediate bucket. If not specified, server-side encryption with Amazon S3-managed keys (SSE-S3) will be used. | `string` | `null`               | no |
 | `emr_kms_encryption_key` | The ARN of an AWS KMS key to use to encrypt the local disk for EMR nodes. If not specified, a new KMS key will be created. | `string` | `null`               | no |
 | `post_install_script` | The path to a custom script to be executed during initial EC2 instance startup. See the [Custom Post-Installation Script](#custom-post-installation-script) section for usage details. |  `string`| `null` | no |
+| `patch_manager_maintenance_window_schedule` | Cron expression for when the automated OS patching maintenance window runs, in UTC. Set to `null` to disable automated OS patching. See the [Automated OS patching](#automated-os-patching) section. | `string` | `cron(0 10 ? * THU *)` (Thursdays at 10:00 UTC) | no |
 
 ## Outputs
 
@@ -187,7 +188,24 @@ aws s3 cp s3://$INTERMEDIATE_BUCKET/emr-logs/$CLUSTER_ID/ s3://etleap-vpc-emr-lo
 
 Once this is done, you can run `terrafrom apply` to recreate or replace the cluster, as the need may be.
 
+# Automated OS patching
+
+The deployment's EC2 instances are patched automatically with AWS Systems Manager Patch Manager. A weekly maintenance window installs operating system security patches and bugfixes 7 days after their release, without rebooting the instances. Patching output is written to the `/etleap/<deployment_id>/patch_manager` CloudWatch log group.
+
+Patching applies to the `Etleap App` and `Etleap NAT` EC2 instances only. These instances are given the following tag: `PatchGroup=etleap-<deployment_id>`.
+
+The maintenance window defaults to Thursdays at 10:00 UTC and can be changed with the `patch_manager_maintenance_window_schedule` variable:
+
+```
+patch_manager_maintenance_window_schedule = "cron(0 3 ? * SUN *)" # Sundays at 03:00 UTC
+```
+
+To disable automated OS patching, set `patch_manager_maintenance_window_schedule` to `null`.
+When disabled, security patching must be applied manually, see [Upgrading the Application Instances](#upgrading-the-application-instances) below for more details.
+
 # Security upgrades
+
+If automated OS patching is enabled (the default), security patching of the `Etleap App` and `Etleap NAT` instances is handled for you and you do not need to follow this section for those instances. See [Automated OS patching](#automated-os-patching). This section still applies when automated patching is disabled, and to the other instances in the deployment.
 
 This section provides information on how to run security upgrade for the deployment.
 

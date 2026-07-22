@@ -390,6 +390,11 @@ variable "post_install_script" {
   description = "The path to a custom script to be executed during initial EC2 instance startup."
 }
 
+variable "patch_manager_maintenance_window_schedule" {
+  default     = "cron(0 10 ? * THU *)"
+  description = "(Optional) Cron expression for when the automated OS patching maintenance window runs, in UTC. Defaults to Thursdays at 10:00 UTC. Set to null to disable automated OS patching."
+}
+
 locals {
   validate_influx_db_hostname_and_password = var.is_influx_db_in_secondary_region ? (var.influx_db_hostname != null && var.influx_db_password_arn != null) : (var.influx_db_hostname == null && var.influx_db_password_arn == null && contains(["us-east-1", 
                                                                     "us-east-2",

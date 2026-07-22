@@ -1,3 +1,19 @@
+# Release 1.18.0
+
+Adds automated OS patching using AWS Systems Manager Patch Manager. Patching is enabled by default, and removes the need for security upgrades to be applied manually to the `Etleap App` and `Etleap NAT` EC2 instances.
+
+Patching is applied during a weekly maintenance window. This window can be configured or disabled using the `patch_manager_maintenance_window_schedule` variable. During the window, security upgrades and bugfixes that were released at least 7 days ago are applied automatically.
+
+Automated patching does not require instances to be restarted. Patching output is written to a CloudWatch log group with 365-day retention. See the "Automated OS patching" section in the README for details.
+
+Patching currently applies only to the `Etleap App` and `Etleap NAT` EC2 instances. An IAM role and instance profile have been added to the `Etleap NAT` instance to support this.
+
+## Upgrade Instructions
+
+Terraform 1.1.0 or later is now required. Please ensure you have upgraded before applying.
+
+This version requires replacing the `Etleap NAT` EC2 instance, which briefly interrupts outbound internet connectivity for the deployment.
+
 # Release 1.17.0
 
 Migrates the `app` instances to Amazon Linux 2023 from Ubuntu 24.04. Also enables kernel live patching for automated security updates.

@@ -22,15 +22,30 @@ resource "aws_iam_policy_attachment" "assume_data_roles" {
   policy_arn = aws_iam_policy.assume_data_roles.arn
 }
 
+locals {
+  # Instances are registered with AWS Systems Manager when they are patched or
+  # when the Etleap support role can open SSM sessions to them.
+  instances_ssm_managed = local.patch_manager_count > 0 || var.allow_iam_support_role
+}
+
+# These attachments let the instances register with AWS Systems Manager in the
+# customer's account, which is required for automated OS patching and for
+# support sessions. Registration by itself grants no access to the instances.
 resource "aws_iam_role_policy_attachment" "app-ssm" {
-  count      = var.allow_iam_support_role ? 1 : 0
+  count      = local.instances_ssm_managed ? 1 : 0
   role       = aws_iam_role.app.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "zookeeper-ssm" {
-  count      = var.allow_iam_support_role ? 1 : 0
+  count      = local.instances_ssm_managed ? 1 : 0
   role       = aws_iam_role.zookeeper.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "nat-ssm" {
+  count      = local.created_vpc_count > 0 && local.instances_ssm_managed ? 1 : 0
+  role       = aws_iam_role.nat[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
@@ -268,6 +283,18 @@ resource "aws_iam_policy" "app_various_limited" {
         "Resource": [
           "arn:aws:sqs:us-east-1:841591717599:Etleap-${var.deployment_id}-github-app-webhooks-queue"
         ]
+      },
+      {
+        "Sid":"SqsAllowAll",
+        "Effect": "Allow",
+        "Action": "sqs:*",
+        "Resource": "${module.inbound_queue.sqs_queue_arn}"
+      },
+      {
+        "Sid":"SnsAllowAll",
+        "Effect": "Allow",
+        "Action": "sns:*",
+        "Resource": "${module.inbound_queue.sns_topic_arn}"
       }
     ]
 }

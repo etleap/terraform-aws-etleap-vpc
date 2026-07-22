@@ -51,7 +51,7 @@ variable "tags" {
 }
 
 resource "aws_instance" "app" {
-  tags                 = merge({Name = "Etleap App ${var.deployment_id} ${var.name}", AppRole = var.app_role, }, var.tags)
+  tags                 = merge({Name = "Etleap App ${var.deployment_id} ${var.name}", AppRole = var.app_role, PatchGroup = "etleap-${var.deployment_id}", }, var.tags)
   volume_tags          = merge({Name = "Etleap App", }, var.tags)
   instance_type        = var.instance_type
   ami                  = var.ami
