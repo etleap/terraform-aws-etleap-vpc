@@ -51,33 +51,7 @@ locals {
     us-west-2      = "ami-0c951270ac7e74796"
   }
 
-  # TEMPORARY: Zookeeper stays on Ubuntu until it is migrated to AL2023
-  # (VIK-7449). These are the Ubuntu AMIs that latest_app_amis held before the
-  # AL2023 migration. Remove this map and zookeeper_ami once ZK is on AL2023.
-  zookeeper_amis = {
-    af-south-1     = "ami-00c3d948804bc9ac0"
-    ap-east-1      = "ami-04900dbefe52f0292"
-    ap-northeast-1 = "ami-03b4e26264e79e1b3"
-    ap-northeast-2 = "ami-04d8c19ce85bf7bc4"
-    ap-south-1     = "ami-05b4d805e813a75a3"
-    ap-southeast-1 = "ami-0ed4ad5c849aae7fe"
-    ap-southeast-2 = "ami-07950cf97c5b22ecd"
-    ca-central-1   = "ami-015345ee32700d712"
-    eu-central-1   = "ami-0f3c0b99dee438443"
-    eu-north-1     = "ami-04769c93e87653487"
-    eu-south-1     = "ami-04889e7fd638ca39b"
-    eu-west-1      = "ami-01d7ca7d503247c4a"
-    eu-west-2      = "ami-0eb8840519b09339f"
-    eu-west-3      = "ami-07f529eb42ada0d59"
-    sa-east-1      = "ami-0759355ae132089e2"
-    us-east-1      = "ami-0e0a4106402da2799"
-    us-east-2      = "ami-079378cd1a0c35a49"
-    us-west-1      = "ami-0047b1dbf7c01e21f"
-    us-west-2      = "ami-0f4ef8559c70234eb"
-  }
-
-  app_ami       = local.latest_app_amis[local.region]
-  zookeeper_ami = local.zookeeper_amis[local.region]
+  app_ami = local.latest_app_amis[local.region]
 
   latest_nat_amis = {
     ap-northeast-1 = "ami-04105315e4af0eb33"

@@ -17,5 +17,5 @@ ZXID_COUNT=$(echo "$ZK_STAT" | grep -i zxid | awk '{print $2}' | python3 -c 'zxi
 echo "[ZOOKEEPER Zxid Check] Mode: $ZK_MODE ZxidCount: $ZXID_COUNT"
 if [ "$ZK_MODE" = "leader" ] && [ "$ZXID_COUNT" -gt 3000000000 ];then
     echo "WARN: Node is leader and Zxid count exceedes 3G, restarting local ZK node"
-    docker restart ubuntu_zookeeper_1
+    docker restart ec2-user-zookeeper-1
 fi

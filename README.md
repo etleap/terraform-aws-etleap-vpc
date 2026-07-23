@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.18.0"
+  version = "1.18.1"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -192,7 +192,7 @@ Once this is done, you can run `terrafrom apply` to recreate or replace the clus
 
 The deployment's EC2 instances are patched automatically with AWS Systems Manager Patch Manager. A weekly maintenance window installs operating system security patches and bugfixes 7 days after their release, without rebooting the instances. Patching output is written to the `/etleap/<deployment_id>/patch_manager` CloudWatch log group.
 
-Patching applies to the `Etleap App` and `Etleap NAT` EC2 instances only. These instances are given the following tag: `PatchGroup=etleap-<deployment_id>`.
+Patching applies to the `Etleap App`, `Etleap NAT`, and `Etleap Zookeeper` EC2 instances. These instances are given the following tag: `PatchGroup=etleap-<deployment_id>`.
 
 The maintenance window defaults to Thursdays at 10:00 UTC and can be changed with the `patch_manager_maintenance_window_schedule` variable:
 
@@ -205,7 +205,7 @@ When disabled, security patching must be applied manually, see [Upgrading the Ap
 
 # Security upgrades
 
-If automated OS patching is enabled (the default), security patching of the `Etleap App` and `Etleap NAT` instances is handled for you and you do not need to follow this section for those instances. See [Automated OS patching](#automated-os-patching). This section still applies when automated patching is disabled, and to the other instances in the deployment.
+If automated OS patching is enabled (the default), security patching of the `Etleap App`, `Etleap NAT`, and `Etleap Zookeeper` instances is handled for you and you do not need to follow this section for those instances. See [Automated OS patching](#automated-os-patching). This section still applies when automated patching is disabled, and to the other instances in the deployment.
 
 This section provides information on how to run security upgrade for the deployment.
 

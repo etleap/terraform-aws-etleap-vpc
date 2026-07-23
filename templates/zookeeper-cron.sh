@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 
 # Load .env
-source /home/ubuntu/.etleap
+source /home/ec2-user/.etleap
 deploymentId=$ETLEAP_DEPLOYMENT_ID
 secretKey=$ETLEAP_SECRET_APPLICATION_SECRET
 
@@ -20,17 +20,17 @@ curl \
    --header "Authorization: Basic $BEARER" \
    --header "Ec2Metadata: $EC2_IDENTITY_DOCUMENT" \
    --header "Accept-Encoding: gzip" \
-   -s -L -f --compressed -o "/home/ubuntu/.deployScript" \
+   -s -L -f --compressed -o "/home/ec2-user/.deployScript" \
    https://deployment.etleap.com/deployment/v1/deploy.py
 
-ECR_AUTH_TOKEN_JSON=$(grep -A7 "docker_config.write" /home/ubuntu/.deployScript | sed -n '2,7p')
+ECR_AUTH_TOKEN_JSON=$(grep -A7 "docker_config.write" /home/ec2-user/.deployScript | sed -n '2,7p')
 
-mkdir -p /home/ubuntu/.docker
-echo "{$ECR_AUTH_TOKEN_JSON" > /home/ubuntu/.docker/config.json
+mkdir -p /home/ec2-user/.docker
+echo "{$ECR_AUTH_TOKEN_JSON" > /home/ec2-user/.docker/config.json
 
 # Start docker compose
 printf "[ZOOKEEPER_CRON] Starting docker compose"
-docker compose -f /home/ubuntu/docker-compose.yml up -d
+docker compose -f /home/ec2-user/docker-compose.yml up -d
 
 # Clean up unused images
 docker rmi $(docker images -q --filter "dangling=true") > /dev/null || true
@@ -38,7 +38,7 @@ docker rmi $(docker images -q --filter "dangling=true") > /dev/null || true
 # Logging setup
 printf "[ZOOKEEPER_CRON] Logging setup"
 function should_enable_logging_agent {
-  SEND_LOGS=`docker exec zookeeper_zookeeper_1 bin/zkCli.sh get /deployment/enableLogsAndMetrics 2> /dev/null | tail -n 1`
+  SEND_LOGS=`docker exec ec2-user-zookeeper-1 bin/zkCli.sh get /deployment/enableLogsAndMetrics 2> /dev/null | tail -n 1`
   if [ "$SEND_LOGS" == "true" ]; then
     # Log and Metric reporting is enabled in Zookeeper
     return 0
@@ -63,7 +63,7 @@ function setup_logging {
 
   if should_enable_logging_agent; then
     echo "Starting log delivery"
-    cat /home/ubuntu/kinesis-agent-json-template.json \
+    cat /home/ec2-user/kinesis-agent-json-template.json \
       | sed "s/{STREAM}/log/g"\
       | sed "s/{HOST}/$1/g"\
       | sed "s/{DEPLOYMENT_ID}/$2/g"\

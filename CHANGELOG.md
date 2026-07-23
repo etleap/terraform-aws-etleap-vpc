@@ -1,3 +1,13 @@
+# Release 1.18.1
+
+Migrates the `zookeeper` instances to Amazon Linux 2023 from Ubuntu 24.04, reusing the same AL2023 app AMI. Also enables kernel live patching for automated security updates, and enrolls the Zookeeper instances in the AWS Systems Manager Patch Manager automated OS patching introduced in `1.18.0` by tagging them with `PatchGroup=etleap-<deployment_id>`.
+
+## Upgrade instructions
+
+The Zookeeper instances reuse the AL2023 app AMI introduced in `1.17.0`, so there are no new AMIs to whitelist if you have already upgraded to `1.17.0`.
+
+This upgrade replaces the Zookeeper EC2 instances. To avoid downtime, replace them one at a time, following the [Upgrading the Zookeeper Cluster](README.md#upgrading-the-zookeeper-cluster) instructions.
+
 # Release 1.18.0
 
 Adds automated OS patching using AWS Systems Manager Patch Manager. Patching is enabled by default, and removes the need for security upgrades to be applied manually to the `Etleap App` and `Etleap NAT` EC2 instances.

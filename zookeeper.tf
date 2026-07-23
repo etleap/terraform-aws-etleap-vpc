@@ -21,13 +21,11 @@ resource "aws_network_interface" "zookeeper" {
 
 resource "aws_instance" "zookeeper" {
   for_each    = local.zookeeper_map
-  tags        = merge({Name = "Etleap ${each.value} ${var.deployment_id}"}, local.default_tags)
+  tags        = merge({Name = "Etleap ${each.value} ${var.deployment_id}", PatchGroup = "etleap-${var.deployment_id}"}, local.default_tags)
   volume_tags = merge({Name = "Etleap ${each.value} ${var.deployment_id}"}, local.default_tags)
 
   instance_type = "t3.small"
-  # TEMPORARY: Zookeeper stays on Ubuntu until it is migrated to AL2023 (VIK-7449).
-  # The app nodes use the AL2023 `local.app_ami`.
-  ami           = local.zookeeper_ami
+  ami           = local.app_ami
   key_name      = var.key_name
   iam_instance_profile = aws_iam_instance_profile.zookeeper.name
 
@@ -69,7 +67,6 @@ resource "aws_instance" "zookeeper" {
     datadog_active = 0,
     zookeeper_id = each.key,
     post_install_script_command = local.post_install_script_command
-    file_kinesis_install = file("${path.module}/templates/kinesis-install.sh"),
     file_zookeeper_install = file("${path.module}/templates/zookeeper-install.sh"),
     file_zookeeper_cron = file("${path.module}/templates/zookeeper-cron.sh"),
     file_zookeeper_stat = file("${path.module}/templates/zookeeper-stat.sh"),

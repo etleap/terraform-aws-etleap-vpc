@@ -3,7 +3,7 @@
 export AWS_DEFAULT_REGION=us-east-1
 
 # Load deployment ID from .etleap environment file
-source /home/ubuntu/.etleap
+source /home/ec2-user/.etleap
 DEPLOYMENT_ID=$ETLEAP_DEPLOYMENT_ID
 
 # Zookeeper might catch more than 1 security group, so let's fetch the first one
