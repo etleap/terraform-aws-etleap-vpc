@@ -19,7 +19,7 @@ output "s3_input_bucket_policy" {
       bucket  = bucket
     })
   }
-  description = "Policies that need to applied to the S3 buckets specified by 's3_input_buckets' so Etleap's role can read from them."
+  description = "Policies that need to be applied to the S3 buckets specified by 's3_input_buckets' so Etleap's role can read from them."
 }
 
 output "setup_password" {
@@ -55,7 +55,7 @@ output "public_route_table_id" {
 
 output "private_route_table_id" {
   value       = var.vpc_id == null ? aws_route_table.private[0].id : "Not managed by this Module"
-  description = "The public subnets' route table, if managed by the module"
+  description = "The private subnets' route table, if managed by the module"
 }
 
 output "vpc_id" {
@@ -89,7 +89,7 @@ output "secondary_app_instance_id" {
 }
 
 output "kms_policy" {
-  value = var.s3_kms_encryption_key == null ? null : <<EOF
+  value       = var.s3_kms_encryption_key == null ? null : <<EOF
 {
     "Sid": "Allow Etleap roles use of the key",
     "Effect": "Allow",
@@ -119,6 +119,6 @@ output "kms_key_arn" {
 }
 
 output "zookeeper_private_ips" {
-  value       = toset([ for i in aws_network_interface.zookeeper : i.private_dns_name ])
+  value       = toset([for i in aws_network_interface.zookeeper : i.private_dns_name])
   description = "Zookeeper ensemble private ips"
 }
