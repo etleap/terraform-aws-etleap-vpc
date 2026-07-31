@@ -1,4 +1,5 @@
 export ETLEAP_SERVICE=zookeeper
+export ETLEAP_ZOOKEEPER_NAME=${zookeeper_name}
 export ETLEAP_DEPLOYMENT_ID=${deployment_id}
 export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${deployment_secret_arn} | jq -r .SecretString)"
 export ETLEAP_ECR_REPO=841591717599.dkr.ecr.us-east-1.amazonaws.com

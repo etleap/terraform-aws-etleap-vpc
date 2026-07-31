@@ -1,6 +1,9 @@
 #cloud-config
 # -*- YAML -*-
 hostname: ${hostname}
+# cloud-init's Amazon Linux distro class inherits `prefer_fqdn = True` from RHEL, which would write
+# the IMDS FQDN (ip-<private-ip>.ec2.internal) to /etc/hostname instead of the hostname set above.
+prefer_fqdn_over_hostname: false
 locale: en_US.UTF-8
 
 groups:

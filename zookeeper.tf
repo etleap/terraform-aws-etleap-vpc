@@ -79,7 +79,8 @@ resource "aws_instance" "zookeeper" {
     }),
     config = templatefile("${path.module}/templates/zookeeper-config.tmpl", {
       deployment_id = var.deployment_id,
-      deployment_secret_arn = module.deployment_secret.arn
+      deployment_secret_arn = module.deployment_secret.arn,
+      zookeeper_name = each.value
     })
   })
 

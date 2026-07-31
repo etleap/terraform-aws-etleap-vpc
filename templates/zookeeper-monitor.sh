@@ -2,25 +2,26 @@
 # Reports outstanding requests, avg latency, RSS and swap usage for running ZooKeeper container
 export AWS_DEFAULT_REGION=us-east-1
 
-# Load deployment ID from .etleap environment file
+# Load the deployment ID, node name and service name from the .etleap environment file.
+# The `Instance` and `Node` dimensions must match the ones the `<zookeeperN> is down` CloudWatch
+# alarms are defined with, so they're passed in from Terraform rather than derived on the instance
+# from the OS hostname and the security group name.
 source /home/ec2-user/.etleap
 DEPLOYMENT_ID=$ETLEAP_DEPLOYMENT_ID
+INSTANCE_NAME=$ETLEAP_ZOOKEEPER_NAME
+NODE_NAME=$ETLEAP_SERVICE
 
-# Zookeeper might catch more than 1 security group, so let's fetch the first one
-IMDS_TOKEN=$(curl -X PUT "http://instance-data/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60" -s)
-SECURITY_GROUP=$(curl -s -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" http://169.254.169.254/latest/meta-data/security-groups | grep 'app\|monitor\|job\|customervpc\|zookeeper' | head -n1)
 ZK_HOST="localhost"
 RETRIES=5
 
 # Identify Zookeeper container
-INSTANCE_NAME=$(cat /etc/hostname)
 ZK_CONTAINER_ID_AND_NAME=`docker ps | tail -n +2 | sed 's/\([^ ]\+\).* \([^ ]\+\)$/\1,\2/' | grep zookeeper`
 ZK_CONTAINER_ID=`echo $ZK_CONTAINER_ID_AND_NAME | cut -d, -f1`
 # Get full-length container ID
 ZK_CONTAINER_ID=`docker ps -q --no-trunc | grep "$ZK_CONTAINER_ID"`
 
 # Define common dimensions
-METRIC_DIMENSIONS="[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$SECURITY_GROUP\"},{\"Name\":\"Deployment\",\"Value\":\"$DEPLOYMENT_ID\"}]"
+METRIC_DIMENSIONS="[{\"Name\":\"Instance\",\"Value\":\"$INSTANCE_NAME\"},{\"Name\":\"Node\",\"Value\":\"$NODE_NAME\"},{\"Name\":\"Deployment\",\"Value\":\"$DEPLOYMENT_ID\"}]"
 
 # Helper function to sends multiple CloudWatch metrics in a single API call.
 # Arguments must be in name/value pairs. e.g. name1 value1 name2 value2
@@ -64,7 +65,7 @@ check_zk_running() {
   put_metrics "Ruok" $RUOK
 
   if [[ -z "$IMOK" ]]; then
-    echo "ZooKeeper node '$INSTANCE_NAME-$SECURITY_GROUP' is down"
+    echo "ZooKeeper node '$INSTANCE_NAME-$NODE_NAME' is down"
     exit 1
   fi
 }
@@ -94,7 +95,7 @@ submit_zk_stats() {
   done
 
   if [[ -z "$STAT" ]]; then
-    echo "Couldn't get stats from ZooKeeper node '$SECURITY_GROUP'"
+    echo "Couldn't get stats from ZooKeeper node '$INSTANCE_NAME'"
     exit 2
   fi
 

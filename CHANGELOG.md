@@ -1,12 +1,20 @@
-# Release 1.18.1
+# Release 1.18.2
 
 Migrates the `zookeeper` instances to Amazon Linux 2023 from Ubuntu 24.04, reusing the same AL2023 app AMI. Also enables kernel live patching for automated security updates, and enrolls the Zookeeper instances in the AWS Systems Manager Patch Manager automated OS patching introduced in `1.18.0` by tagging them with `PatchGroup=etleap-<deployment_id>`.
+
+This replaces `1.18.1`, which caused the `<zookeeper1|2|3> is down` CloudWatch alarms to go into the `INSUFFICIENT_DATA` state. This version includes a fix for that issue.
 
 ## Upgrade instructions
 
 The Zookeeper instances reuse the AL2023 app AMI introduced in `1.17.0`, so there are no new AMIs to whitelist if you have already upgraded to `1.17.0`.
 
 This upgrade replaces the Zookeeper EC2 instances. To avoid downtime, replace them one at a time, following the [Upgrading the Zookeeper Cluster](README.md#upgrading-the-zookeeper-cluster) instructions.
+
+If you are upgrading from `1.18.1`, the Zookeeper instances will be replaced again. Follow the instructions above to avoid downtime.
+
+# Release 1.18.1
+
+This version is deprecated due to an issue with Zookeeper metrics, and has been replaced by `1.18.2`. Please skip this version.
 
 # Release 1.18.0
 
