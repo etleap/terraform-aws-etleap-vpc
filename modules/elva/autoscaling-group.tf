@@ -1,11 +1,3 @@
-locals {
-  // Ubuntu 20.04 LTS - amd64, find and update AMIs from https://cloud-images.ubuntu.com/locator/ec2/ - must be hvm type for new instance types
-  ami = {
-    us-east-1 = "ami-0c1704bac156af62c"
-    eu-west-3 = "ami-07c3b0c60cfea48b5"
-  }
-}
-
 resource "aws_autoscaling_group" "elva" {
   depends_on                = [aws_lb_listener.elva_https, aws_lb_listener.elva_http]
   vpc_zone_identifier       = [var.subnet_a_private_id, var.subnet_b_private_id]
@@ -47,39 +39,32 @@ resource "aws_autoscaling_policy" "elva" {
 
 resource "aws_launch_configuration" "elva" {
   name_prefix          = "etleap-${var.deployment_id}-elva-vpc"
-  image_id             = local.ami[var.region]
+  image_id             = var.ami
   instance_type        = "t3.medium"
   iam_instance_profile = aws_iam_instance_profile.elva.name
   key_name             = var.key_name
   security_groups      = [aws_security_group.elva-node.id]
   enable_monitoring    = true
-  user_data            = <<EOF
+  user_data = <<EOF
 #!/bin/bash
-sudo apt-get update
-sudo apt-get install ntp unzip -y
-export VERSION=20.10.22
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-sudo apt update
-sudo apt install docker-ce -y
-sudo usermod -aG docker ubuntu
+set -euo pipefail
 
-sudo echo "server 169.254.169.123 prefer iburst" >> /etc/ntp.conf
-sudo service ntp restart
-sudo ntpq -pn
-
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.8.3.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
+gpasswd -a ec2-user docker
+systemctl enable --now docker
 
 for i in 1 2 3; do
-  aws ecr get-login-password --region us-east-1 | sudo -H docker login --username AWS --password-stdin 841591717599.dkr.ecr.us-east-1.amazonaws.com && sudo -H docker pull 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva && break || sleep 3;
+  aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 841591717599.dkr.ecr.us-east-1.amazonaws.com && docker pull 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva && break || sleep 3;
 done
 
-sudo docker run -d -e AWS_REGION=${var.region} -e ELVA_ENV=vpc -e CONFIG_BUCKET_NAME=${var.config_bucket.bucket} -e AWS_ACCESS_KEY=${aws_iam_access_key.elva.id} -e AWS_SECRET_KEY=${aws_iam_access_key.elva.secret} -p 3000:3000 -p 8889:8889 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva
+docker run -d -e AWS_REGION=${var.region} -e ELVA_ENV=vpc -e CONFIG_BUCKET_NAME=${var.config_bucket.bucket} -e AWS_ACCESS_KEY=${aws_iam_access_key.elva.id} -e AWS_SECRET_KEY=${aws_iam_access_key.elva.secret} -p 3000:3000 -p 8889:8889 841591717599.dkr.ecr.us-east-1.amazonaws.com/elva
 
 EOF
 
+  metadata_options {
+    http_tokens                 = "required"
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 2
+  }
 
   lifecycle {
     create_before_destroy = true

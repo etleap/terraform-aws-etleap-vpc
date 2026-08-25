@@ -1,3 +1,11 @@
+# Release 1.18.3
+
+This change only applies to deployments that have `enable_streaming_ingestion` set to `true` (defaults to `false`). Migrates the `elva` streaming ingestion instances to Amazon Linux 2023 from Ubuntu 20.04, reusing the same AL2023 AMI as the `app` and `zookeeper` instances. Also fixes an issue where IMDSv2 was not required.
+
+## Upgrade instructions
+
+This upgrade is a no-op unless you have set `enable_streaming_ingestion` to `true`. This upgrade replaces the streaming ingestion EC2 instances. The autoscaling group keeps a minimum of 4 instances behind a load balancer, so the streaming ingestion endpoint stays available while the instances are replaced.
+
 # Release 1.18.2
 
 Migrates the `zookeeper` instances to Amazon Linux 2023 from Ubuntu 24.04, reusing the same AL2023 app AMI. Also enables kernel live patching for automated security updates, and enrolls the Zookeeper instances in the AWS Systems Manager Patch Manager automated OS patching introduced in `1.18.0` by tagging them with `PatchGroup=etleap-<deployment_id>`.

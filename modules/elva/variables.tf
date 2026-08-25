@@ -49,6 +49,10 @@ variable "streaming_endpoint_access_cidr_blocks" {
 variable "app_security_group_id" {
 }
 
+variable "ami" {
+  description = "The Amazon Linux 2023 app AMI. Elva shares it with the app and Zookeeper nodes, so Docker, the AWS CLI and the SSM agent are already installed."
+}
+
 variable "tags" {
   type = map(string)
   default = {}
