@@ -449,3 +449,7 @@ data "aws_ec2_instance_type" "dms_instance_type" {
   // DMS instance types are prefixed with "dms.", which isn't supported by "aws_ec2_instance_type" data source
   instance_type = replace(var.dms_instance_type, "dms.", "")
 }
+
+data "aws_ec2_instance_type" "nat_instance_type" {
+  instance_type = var.nat_instance_type
+}

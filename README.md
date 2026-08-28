@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.18.3"
+  version = "1.18.4"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -172,7 +172,7 @@ Critical alarms are for conditions that cause pipelines to stop.
 | Zookepeer Unhealthy Nodes             | Yes      | Zookeeper cluster has Unhealthy Nodes                                                                                    | Contact Support                                                                                                                                                                                               |
 | * App Kinesis logger agent is running | Yes      | A Kinesis logger agent is not running                                                                                    | Contact Support                                                                                                                                                                                               |
 | High Job GC Activity                  | Yes      | The data processing application is spending a significant time doing garbage collection.                                 | If the monitored metric has been steadily increasing over time, upgrade the `app_instance_type` to one that has more memory. Contact support if this alarm is caused by a sudden spike in the metric.         |
-| NAT Network Saturation                | Yes      | The NAT NetworkIn bandwidth has exceeded the threshold. Changing the `nat_instance_type` does not affect this threshold. | Contact Support                                                                                                                                                                                               |
+| NAT Network Saturation                | Yes      | The NAT instance's `NetworkIn` traffic has exceeded 90% of the baseline network bandwidth of the `nat_instance_type` for 90 minutes. Note that this is the sustained baseline bandwidth, not the higher burst bandwidth AWS advertises as "up to". |  If the traffic is expected to stay at this level, upgrade `nat_instance_type` to an instance with a higher baseline network bandwidth, for example the next larger size in the same family. See [Amazon EC2 instance network bandwidth](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-network-bandwidth.html) for the baseline bandwidth of each instance type. |
 
 ### Reprovisioning a new EMR cluster
 

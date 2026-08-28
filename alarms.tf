@@ -546,9 +546,24 @@ resource "aws_cloudwatch_metric_alarm" "job_gc" {
   }
 }
 
+locals {
+  nat_alarm_period_seconds = 900
+
+  nat_baseline_bandwidth_gbps = one([
+    for card in tolist(data.aws_ec2_instance_type.nat_instance_type.network_cards) :
+    card if card.index == data.aws_ec2_instance_type.nat_instance_type.default_network_card_index
+  ]).baseline_bandwidth
+
+  // Using the nat_instance_type baseline_bandwidth (which is in Gbps), we calculate the 90% threshold for the number of bytes in 15 minutes 
+  // that the NAT `NetworkIn` has to exceed for us to have exceeded the baseline_bandwidth.
+  // Gbps * 1000 * 1000 * 100 = bps -> bps / 8 = Bps -> Bps * period_seconds = Bytes -> Bytes * 0.9 = 90% Byte threshold
+  nat_network_saturation_threshold = ceil(0.9 * local.nat_baseline_bandwidth_gbps * 1000 * 1000 * 1000 / 8 * local.nat_alarm_period_seconds)
+}
+
 resource "aws_cloudwatch_metric_alarm" "nat_network" {
   count               = local.created_vpc_count
   alarm_name          = "Etleap - ${var.deployment_id} - NAT Network Saturation"
+  alarm_description   = "The NAT instance's `NetworkIn` traffic has exceeded 90% of the ${local.nat_baseline_bandwidth_gbps} Gbps baseline network bandwidth of its instance type, ${var.nat_instance_type}, for 90 minutes."
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "6"
   metric_name         = "NetworkIn"
@@ -556,9 +571,9 @@ resource "aws_cloudwatch_metric_alarm" "nat_network" {
   dimensions = {
     InstanceId = aws_instance.nat[count.index].id
   }
-  period                    = "900"
+  period                    = local.nat_alarm_period_seconds
   statistic                 = "Sum"
-  threshold                 = "78750000000" # 78.75*1000*1000*1000
+  threshold                 = local.nat_network_saturation_threshold
   alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
   ok_actions                = var.critical_cloudwatch_alarm_sns_topics
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
