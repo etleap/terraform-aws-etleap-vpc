@@ -1,4 +1,4 @@
-# Release 1.19.0
+# Release 1.18.4
 
 The threshold of the `NAT Network Saturation` alarm is now calculated from the `nat_instance_type` instead of being a fixed value. It is set to 90% of the inbound traffic the instance type can sustain over the alarm's 15-minute period at its baseline network bandwidth. This was already the way the threshold was calculated for the default NAT instance type, so the alarm threshold is only updated if the variable `nat_instance_type` is set.
 
