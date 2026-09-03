@@ -25,9 +25,6 @@ variable "post_install_script_command" {
 variable "ami" {
 }
 
-variable "key_name" {
-}
-
 variable "ssl_pem" {
 }
 
@@ -55,7 +52,6 @@ resource "aws_instance" "app" {
   volume_tags          = merge({Name = "Etleap App", }, var.tags)
   instance_type        = var.instance_type
   ami                  = var.ami
-  key_name             = var.key_name
   iam_instance_profile = var.instance_profile
 
   network_interface {

@@ -1,3 +1,21 @@
+# Release 1.19.0
+
+Moves access to the deployment's EC2 instances from SSH to AWS Systems Manager (SSM), which is more secure as it removes the need for an open SSH port and shared SSH key pairs, and instead controls access through IAM. The `Etleap App`, `Etleap NAT`, Zookeeper, and EMR instances are now reachable through SSM by the account owner.
+
+Replaces SSH access to the deployment's EC2 instances with AWS Systems Manager (SSM). The `Etleap App`, `Etleap NAT`, `Etleap Zookeeper` and `Etleap EMR` instances are now registered with SSM, and can be reached by any IAM principal in your account that has the required permissions. See [Connecting to the deployment's EC2 instances](./README.md#connectig-to-the-deployments-ec2-instances) in the README for the permissions and the commands to use.
+
+Instances are registered with SSM regardless of whether `allow_iam_support_role` or automated OS patching are enabled. Previously registration depended on one of those being on. Registration by itself grants no access, and this change does not grant Etleap any additional access to the deployment.
+
+SSM is more secure than SSH: there is no inbound SSH from outside the deployment, no customer-managed SSH key pair, and access is controlled through IAM. The `key_name` and `ssh_access_cidr_blocks` variables have been removed.
+
+## Upgrade instructions
+
+This is a breaking change. Remove the `key_name` and `ssh_access_cidr_blocks` arguments from your module configuration before applying. If the AWS key pair was only used for Etleap, you can delete that resource as well.
+
+Before applying, grant the IAM role you will use for SSM the [required permissions](./README.md#required-iam-permissions), so that you keep access to the instances.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The `Etleap App`, `Etleap NAT` and `Etleap Zookeeper` instances are not replaced, and inbound SSH to them is closed as soon as the apply completes.
+
 # Release 1.18.4
 
 The threshold of the `NAT Network Saturation` alarm is now calculated from the `nat_instance_type` instead of being a fixed value. It is set to 90% of the inbound traffic the instance type can sustain over the alarm's 15-minute period at its baseline network bandwidth. This was already the way the threshold was calculated for the default NAT instance type, so the alarm threshold is only updated if the variable `nat_instance_type` is set.

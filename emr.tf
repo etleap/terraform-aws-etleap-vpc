@@ -261,7 +261,6 @@ resource "aws_emr_cluster" "emr" {
   security_configuration            = aws_emr_security_configuration.emrfs_sse_kms.name
 
   ec2_attributes {
-    key_name                          = var.key_name
     subnet_id                         = local.subnet_b_private_id
     emr_managed_master_security_group = aws_security_group.emr-master-managed.id
     emr_managed_slave_security_group  = aws_security_group.emr-slave-managed.id

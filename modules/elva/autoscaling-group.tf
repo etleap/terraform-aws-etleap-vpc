@@ -42,7 +42,6 @@ resource "aws_launch_configuration" "elva" {
   image_id             = var.ami
   instance_type        = "t3.medium"
   iam_instance_profile = aws_iam_instance_profile.elva.name
-  key_name             = var.key_name
   security_groups      = [aws_security_group.elva-node.id]
   enable_monitoring    = true
   user_data = <<EOF

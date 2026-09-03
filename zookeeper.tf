@@ -26,7 +26,6 @@ resource "aws_instance" "zookeeper" {
 
   instance_type = "t3.small"
   ami           = local.app_ami
-  key_name      = var.key_name
   iam_instance_profile = aws_iam_instance_profile.zookeeper.name
 
   user_data_replace_on_change = true
@@ -93,20 +92,6 @@ resource "aws_security_group" "zookeeper" {
   lifecycle {
     ignore_changes = [name, description, tags, tags_all]
   }
-}
-
-resource "aws_security_group_rule" "zookeeper-ingress-22" {
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  security_group_id = aws_security_group.zookeeper.id
-  cidr_blocks       = var.ssh_access_cidr_blocks
-}
-
-moved {
-  from = aws_security_group_rule.zookeeper-allow-ssh
-  to   = aws_security_group_rule.zookeeper-ingress-22
 }
 
 # Connections to client port 2181 should be allowed from every running application that needs access to ZK cluster (app, monitor, job, emr, etc.)

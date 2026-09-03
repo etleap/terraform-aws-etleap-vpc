@@ -14,7 +14,6 @@ module "main_app" {
   network_interface = aws_network_interface.main_app.id
 
   ami                  = local.app_ami
-  key_name             = var.key_name
   ssl_pem              = local.ssl_pem
   ssl_key              = local.ssl_key
   region               = local.region
@@ -55,7 +54,6 @@ module "secondary_app" {
   network_interface = aws_network_interface.secondary_app[0].id
 
   ami                  = local.app_ami
-  key_name             = var.key_name
   ssl_pem              = local.ssl_pem
   ssl_key              = local.ssl_key
   region               = local.region
@@ -155,20 +153,6 @@ resource "aws_security_group_rule" "app-egress-emr" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.app.id
   source_security_group_id = aws_security_group.emr.id
-}
-
-resource "aws_security_group_rule" "app-ingress-22" {
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  security_group_id = aws_security_group.app.id
-  cidr_blocks       = var.ssh_access_cidr_blocks
-}
-
-moved {
-  from = aws_security_group_rule.app-allow-ssh
-  to   = aws_security_group_rule.app-ingress-22
 }
 
 resource "aws_security_group_rule" "app-ingress-443" {

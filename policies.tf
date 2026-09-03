@@ -22,29 +22,30 @@ resource "aws_iam_policy_attachment" "assume_data_roles" {
   policy_arn = aws_iam_policy.assume_data_roles.arn
 }
 
-locals {
-  # Instances are registered with AWS Systems Manager when they are patched or
-  # when the Etleap support role can open SSM sessions to them.
-  instances_ssm_managed = local.patch_manager_count > 0 || var.allow_iam_support_role
-}
-
-# These attachments let the instances register with AWS Systems Manager in the
-# customer's account, which is required for automated OS patching and for
-# support sessions. Registration by itself grants no access to the instances.
+# Registering an instance with Systems Manager does not by itself grant anyone
+# access to it. Access requires IAM permissions on the caller's side.
 resource "aws_iam_role_policy_attachment" "app-ssm" {
-  count      = local.instances_ssm_managed ? 1 : 0
   role       = aws_iam_role.app.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+moved {
+  from = aws_iam_role_policy_attachment.app-ssm[0]
+  to   = aws_iam_role_policy_attachment.app-ssm
+}
+
 resource "aws_iam_role_policy_attachment" "zookeeper-ssm" {
-  count      = local.instances_ssm_managed ? 1 : 0
   role       = aws_iam_role.zookeeper.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+moved {
+  from = aws_iam_role_policy_attachment.zookeeper-ssm[0]
+  to   = aws_iam_role_policy_attachment.zookeeper-ssm
+}
+
 resource "aws_iam_role_policy_attachment" "nat-ssm" {
-  count      = local.created_vpc_count > 0 && local.instances_ssm_managed ? 1 : 0
+  count      = local.created_vpc_count > 0 ? 1 : 0
   role       = aws_iam_role.nat[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
@@ -60,9 +61,13 @@ resource "aws_iam_role_policy_attachment" "zookepeer_assume_etleap_roles" {
 }
 
 resource "aws_iam_role_policy_attachment" "emr-ssm" {
-  count      = var.allow_iam_support_role ? 1 : 0
   role       = aws_iam_role.emr.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+moved {
+  from = aws_iam_role_policy_attachment.emr-ssm[0]
+  to   = aws_iam_role_policy_attachment.emr-ssm
 }
 
 resource "aws_iam_role_policy_attachment" "emr_profile_policy" {

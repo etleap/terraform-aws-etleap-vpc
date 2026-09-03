@@ -10,9 +10,6 @@ variable app_role_name {
 variable vpc_id {
 }
 
-variable key_name {   
-}
-
 variable subnet_a_public_id {
 }
 

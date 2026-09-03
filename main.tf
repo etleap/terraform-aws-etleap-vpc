@@ -17,7 +17,6 @@ module "elva" {
   app_role_name                            = aws_iam_role.app.name
   ami                                      = local.app_ami
   vpc_id                                   = local.vpc_id
-  key_name                                 = var.key_name
   subnet_a_public_id                       = local.subnet_a_public_id
   subnet_a_private_id                      = local.subnet_a_private_id
   subnet_b_public_id                       = local.subnet_b_public_id

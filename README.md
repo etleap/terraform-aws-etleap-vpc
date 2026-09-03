@@ -12,13 +12,12 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.18.4"
+  version = "1.19.0"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
   vpc_cidr_block_2 = 22
   vpc_cidr_block_3 = 3
-  key_name         = aws_key_pair.ssh.key_name
   first_name       = "John"
   last_name        = "Smith"
   email            = "john.smith@example.com"
@@ -56,7 +55,6 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `vpc_cidr_block_1` | The first octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
 | `vpc_cidr_block_2` | The second octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
 | `vpc_cidr_block_3` | The third octet of the CIDR block of the desired VPC's address space. | `int` | n/a | no |
-| `key_name` | The AWS Key Pair to use for SSH access into the EC2 instances. | `string` | n/a | yes |
 | `first_name` | The first name to use when creating the first Etleap user account. | `string` | n/a | yes |
 | `last_name` | The last name to use when creating the first Etleap user account. | `string` | n/a | yes |
 | `email` | The email to use when creating the first Etleap user account. | `string` | n/a | yes |
@@ -86,7 +84,6 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `connection_secrets` | A map between environment variables and Secrets Manager Secret ARN for secrets to be injected into the application. This is only used for enabling certain integration. | `map(string, string)` | `{}` | no |
 | `resource_tags` | Resource tags to be applied to all resources create by this template. | `map(string, string)` | `{}` | no |
 | `app_access_cidr_blocks` | CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
-| `ssh_access_cidr_blocks` | CIDR ranges that have SSH access to the application instance(s) (port 22).  Defaults to allowing all IP addresses. | `list(string)` | `["0.0.0.0"]` | no |
 | `outbound_access_destinations` | CIDR ranges, ports and protocols to allow outbound access to for pipeline sources and destinations. Defaults to allowing all outbound traffic. Note that regardless of this value, outbound traffic to ports 80 and 443 is always allowed. | `list(map(string, any))` | all outbound traffic | no |
 | `roles_allowed_to_be_assumed` |A list of external roles that can be assumed by the app. When not specified, it defaults to all roles (*) | `list(string)` | `[]` | no |
 | `enable_public_access` |Enable public access to the Etleap deployment. This will create an _Internet facing_ ALB. Defaults to `true`. | `boolean` | `true` | no |
@@ -140,6 +137,95 @@ Go to the URL in the `app-hostname`, and use the email provided in the template 
 A temporary password was created as part of the deployment, and it's value is the output of `terraform output setup-password`.
 
 Once logged in you'll be prompted to create a new password.
+
+# Connecting to the deployment's EC2 instances
+
+Your deployment's EC2 instances can be reached with [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html), which controls access through IAM. Session Manager can be used through the AWS CLI with the [Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) (`aws ssm`) installed. Connections over SSH are not supported.
+
+## Required IAM Permissions
+
+The operator IAM role must have the following permissions. These can be added as an inline policy.
+
+```json
+{
+    "Effect": "Allow",
+    "Action": "ssm:StartSession",
+    "Resource": "arn:aws:ec2:us-east-1:209479308486:instance/*",
+    "Condition": {
+        "StringEquals": { "ssm:resourceTag/Deployment": "<DEPLOYMENT_ID>" },
+        "StringLike": { "ssm:resourceTag/Name": "Etleap*" }
+    }
+},
+{
+    "Effect": "Allow",
+    "Action": "ssm:StartSession",
+    "Resource": [
+        "arn:aws:ssm:<REGION>:<ACCOUNT_ID>:document/SSM-SessionManagerRunShell",
+        "arn:aws:ssm:<REGION>::document/AWS-StartInteractiveCommand"
+    ]
+},
+{
+    "Effect": "Allow",
+    "Action": [
+        "ssm:TerminateSession",
+        "ssm:ResumeSession"
+    ],
+    "Resource": "arn:aws:ssm:<REGION>:<ACCOUNT_ID>:session/${aws:username}-*"
+},
+{
+    "Effect": "Allow",
+    "Action": [
+        "ec2:DescribeInstances",
+        "ssm:DescribeInstanceInformation"
+    ],
+    "Resource": "*"
+}
+```
+
+Replace `<DEPLOYMENT_ID>` with the deployment ID provided by Etleap, `<REGION>` with your deployment region, and `<ACCOUNT_ID>` with your 12 digit AWS account ID.
+
+## Accessing EC2 Instances via SSM
+
+To list the deployment's instances:
+
+```
+aws ec2 describe-instances \
+  --filters "Name=tag:Deployment,Values=<DEPLOYMENT_ID>" \
+            "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].[InstanceId,Tags[?Key==`Name`].Value|[0]]' \
+  --output table
+```
+
+Replace `<DEPLOYMENT_ID>` with your deployment id. This lists the running `Etleap App`, `Etleap Zookeeper`, `Etleap NAT` and `Etleap EMR` instances.
+
+`Etleap Elva` nodes for streaming ingestion are not listed and are not reachable through SSM.
+
+To open a shell on EMR nodes, which uses the `hadoop` user:
+
+```
+aws ssm start-session --target <EMR_INSTANCE_ID> --document-name AWS-StartInteractiveCommand --parameters '{"command": ["sudo -iu hadoop"]}'
+```
+
+To open a shell on any other node:
+
+```
+aws ssm start-session --target <INSTANCE_ID> --document-name AWS-StartInteractiveCommand --parameters '{"command": ["if id -u ec2-user >/dev/null 2>&1; then sudo -iu ec2-user; else sudo -iu ubuntu; fi"]}'
+```
+
+## Ensuring that instances can reach Systems Manager
+
+The SSM agent on each instance must be able to reach AWS Systems Manager service endpoints over outbound HTTPS (port 443). Outbound traffic over HTTPS is enabled by default when the `Etleap NAT` is used. If you are using your own NAT, ensure egress firewall rules are set to allow outbound traffic on port 443 to the `ssm`, `ssmmessages`, and `ec2messages` endpoints.
+
+To check which instances are registered with SSM, run:
+
+```
+aws ssm describe-instance-information \
+  --filters "Key=tag:Deployment,Values=<DEPLOYMENT_ID>" \
+  --query 'InstanceInformationList[].[InstanceId,PingStatus,PlatformName]' \
+  --output table
+```
+
+Every running instance in the deployment should have a `PingStatus` of `Online`. This may take a few minutes to update, as instances register a few minutes after they start. Instances which are missing from the list or show a status of `ConnectionLost` cannot reach Systems Manager. Check that their subnets have a route to the Systems Manager endpoints.
 
 # Monitoring and operation
 

@@ -6,7 +6,6 @@ resource "aws_instance" "nat" {
 
   ami                         = local.nat_ami
   instance_type               = var.nat_instance_type
-  key_name                    = var.key_name
   iam_instance_profile        = aws_iam_instance_profile.nat[0].name
   vpc_security_group_ids      = [aws_security_group.nat[0].id]
   subnet_id                   = aws_subnet.b_public[0].id

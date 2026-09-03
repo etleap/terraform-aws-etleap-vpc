@@ -37,10 +37,6 @@ variable "vpc_cidr_block_3" {
   }
 }
 
-variable "key_name" {
-  description = "The AWS Key Pair to use for SSH access into the EC2 instances."
-}
-
 variable "first_name" {
   description = "The first name to use when creating the first Etleap user account."
 }
@@ -229,11 +225,6 @@ variable "disable_cdc_support" {
 variable "app_access_cidr_blocks" {
   default     = ["0.0.0.0/0"]
   description = "CIDR ranges that have access to the application (port 443). Defaults to allowing all IP addresses."
-}
-
-variable "ssh_access_cidr_blocks" {
-  default     = ["0.0.0.0/0"]
-  description = "CIDR ranges that have SSH access to the application instance(s). Defaults to allowing all IP addresses."
 }
 
 variable "roles_allowed_to_be_assumed" {
