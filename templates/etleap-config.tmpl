@@ -36,7 +36,6 @@ export ETLEAP_DMS_INSTANCE_NAME="${var.dms_replication_instance_name}"
 %{ endif }
 
 export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"
-export MARKETPLACE_DEPLOYMENT="false"
 export ETLEAP_SECRET_APPLICATION_SECRET="$(aws secretsmanager get-secret-value --secret-id ${var.deployment_secret_arn} | jq -r .SecretString)"
 export ETLEAP_RDS_HOSTNAME="${var.db_address}"
 export ETLEAP_EMR_HOSTNAME="$(aws ssm get-parameter --name ${var.emr_cluster_config_name} --output text --query Parameter.Value)"

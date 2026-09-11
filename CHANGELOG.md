@@ -1,3 +1,7 @@
+# Release 1.19.1
+
+Removes the `MARKETPLACE_DEPLOYMENT` environment variable from the app, Zookeeper and EMR configuration. The variable was always set to `false`, and the Etleap code that read it has been removed along with the AWS Marketplace deployment flow it belonged to. Log and metric reporting continues to default to on when Zookeeper has no setting for it, which is what `false` already produced. There is no change in behaviour and nothing to do on upgrade.
+
 # Release 1.19.0
 
 Moves access to the deployment's EC2 instances from SSH to AWS Systems Manager (SSM), which is more secure as it removes the need for an open SSH port and shared SSH key pairs, and instead controls access through IAM. The `Etleap App`, `Etleap NAT`, Zookeeper, and EMR instances are now reachable through SSM by the account owner.
