@@ -1,3 +1,14 @@
+# Release 1.19.1
+
+Removes the unused `MARKETPLACE_DEPLOYMENT` environment variable from the app and Zookeeper configuration, and the argument that passed it to the EMR Kinesis Agent bootstrap action. There is no change in behavior.
+
+## Upgrade instructions
+
+This upgrade will replace the App and Zookeeper instances, causing 10-15 minutes of downtime.
+If you would like to upgrade without downtime, please follow the instructions for [upgrading the App](./README.md#upgrading-the-application-instances) and [Zookeeper](./README.md#upgrading-the-zookeeper-cluster) instances.
+
+It also requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. This can be done separately by following the instructions for [upgrading the EMR Cluster](./README.md#upgrading-the-emr-cluster).
+
 # Release 1.19.0
 
 Moves access to the deployment's EC2 instances from SSH to AWS Systems Manager (SSM), which is more secure as it removes the need for an open SSH port and shared SSH key pairs, and instead controls access through IAM. The `Etleap App`, `Etleap NAT`, Zookeeper, and EMR instances are now reachable through SSM by the account owner.

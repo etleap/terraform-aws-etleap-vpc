@@ -45,11 +45,8 @@ function should_enable_logging_agent {
   elif [ "$SEND_LOGS" == "false" ]; then
     # Log and Metric reporting is disabled in Zookeeper
     return 1
-  elif [ "$MARKETPLACE_DEPLOYMENT" == "true" ]; then
-    # Log and Metric reporting hasn't been set in Zookeeper, but this is a Marketplace deployment so don't send logs by default
-    return 1
   else
-    # Log and Metric reporting hasn't been set in Zookeeper, and this is a Non-Marketplace deployment so send logs by default
+    # Log and Metric reporting hasn't been set in Zookeeper, so send logs by default
     return 0
   fi
 }
