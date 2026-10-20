@@ -1,3 +1,9 @@
+# Release 1.19.2
+
+Fixes an issue where EMR jobs could not connect to some sources with IP addresses in `172.17.0.0/16` to `172.31.0.0/16`. Docker networks on the EMR nodes each used one of these ranges, so the nodes sent traffic for that range to a local Docker network instead of the VPC. A new bootstrap action configures Docker on the EMR task nodes to use `198.18.0.0/15`, which is reserved for network benchmarking and is not used for private networks.
+
+This upgrade requires replacement of the EMR cluster, which will cause 10-15 minutes of downtime to pipelines. The API and Web UI will be unaffected.
+
 # Release 1.19.1
 
 Removes the unused `MARKETPLACE_DEPLOYMENT` environment variable from the app and Zookeeper configuration, and the argument that passed it to the EMR Kinesis Agent bootstrap action. There is no change in behavior.
