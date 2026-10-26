@@ -1,3 +1,13 @@
+# Release 1.20.0
+
+Adds the optional `permissions_boundary` variable. When you set it to the ARN of an IAM policy, the module sets that policy as the permissions boundary on every IAM role and user that it creates. Use it when your account requires a permissions boundary on IAM roles and users. The policy must allow the actions that the module's roles use.
+
+If `dms_roles_to_be_created` is `true`, the boundary is also set on `dms-vpc-role` and `dms-cloudwatch-logs-role`. These roles are used by all of DMS in the account, not only by Etleap.
+
+Also adds the deployment's tags to the InfluxDB API token secret, the patch baseline and the maintenance window. The upgrade updates these in place, with no downtime.
+
+If you do not set `permissions_boundary`, this upgrade does not change any other resources. Setting it later updates the roles and user in place, with no downtime.
+
 # Release 1.19.2
 
 Fixes an issue where EMR jobs could not connect to some sources with IP addresses in `172.17.0.0/16` to `172.31.0.0/16`. Docker networks on the EMR nodes each used one of these ranges, so the nodes sent traffic for that range to a local Docker network instead of the VPC. A new bootstrap action configures Docker on the EMR task nodes to use `198.18.0.0/15`, which is reserved for network benchmarking and is not used for private networks.

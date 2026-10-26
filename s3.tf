@@ -65,6 +65,7 @@ resource "aws_iam_role" "intermediate" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_iam_policy" "intermediate" {
@@ -122,6 +123,7 @@ resource "aws_iam_role" "s3_input_role" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 }
 
 resource aws_iam_policy "s3_input_policy" {

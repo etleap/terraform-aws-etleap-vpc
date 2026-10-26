@@ -75,10 +75,11 @@ data "aws_iam_policy_document" "dms_assume_role" {
 }
 
 resource "aws_iam_role" "dms-vpc-role" {
-    count              = var.dms_roles_to_be_created && !var.disable_cdc_support ? 1 : 0
-    tags               = local.default_tags
-    name               = "dms-vpc-role"
-    assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+    count                = var.dms_roles_to_be_created && !var.disable_cdc_support ? 1 : 0
+    tags                 = local.default_tags
+    name                 = "dms-vpc-role"
+    assume_role_policy   = data.aws_iam_policy_document.dms_assume_role.json
+    permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
@@ -88,10 +89,11 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
 }
 
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {
-    count              = var.dms_roles_to_be_created && !var.disable_cdc_support ? 1 : 0
-    tags               = local.default_tags
-    name               = "dms-cloudwatch-logs-role"
-    assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+    count                = var.dms_roles_to_be_created && !var.disable_cdc_support ? 1 : 0
+    tags                 = local.default_tags
+    name                 = "dms-cloudwatch-logs-role"
+    assume_role_policy   = data.aws_iam_policy_document.dms_assume_role.json
+    permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
@@ -101,10 +103,11 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
 }
 
 resource "aws_iam_role" "dms" {
-  count              = var.disable_cdc_support ? 0 : 1
-  tags               = local.default_tags
-  name               = "Etleap-dms-role${local.resource_name_suffix}"
-  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+  count                = var.disable_cdc_support ? 0 : 1
+  tags                 = local.default_tags
+  name                 = "Etleap-dms-role${local.resource_name_suffix}"
+  assume_role_policy   = data.aws_iam_policy_document.dms_assume_role.json
+  permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_iam_policy" "dms_s3" {

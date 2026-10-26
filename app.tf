@@ -281,6 +281,7 @@ resource "aws_iam_role" "app" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_lb" "app" {

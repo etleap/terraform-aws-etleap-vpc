@@ -14,6 +14,7 @@ module "elva" {
 
   deployment_random                        = local.deployment_random
   resource_name_suffix                     = local.resource_name_suffix
+  permissions_boundary                     = var.permissions_boundary
   app_role_name                            = aws_iam_role.app.name
   ami                                      = local.app_ami
   vpc_id                                   = local.vpc_id

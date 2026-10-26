@@ -24,6 +24,7 @@ resource "aws_iam_role" "support" {
     ]
 }
 EOF
+    permissions_boundary = var.permissions_boundary
 
 }
 

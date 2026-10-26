@@ -54,3 +54,8 @@ variable "tags" {
   type = map(string)
   default = {}
 }
+
+variable "permissions_boundary" {
+  default     = null
+  description = "ARN of an IAM permissions boundary to set on the user this module creates."
+}

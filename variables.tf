@@ -134,6 +134,17 @@ variable "dms_roles_to_be_created" {
   description = "Set to `true` if this template should create the roles required by DMS, `dms-vpc-role` and `dms-cloudwatch-logs-role`. Set to `false` if are already using DMS in the account where you deploy Etleap."
 }
 
+variable "permissions_boundary" {
+  type        = string
+  default     = null
+  description = "ARN of an IAM permissions boundary to set on every role and user this module creates. Set it when your account requires a permissions boundary on IAM roles and users."
+
+  validation {
+    condition     = var.permissions_boundary == null ? true : can(regex("^arn:aws[a-z-]*:iam::[0-9]{12}:policy/", var.permissions_boundary))
+    error_message = "The permissions boundary must be the ARN of an IAM policy, for example arn:aws:iam::123456789012:policy/name."
+  }
+}
+
 variable "unique_resource_names" {
   default     = true
   description = "If set to 'true', a suffix is appended to resource names to make them unique per deployment. Recommend leaving this as 'true' except in the case of migrations from earlier versions."

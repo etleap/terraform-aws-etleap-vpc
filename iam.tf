@@ -22,6 +22,7 @@ resource "aws_iam_role" "etleap-role-devops" {
     ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 }
 
 output "iam_role_devops_arn" {

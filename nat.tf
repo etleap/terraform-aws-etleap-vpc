@@ -63,6 +63,7 @@ resource "aws_iam_role" "nat" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_security_group" "nat" {

@@ -12,7 +12,7 @@ Note: This deployment requires Amazon Timestream for InfluxDB to be available in
 ```
 module "etleap" {
   source  = "etleap/etleap-vpc/aws"
-  version = "1.19.2"
+  version = "1.20.0"
 
   deployment_id    = "deployment" # This will be provided by Etleap
   vpc_cidr_block_1 = 172
@@ -103,6 +103,7 @@ Note: Either `vpc_cidr_block_1`, `vpc_cidr_block_2`, `vpc_cidr_block_3` or `vpc_
 | `emr_kms_encryption_key` | The ARN of an AWS KMS key to use to encrypt the local disk for EMR nodes. If not specified, a new KMS key will be created. | `string` | `null`               | no |
 | `post_install_script` | The path to a custom script to be executed during initial EC2 instance startup. See the [Custom Post-Installation Script](#custom-post-installation-script) section for usage details. |  `string`| `null` | no |
 | `patch_manager_maintenance_window_schedule` | Cron expression for when the automated OS patching maintenance window runs, in UTC. Set to `null` to disable automated OS patching. See the [Automated OS patching](#automated-os-patching) section. | `string` | `cron(0 10 ? * THU *)` (Thursdays at 10:00 UTC) | no |
+| `permissions_boundary` | The ARN of an IAM permissions boundary to set on every IAM role and user that this module creates. Set it when your account requires a permissions boundary on IAM roles and users. | `string` | `null` | no |
 
 ## Outputs
 

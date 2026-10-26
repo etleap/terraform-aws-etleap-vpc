@@ -1,7 +1,8 @@
 # User required for reading streaming configurations in streaming-configuration
 resource "aws_iam_user" "elva" {
-  tags = var.tags
-  name = "etleap_streaming_ingress_${var.deployment_id}"
+  tags                 = var.tags
+  name                 = "etleap_streaming_ingress_${var.deployment_id}"
+  permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_iam_access_key" "elva" {

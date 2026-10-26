@@ -8,6 +8,7 @@ locals {
 resource "aws_ssm_patch_baseline" "al2023" {
   count = local.patch_manager_count
 
+  tags             = local.default_tags
   name             = "Etleap-${var.deployment_id}-AL2023-Baseline"
   description      = "AL2023 baseline - Security (Critical/Important/Medium/Low) and Bugfix, 7-day auto-approval"
   operating_system = "AMAZON_LINUX_2023"
@@ -72,6 +73,7 @@ resource "aws_iam_role" "ssm_maintenance_window" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_maintenance_window" {
@@ -121,6 +123,7 @@ resource "aws_cloudwatch_log_group" "ssm_patching" {
 resource "aws_ssm_maintenance_window" "etleap" {
   count = local.patch_manager_count
 
+  tags              = local.default_tags
   name              = "Etleap-${var.deployment_id}-MaintenanceWindow"
   schedule          = var.patch_manager_maintenance_window_schedule
   schedule_timezone = "Etc/UTC"

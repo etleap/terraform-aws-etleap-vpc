@@ -115,6 +115,7 @@ resource "aws_iam_role" "zookeeper" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 
 lifecycle {
   ignore_changes = [name, description, tags]
@@ -139,6 +140,7 @@ resource "aws_iam_role" "emr" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 }
 
 resource "aws_iam_policy" "get_secrets_and_params" {
@@ -458,6 +460,7 @@ resource "aws_iam_role" "emr_default_role" {
   ]
 }
 EOF
+  permissions_boundary = var.permissions_boundary
 
 }
 

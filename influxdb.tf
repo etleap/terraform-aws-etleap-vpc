@@ -33,6 +33,7 @@ module "influx_db_password" {
 }
 
 resource "aws_secretsmanager_secret" "influx_db_api_token" {
+  tags = local.default_tags
   name = "EtleapInfluxDbApiToken${local.resource_name_suffix}"
 }
 
