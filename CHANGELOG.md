@@ -1,3 +1,23 @@
+# Release 1.20.1
+
+Upgrades the RDS instance MySQL version to 8.4.11 from 8.4.7, as AWS ends standard support for 8.4.7 on November 30, 2026. This is a minor version upgrade.
+
+This release contains a DB upgrade. Please follow the steps below to ensure a safe upgrade. This will require up to 1 hour of downtime.
+
+## Upgrade instructions
+1. Don't update the module version until step 2 below.
+   Add the following property to the module definition:
+   ```
+   app_available = false
+   ```
+   Run `terraform apply` to stop the app EC2 instances that access the database.
+2. Change the module version to `1.20.1` and add the following property to the module definition:
+   ```
+   rds_apply_immediately = true
+   ```
+3. Run `terraform apply` to upgrade the DB version.
+4. Once the previous step is complete, remove the `app_available` and `rds_apply_immediately` variables and run `terraform apply` to bring the application back online.
+
 # Release 1.20.0
 
 Adds the optional `permissions_boundary` variable. When you set it to the ARN of an IAM policy, the module sets that policy as the permissions boundary on every IAM role and user that it creates. Use it when your account requires a permissions boundary on IAM roles and users. The policy must allow the actions that the module's roles use.
