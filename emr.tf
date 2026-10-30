@@ -665,6 +665,16 @@ resource "aws_security_group_rule" "emr-egress-2181-zookeeper" {
   source_security_group_id = aws_security_group.zookeeper.id
 }
 
+resource "aws_security_group_rule" "emr-egress-9098-msk" {
+  count                    = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  type                     = "egress"
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.emr.id
+  source_security_group_id = aws_security_group.msk[0].id
+}
+
 # Required to access apt and other install resources
 resource "aws_security_group_rule" "emr-egress-80" {
   type              = "egress"

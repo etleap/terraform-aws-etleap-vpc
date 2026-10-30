@@ -431,6 +431,154 @@ resource "aws_cloudwatch_metric_alarm" "dms_freeable_memory" {
   insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
 }
 
+# ---------------------------------------------------------------------------
+# MSK / Kafka alarms
+# ---------------------------------------------------------------------------
+
+resource "aws_cloudwatch_metric_alarm" "msk_active_controller_count" {
+  count = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  tags  = local.default_tags
+
+  alarm_name          = "Etleap - ${var.deployment_id} - Kafka Active Controller Count != 1"
+  alarm_description   = "MSK does not have exactly one active controller (0 = failover / no controller, >1 = split brain)."
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  datapoints_to_alarm = "2"
+  threshold           = "0"
+  treat_missing_data  = "breaching"
+
+  metric_query {
+    id          = "e1"
+    expression  = "ABS(m1 - 1)"
+    label       = "Deviation from single active controller"
+    return_data = true
+  }
+
+  metric_query {
+    id = "m1"
+    metric {
+      metric_name = "ActiveControllerCount"
+      namespace   = "AWS/Kafka"
+      period      = "60"
+      stat        = "Sum"
+      dimensions = {
+        "Cluster Name" = aws_msk_cluster.etleap[0].cluster_name
+      }
+    }
+  }
+
+  alarm_actions             = var.critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.critical_cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "msk_broker_disk" {
+  count = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : aws_msk_cluster.etleap[0].number_of_broker_nodes
+  tags  = local.default_tags
+
+  alarm_name          = "Etleap - ${var.deployment_id} - Kafka broker ${count.index + 1} 85% Disk"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "KafkaDataLogsDiskUsed"
+  namespace           = "AWS/Kafka"
+  dimensions = {
+    "Cluster Name" = aws_msk_cluster.etleap[0].cluster_name
+    "Broker ID"    = tostring(count.index + 1)
+  }
+  period                    = "300"
+  statistic                 = "Average"
+  threshold                 = "85"
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "msk_broker_cpu" {
+  count = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : aws_msk_cluster.etleap[0].number_of_broker_nodes
+  tags  = local.default_tags
+
+  // AWS recommends keeping CpuUser + CpuSystem under 60%
+  alarm_name          = "Etleap - ${var.deployment_id} - Kafka broker ${count.index + 1} 60% CPU"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  threshold           = "60"
+
+  metric_query {
+    id          = "e1"
+    expression  = "m1 + m2"
+    label       = "CPU used %"
+    return_data = true
+  }
+
+  metric_query {
+    id = "m1"
+    metric {
+      metric_name = "CpuUser"
+      namespace   = "AWS/Kafka"
+      period      = "300"
+      stat        = "Average"
+      dimensions = {
+        "Cluster Name" = aws_msk_cluster.etleap[0].cluster_name
+        "Broker ID"    = tostring(count.index + 1)
+      }
+    }
+  }
+
+  metric_query {
+    id = "m2"
+    metric {
+      metric_name = "CpuSystem"
+      namespace   = "AWS/Kafka"
+      period      = "300"
+      stat        = "Average"
+      dimensions = {
+        "Cluster Name" = aws_msk_cluster.etleap[0].cluster_name
+        "Broker ID"    = tostring(count.index + 1)
+      }
+    }
+  }
+
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
+}
+
+resource "aws_cloudwatch_metric_alarm" "msk_broker_memory" {
+  count = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : aws_msk_cluster.etleap[0].number_of_broker_nodes
+  tags  = local.default_tags
+
+  alarm_name          = "Etleap - ${var.deployment_id} - Kafka broker ${count.index + 1} 80% Memory"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "3"
+  threshold           = "80"
+
+  metric_query {
+    id          = "e1"
+    // Memory size is in MiB, so we need to convert to bytes(1024*1024)
+    expression  = "100 * (m1 / ${data.aws_ec2_instance_type.msk_instance_type.memory_size * 1024 * 1024})"
+    label       = "Memory used %"
+    return_data = true
+  }
+
+  metric_query {
+    id = "m1"
+    metric {
+      metric_name = "MemoryUsed"
+      namespace   = "AWS/Kafka"
+      period      = "300"
+      stat        = "Average"
+      dimensions = {
+        "Cluster Name" = aws_msk_cluster.etleap[0].cluster_name
+        "Broker ID"    = tostring(count.index + 1)
+      }
+    }
+  }
+
+  alarm_actions             = var.non_critical_cloudwatch_alarm_sns_topics
+  ok_actions                = var.non_critical_cloudwatch_alarm_sns_topics
+  insufficient_data_actions = var.non_critical_cloudwatch_alarm_sns_topics
+}
+
 resource "aws_cloudwatch_metric_alarm" "zookeeper_unhealthy_nodes" {
   for_each = local.zookeeper_map
   tags     = local.default_tags

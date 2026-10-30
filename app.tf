@@ -207,6 +207,16 @@ resource "aws_security_group_rule" "app-egress-2181-zookeeper" {
   source_security_group_id = aws_security_group.zookeeper.id
 }
 
+resource "aws_security_group_rule" "app-egress-9098-msk" {
+  count                    = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  type                     = "egress"
+  from_port                = 9098
+  to_port                  = 9098
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app.id
+  source_security_group_id = aws_security_group.msk[0].id
+}
+
 resource "aws_security_group_rule" "app-egress-8086-influxdb" {
   count                    = var.is_influx_db_in_secondary_region ? 0 : 1
   type                     = "egress"

@@ -129,6 +129,16 @@ variable "dms_instance_type" {
   description = "The instance type for the DMS instance. Defaults to `dms.t3.small`. Not used if `disable_cdc_support` is set to `true`."
 }
 
+variable "msk_instance_type" {
+  default     = "kafka.m7g.large"
+  description = "(Internal)  The instance type for the MSK broker instances. Defaults to `kafka.m7g.large`. Not used if `disable_cdc_support` is set to `true`."
+
+  validation {
+    condition     = can(regex("^kafka\\.", var.msk_instance_type))
+    error_message = "Only standard kafka brokers are supported. The instance type must begin with `kafka.`"
+  }
+}
+
 variable "dms_roles_to_be_created" {
   default     = true
   description = "Set to `true` if this template should create the roles required by DMS, `dms-vpc-role` and `dms-cloudwatch-logs-role`. Set to `false` if are already using DMS in the account where you deploy Etleap."
@@ -226,6 +236,11 @@ variable "s3_kms_encryption_key" {
 variable "emr_kms_encryption_key" {
   default     = null
   description = "The ARN of an AWS KMS key to use to encrypt the local disk for EMR nodes. If not specified, a new KMS key will be created."
+}
+
+variable "msk_kms_encryption_key" {
+  default     = null
+  description = "(Internal) The ARN of an AWS KMS key to use to encrypt data at rest in MSK. If not specified, a new KMS key will be created. This variable does nothing if disable_cdc_support is set to true."
 }
 
 variable "disable_cdc_support" {
@@ -344,6 +359,11 @@ variable "disable_cognito_identity_pool" {
   description = "(Internal) Set to true to disable creation of the Cognito Identity Pool for Azure Entra ID federation. This will prevent Azure Blob Storage connections from working. Only change from the default value if requested by Etleap's support team."
 }
 
+variable "enable_msk_cluster" {
+  default = false
+  description = "(Internal) Whether to create MSK infrastructure in the VPC. This should not be enabled unless requested by Etleap's support team."
+}
+
 variable "outbound_access_destinations" {
   default = [{
     cidr_block = "0.0.0.0/0"
@@ -450,6 +470,11 @@ resource "null_resource" "are_cidr_ranges_valid" {
 data "aws_ec2_instance_type" "dms_instance_type" {
   // DMS instance types are prefixed with "dms.", which isn't supported by "aws_ec2_instance_type" data source
   instance_type = replace(var.dms_instance_type, "dms.", "")
+}
+
+data "aws_ec2_instance_type" "msk_instance_type" {
+  // MSK instance types are prefixed with "kafka.", which isn't supported by "aws_ec2_instance_type" data source
+  instance_type = replace(var.msk_instance_type, "kafka.", "")
 }
 
 data "aws_ec2_instance_type" "nat_instance_type" {

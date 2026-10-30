@@ -4,6 +4,13 @@ resource "aws_iam_policy_attachment" "secrets" {
   policy_arn = aws_iam_policy.get_secrets_and_params.arn
 }
 
+resource "aws_iam_policy_attachment" "app_msk_secret_read" {
+  count      = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  name       = "Etleap-${var.deployment_id}-App-MSKSecret-Read-Policy"
+  roles      = [aws_iam_role.app.name]
+  policy_arn = aws_iam_policy.app_msk_secret_read[0].arn
+}
+
 resource "aws_iam_policy_attachment" "app_various_limited" {
   name       = "Etleap App Specific Permissions"
   roles      = [aws_iam_role.app.name]
@@ -186,8 +193,30 @@ resource "aws_iam_policy" "get_secrets_and_params" {
 EOF
 }
 
+resource "aws_iam_policy" "app_msk_secret_read" {
+  tags   = local.default_tags
+  count  = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  name   = "Etleap-${var.deployment_id}-App-MSKSecret-Read-Policy"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Resource": [
+                "${aws_secretsmanager_secret.msk_scram_dms[0].arn}"
+            ]
+        }
+    ]
+}
+EOF
+}
+
 # All app instance specific permissions that are not used by other instances
-# Organized in a single policy to avoid breaching the 10 policy per role limit
+# Organized in a single policy to avoid breaching the 20 policy per role limit
 resource "aws_iam_policy" "app_various_limited" {
   tags   = local.default_tags
   name   = "Etleap-${var.deployment_id}-App-Various-Limited-Policy"
@@ -547,6 +576,65 @@ resource "aws_iam_policy_attachment" "kinesis_emr_permissions_policy" {
   name       = "EtleapEMRKinesisPermissionPolicy${local.resource_name_suffix}"
   roles      = [aws_iam_role.emr.name]
   policy_arn = aws_iam_policy.kinesis_emr_permissions_policy.arn
+}
+
+resource "aws_iam_policy" "app_emr_msk_limited" {
+  count = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  tags  = local.default_tags
+  name  = "Etleap-${var.deployment_id}-App_EMR-MSK-Limited-Policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kafka:DescribeCluster",
+        "kafka:DescribeClusterV2",
+        "kafka:GetBootstrapBrokers",
+        "kafka:ListClusters",
+        "kafka:ListClustersV2"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kafka-cluster:Connect",
+        "kafka-cluster:DescribeCluster"
+      ],
+      "Resource": "${aws_msk_cluster.etleap[0].arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kafka-cluster:DescribeTopic",
+        "kafka-cluster:DescribeTopicDynamicConfiguration",
+        "kafka-cluster:ReadData",
+        "kafka-cluster:WriteData",
+        "kafka-cluster:CreateTopic",
+        "kafka-cluster:DeleteTopic"
+      ],
+      "Resource": "arn:aws:kafka:${local.region}:${data.aws_caller_identity.current.account_id}:topic/${aws_msk_cluster.etleap[0].cluster_name}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kafka-cluster:AlterGroup",
+        "kafka-cluster:DescribeGroup"
+      ],
+      "Resource": "arn:aws:kafka:${local.region}:${data.aws_caller_identity.current.account_id}:group/${aws_msk_cluster.etleap[0].cluster_name}/*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "app_emr_msk_limited" {
+  count      = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  name       = "Etleap-${var.deployment_id}-App_EMR-MSK-Limited-Policy"
+  roles      = [aws_iam_role.emr.name, aws_iam_role.app.name]
+  policy_arn = aws_iam_policy.app_emr_msk_limited[0].arn
 }
 
 # Provides access to the EBS EMR KMS key to encrypt and decrypt the local disk

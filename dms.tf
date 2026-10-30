@@ -207,3 +207,13 @@ resource "aws_iam_role_policy_attachment" "app_dms" {
   role       = aws_iam_role.app.name
   policy_arn = aws_iam_policy.job_manage_dms[0].arn
 }
+
+resource "aws_security_group_rule" "dms-egress-9096-msk" {
+  count                    = var.disable_cdc_support || !var.enable_msk_cluster ? 0 : 1
+  type                     = "egress"
+  from_port                = 9096
+  to_port                  = 9096
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.dms[0].id
+  source_security_group_id = aws_security_group.msk[0].id
+}

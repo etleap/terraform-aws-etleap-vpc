@@ -33,6 +33,11 @@ export ETLEAP_VPC_SUBNET_C_CIDR="$(aws ec2 describe-subnets --subnet-ids ${var.v
 export ETLEAP_DMS_ROLE_ARN="${var.dms_role}"
 export ETLEAP_DMS_INSTANCE_ARN="${var.dms_replication_instance_arn}"
 export ETLEAP_DMS_INSTANCE_NAME="${var.dms_replication_instance_name}"
+%{ if var.enable_msk ~}
+export ETLEAP_MSK_BOOTSTRAP_BROKERS_IAM="${var.msk_bootstrap_brokers_iam}"
+export ETLEAP_MSK_BOOTSTRAP_BROKERS_SCRAM="${var.msk_bootstrap_brokers_scram}"
+export ETLEAP_SECRET_KAFKA_DMS_SASL_PASSWORD="$(aws secretsmanager get-secret-value --secret-id ${var.msk_dms_auth_arn} | jq -r .SecretString | jq -r .password)"
+%{~ endif ~}
 %{ endif }
 
 export ETLEAP_AWS_ACCOUNT_ID="${var.account_id}"

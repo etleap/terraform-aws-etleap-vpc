@@ -118,6 +118,10 @@ locals {
     influx_db_api_token_arn                  = aws_secretsmanager_secret.influx_db_api_token.arn
     iceberg_system_tables_db_name            = aws_glue_catalog_database.iceberg_system_tables_db.name
     cognito_azure_identity_pool              = var.disable_cognito_identity_pool ? null : aws_cognito_identity_pool.etleap_azure_identity_pool[0].id
+    enable_msk                               = var.enable_msk_cluster
+    msk_bootstrap_brokers_iam                = var.disable_cdc_support || !var.enable_msk_cluster ? null : aws_msk_cluster.etleap[0].bootstrap_brokers_sasl_iam
+    msk_bootstrap_brokers_scram              = var.disable_cdc_support || !var.enable_msk_cluster ? null : aws_msk_cluster.etleap[0].bootstrap_brokers_sasl_scram
+    msk_dms_auth_arn                         = var.disable_cdc_support || !var.enable_msk_cluster ? null : aws_secretsmanager_secret.msk_scram_dms[0].arn
   }
 }
 

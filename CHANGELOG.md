@@ -1,3 +1,14 @@
+# Release 1.21.0
+
+> **Note:** All changes in this release are behind an internal feature flag.
+> Upgrading to this version introduces no changes to your Etleap deployment.
+> A later release will make the changes described below generally available. 
+
+Adds an AWS-managed Kafka cluster (AWS MSK) to the Etleap deployment, behind an internal feature flag. AWS MSK will be used, instead of AWS Kinesis, to handle in-transit data for CDC pipelines that write to Iceberg.
+
+MSK supports greater throughput than Kinesis, and therefore provides greater scalability and lower end-to-end latencies for Iceberg pipelines that read from database sources.
+The use of Kinesis in CDC pipelines is now deprecated and will be removed in a later release.
+
 # Release 1.20.1
 
 Upgrades the RDS instance MySQL version to 8.4.11 from 8.4.7, as AWS ends standard support for 8.4.7 on November 30, 2026. This is a minor version upgrade.
